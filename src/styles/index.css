@@ -1,0 +1,32 @@
+/**
+ * Punto de entrada del sistema de estilos de Rumbo Lab.
+ *
+ * Orden obligatorio:
+ *   1. tokens   — primitivas independientes del tema (tipografía, espacio, radio, motion)
+ *   2. themes   — valores de color por tema (claro por defecto, oscuro heredado)
+ *   3. globals  — reset y estilos base de documento
+ *   4. animations
+ *
+ * Los estilos de cada componente viven junto al componente, en su propio
+ * CSS Module. Esta hoja no debe crecer con reglas de componentes.
+ */
+
+/* 1. Tokens */
+@import './tokens/typography.css';
+@import './tokens/spacing.css';
+@import './tokens/radius.css';
+@import './tokens/motion.css';
+
+/* 2. Temas */
+@import './themes/light.css';
+@import './themes/dark.css';
+
+/* 3. Globales */
+@import './globals/reset.css';
+@import './globals/base.css';
+@import './globals/layout.css';
+@import './globals/accessibility.css';
+
+/* 4. Animaciones */
+@import './animations/keyframes.css';
+@import './animations/reveal.css';

@@ -1,0 +1,58 @@
+/**
+ * Primitivas de layout compartidas por las secciones de la landing.
+ *
+ * Landing · sección 4: ancho base 1440 px, grid de 12 columnas, secciones amplias,
+ * márgenes consistentes. Estas clases garantizan que todas las secciones compartan
+ * exactamente el mismo ritmo horizontal y vertical.
+ */
+
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-gutter);
+}
+
+.container-wide {
+  width: 100%;
+  max-width: var(--container-wide);
+  margin-inline: auto;
+  padding-inline: var(--container-gutter);
+}
+
+/* Grid de 12 columnas para composiciones asimétricas. */
+.grid-12 {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  gap: var(--grid-gap);
+}
+
+.section {
+  position: relative;
+  padding-block: var(--section-padding-y);
+}
+
+.section-lg {
+  padding-block: var(--section-padding-y-lg);
+}
+
+/* Banda alterna para separar secciones sin recurrir a color saturado. */
+.section-alt {
+  background-color: var(--bg-alt);
+}
+
+@media (max-width: 900px) {
+  :root {
+    --container-gutter: var(--space-5);
+  }
+
+  .grid-12 {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .grid-12 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -1,0 +1,84 @@
+/**
+ * Estilos base de documento y elementos.
+ *
+ * Todo consume tokens. Cambiar de tema no requiere tocar esta hoja.
+ */
+
+html {
+  /* El scroll suave lo controla el usuario vía prefers-reduced-motion. */
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--navbar-height) + var(--space-6));
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-relaxed);
+  letter-spacing: var(--tracking-normal);
+  /* El cambio de tema no debe sentirse como un corte brusco. */
+  transition:
+    background-color var(--duration-normal) var(--ease-standard),
+    color var(--duration-normal) var(--ease-standard);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-tight);
+  color: var(--text);
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--text-5xl);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tighter);
+}
+
+h2 {
+  font-size: var(--text-4xl);
+  letter-spacing: var(--tracking-tighter);
+}
+
+h3 {
+  font-size: var(--text-xl);
+}
+
+h4 {
+  font-size: var(--text-lg);
+}
+
+p {
+  text-wrap: pretty;
+}
+
+strong {
+  font-weight: var(--weight-semibold);
+  color: var(--text);
+}
+
+::selection {
+  background-color: var(--halo-brand);
+  color: var(--text);
+}
+
+::placeholder {
+  color: var(--text-faint);
+}
+
+/* Focus visible en 2px sobre --brand. Nunca se remueve por estética. */
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}

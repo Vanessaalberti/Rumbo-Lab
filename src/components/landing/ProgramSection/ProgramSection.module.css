@@ -1,0 +1,84 @@
+.inner {
+  align-items: center;
+}
+
+.composition {
+  grid-column: span 7;
+  position: relative;
+}
+
+.window {
+  position: relative;
+  z-index: 1;
+}
+
+.floatingCard {
+  position: absolute;
+  right: calc(var(--space-10) * -1);
+  bottom: calc(var(--space-8) * -1);
+  z-index: 2;
+}
+
+.copy {
+  grid-column: 9 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.item {
+  display: flex;
+  gap: var(--space-3);
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  color: var(--text-soft);
+}
+
+.itemIcon {
+  color: var(--teal);
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.note {
+  padding: var(--space-5);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--text-soft);
+}
+
+.noteStrong {
+  color: var(--text);
+  font-weight: var(--weight-semibold);
+}
+
+@media (max-width: 1080px) {
+  .copy {
+    grid-column: 1 / -1;
+    order: -1;
+  }
+
+  .composition {
+    grid-column: 1 / -1;
+    margin-top: var(--space-10);
+  }
+
+  .floatingCard {
+    right: var(--space-2);
+  }
+}
+
+@media (max-width: 700px) {
+  .floatingCard {
+    display: none;
+  }
+}

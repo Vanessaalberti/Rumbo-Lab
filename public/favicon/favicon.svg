@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Rumbo Lab">
+  <rect width="32" height="32" rx="8" fill="#172033" />
+  <path
+    d="M8 22.5 L13.5 17 L18 20 L24.5 11.5"
+    fill="none"
+    stroke="#14B8A6"
+    stroke-width="2.4"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <circle cx="24.5" cy="11.5" r="3" fill="#2563EB" stroke="#172033" stroke-width="2" />
+</svg>

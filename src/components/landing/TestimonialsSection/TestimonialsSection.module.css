@@ -1,0 +1,61 @@
+.heading {
+  margin-bottom: var(--space-16);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.testimonial {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  height: 100%;
+}
+
+/* La segunda tarjeta se eleva: rompe la simetría sin introducir ruido. */
+.raised {
+  margin-top: calc(var(--space-8) * -1);
+}
+
+.quote {
+  font-size: var(--text-lg);
+  line-height: var(--leading-relaxed);
+  color: var(--text);
+  letter-spacing: var(--tracking-tight);
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-top: var(--space-5);
+  margin-top: auto;
+  border-top: 1px solid var(--border-soft);
+}
+
+.authorName {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--text);
+  line-height: 1.35;
+}
+
+.authorRole {
+  font-size: var(--text-sm);
+  color: var(--text-soft);
+  line-height: 1.35;
+}
+
+@media (max-width: 1000px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .raised {
+    margin-top: 0;
+  }
+}

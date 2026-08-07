@@ -1,0 +1,30 @@
+/**
+ * Aparición de contenido al entrar en viewport.
+ *
+ * Landing · sección 9: desplazamientos sutiles y animaciones discretas al hacer
+ * scroll. El estado inicial solo se aplica cuando la aparición está habilitada
+ * (data-reveal="pending"), para que el contenido siga siendo visible si el
+ * observador nunca llega a ejecutarse.
+ */
+
+[data-reveal='pending'] {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+[data-reveal='visible'] {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity var(--duration-reveal) var(--ease-out),
+    transform var(--duration-reveal) var(--ease-out);
+  /* Escalonado opcional para hijos de una misma composición. */
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal='pending'] {
+    opacity: 1;
+    transform: none;
+  }
+}

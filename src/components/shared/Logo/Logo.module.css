@@ -1,0 +1,42 @@
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.mark {
+  flex-shrink: 0;
+}
+
+.markBackground {
+  fill: var(--text);
+}
+
+.markPath {
+  fill: none;
+  stroke: var(--teal);
+}
+
+.markNode {
+  fill: var(--brand);
+  stroke: var(--text);
+  stroke-width: 2;
+}
+
+.wordmark {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-tight);
+  color: var(--text);
+  line-height: 1;
+}
+
+.sm .wordmark {
+  font-size: var(--text-md);
+}
+
+.wordmarkAccent {
+  color: var(--text-soft);
+  font-weight: var(--weight-medium);
+  margin-left: 0.22em;
+}

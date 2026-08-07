@@ -1,0 +1,113 @@
+/**
+ * Chasis de ventana de producto.
+ *
+ * Mockups Oficiales · sección 3: los mockups deben sentirse como fotografías de
+ * producto — perspectiva, profundidad, sombras suaves, bordes definidos — nunca
+ * como capturas de pantalla recortadas.
+ */
+
+.window {
+  position: relative;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+  /* Las ventanas nunca se comprimen por debajo de su composición interna. */
+  isolation: isolate;
+}
+
+/* Barra de título: identifica la vista del producto que se está mostrando. */
+.titlebar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
+}
+
+.dots {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background-color: var(--border);
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-inline: auto;
+  padding: 3px var(--space-4);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  font-size: var(--text-2xs);
+  color: var(--text-soft);
+  letter-spacing: var(--tracking-normal);
+  max-width: 62%;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+/* `text-overflow` no actúa sobre un contenedor flex: el recorte tiene que
+   ocurrir en el tramo de texto, que es el que puede crecer. */
+.breadcrumbAccent {
+  color: var(--text);
+  font-weight: var(--weight-medium);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.body {
+  position: relative;
+}
+
+/**
+ * Las vistas del producto tienen un ancho mínimo por debajo del cual su
+ * composición deja de tener sentido (Mockups Oficiales · sección 2: jerarquía
+ * consistente, nunca elementos truncados a la mitad).
+ *
+ * En pantallas angostas la ventana se desplaza horizontalmente en lugar de
+ * recortar su contenido: se ve una pantalla real, no una rota.
+ */
+@media (max-width: 900px) {
+  .body {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .body > * {
+    min-width: 660px;
+  }
+}
+
+/* --- Profundidad ------------------------------------------------------- */
+
+/* Ventana secundaria: acompaña, nunca compite con la principal. */
+.secondary {
+  box-shadow: var(--shadow-lg);
+}
+
+.tertiary {
+  box-shadow: var(--shadow-md);
+}
+
+/* Atenuación de las ventanas que quedan detrás en la composición. */
+.recessed::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: var(--bg);
+  opacity: 0.28;
+  pointer-events: none;
+}

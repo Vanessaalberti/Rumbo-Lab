@@ -1,0 +1,65 @@
+/**
+ * Mockups Oficiales · sección 6 — Tarjetas flotantes.
+ * Representan eventos reales del sistema. Nunca son decorativas.
+ */
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  white-space: nowrap;
+  animation: rumbo-float 7s var(--ease-in-out) infinite;
+  /* Cada tarjeta arranca su flotación en un punto distinto del ciclo para que
+     la composición no lata al unísono. */
+  animation-delay: var(--float-delay, 0s);
+}
+
+.iconWrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.tone-progress {
+  background-color: var(--teal-tint);
+  color: var(--teal-ink);
+}
+
+.tone-brand {
+  background-color: var(--brand-tint);
+  color: var(--brand-strong);
+}
+
+.tone-attention {
+  background-color: var(--amber-tint);
+  color: var(--amber-strong);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.title {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--text);
+  line-height: 1.35;
+}
+
+.meta {
+  font-size: var(--text-2xs);
+  color: var(--text-soft);
+  line-height: 1.35;
+}

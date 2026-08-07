@@ -1,0 +1,25 @@
+# Cabeceras de seguridad para hosting estático (Netlify / Cloudflare Pages).
+#
+# Para otros hostings, replicar las mismas cabeceras:
+#   Vercel  → "headers" en vercel.json
+#   Nginx   → directivas add_header
+#   Apache  → Header always set
+#
+# IMPORTANTE — Content-Security-Policy:
+# El hash de script-src corresponde al script de arranque del tema que vive
+# inline en index.html. Si ese script cambia, el hash deja de coincidir y la
+# página se queda sin tema. Regenerarlo con:
+#
+#   node -e "const c=require('crypto'),f=require('fs');const s=f.readFileSync('index.html','utf8').match(/<script>([\s\S]*?)<\/script>/)[1];console.log('sha256-'+c.createHash('sha256').update(s,'utf8').digest('base64'))"
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-TUK/SrKxI23KT5eGHMJx/HI87Rt5Br9dZmbBvhbHDz4='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+# Los assets con hash en el nombre son inmutables.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

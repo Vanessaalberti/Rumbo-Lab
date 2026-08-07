@@ -1,0 +1,16 @@
+{
+  "name": "Rumbo Lab",
+  "short_name": "Rumbo Lab",
+  "description": "Organizá, documentá y hacé visible tu desarrollo profesional.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F7F6F2",
+  "theme_color": "#F7F6F2",
+  "icons": [
+    {
+      "src": "/favicon/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

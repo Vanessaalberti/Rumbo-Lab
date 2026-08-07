@@ -1,0 +1,10 @@
+.link {
+  color: var(--brand-strong);
+  font-weight: var(--weight-semibold);
+  border-radius: var(--radius-xs);
+  transition: var(--transition-colors);
+}
+
+.link:hover {
+  text-decoration: underline;
+}

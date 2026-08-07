@@ -1,0 +1,67 @@
+.heading {
+  margin-bottom: var(--space-12);
+  grid-column: span 6;
+}
+
+.claims {
+  grid-column: 8 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding-top: var(--space-10);
+}
+
+.claim {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-left: var(--space-5);
+  border-left: 1px solid var(--border);
+}
+
+.claimValue {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-tighter);
+  color: var(--text);
+  line-height: 1.1;
+}
+
+.claimText {
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  color: var(--text-soft);
+}
+
+.composition {
+  position: relative;
+  margin-top: var(--space-16);
+}
+
+.floatingCard {
+  position: absolute;
+  left: calc(var(--space-10) * -1);
+  bottom: calc(var(--space-8) * -1);
+  z-index: 2;
+}
+
+@media (max-width: 1080px) {
+  .heading,
+  .claims {
+    grid-column: 1 / -1;
+  }
+
+  .claims {
+    padding-top: 0;
+  }
+
+  .floatingCard {
+    left: var(--space-2);
+  }
+}
+
+@media (max-width: 700px) {
+  .floatingCard {
+    display: none;
+  }
+}

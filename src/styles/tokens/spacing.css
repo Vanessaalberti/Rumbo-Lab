@@ -1,0 +1,40 @@
+/**
+ * Tokens de espaciado y layout.
+ *
+ * Landing · sección 4: desktop-first, ancho base 1440 px, grid de 12 columnas,
+ * secciones amplias y espaciado generoso. La interfaz debe respirar.
+ *
+ * Escala de base 4px. El espacio negativo es el recurso principal de jerarquía
+ * después de la tipografía — por eso la escala llega hasta valores muy grandes.
+ */
+
+:root {
+  --space-0: 0;
+  --space-1: 0.25rem; /* 4 */
+  --space-2: 0.5rem; /* 8 */
+  --space-3: 0.75rem; /* 12 */
+  --space-4: 1rem; /* 16 */
+  --space-5: 1.25rem; /* 20 */
+  --space-6: 1.5rem; /* 24 */
+  --space-8: 2rem; /* 32 */
+  --space-10: 2.5rem; /* 40 */
+  --space-12: 3rem; /* 48 */
+  --space-16: 4rem; /* 64 */
+  --space-20: 5rem; /* 80 */
+  --space-24: 6rem; /* 96 */
+  --space-32: 8rem; /* 128 */
+  --space-40: 10rem; /* 160 */
+
+  /* --- Layout ---------------------------------------------------------- */
+  --container-max: 1200px; /* contenido dentro del ancho base de 1440 */
+  --container-wide: 1360px; /* composiciones de mockups que exceden el contenido */
+  --container-gutter: var(--space-8);
+  --grid-columns: 12;
+  --grid-gap: var(--space-6);
+
+  /* Ritmo vertical entre secciones de la landing. */
+  --section-padding-y: clamp(var(--space-20), 8vw, var(--space-32));
+  --section-padding-y-lg: clamp(var(--space-24), 10vw, var(--space-40));
+
+  --navbar-height: 72px;
+}

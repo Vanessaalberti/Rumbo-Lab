@@ -1,0 +1,50 @@
+/**
+ * Encuadre fotográfico.
+ *
+ * Dirección Fotográfica · sección 11: fotografía y mockups forman una única
+ * composición. La imagen nunca aparece aislada del producto — siempre hay una
+ * ventana de Rumbo Lab apoyada encima.
+ */
+
+.frame {
+  position: relative;
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+  background-color: var(--bg-alt);
+  border: 1px solid var(--border);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Contraste moderado: la dirección es documental, no publicitaria. */
+  filter: saturate(0.94) contrast(1.02);
+}
+
+/**
+ * Fondo de la composición mientras no hay fotografía cargada.
+ *
+ * No es un placeholder visible: es una superficie neutra diseñada para sostener
+ * la ventana de producto. La landing se ve terminada con o sin fotografía; al
+ * dejar un archivo en `assets/photos/` la composición gana la capa humana.
+ */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 30% 25%,
+    var(--halo-teal),
+    transparent 60%
+  );
+}

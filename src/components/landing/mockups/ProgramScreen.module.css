@@ -1,0 +1,25 @@
+.timeline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.moreParticipants {
+  font-size: var(--text-2xs);
+  color: var(--text-soft);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border-soft);
+}
+
+@media (max-width: 900px) {
+  .body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

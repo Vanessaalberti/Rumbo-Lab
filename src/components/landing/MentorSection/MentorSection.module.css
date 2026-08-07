@@ -1,0 +1,117 @@
+/**
+ * Mentor — Storytelling · sección 4.
+ * Amplía la perspectiva: el producto ya no beneficia solo al aprendiz.
+ */
+
+.inner {
+  align-items: center;
+}
+
+.copy {
+  grid-column: span 4;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.points {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  margin-top: var(--space-2);
+}
+
+.point {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.pointIcon {
+  color: var(--teal);
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.pointTitle {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.pointText {
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  color: var(--text-soft);
+  margin-top: 2px;
+}
+
+/* --- Composición: fotografía + producto --------------------------------- */
+
+.composition {
+  grid-column: 6 / -1;
+  position: relative;
+}
+
+/* La capa fotográfica sostiene la ventana: el software acompaña una actividad
+   real (Dirección Fotográfica · sección 11). */
+.photo {
+  aspect-ratio: 4 / 3;
+  width: 100%;
+}
+
+.window {
+  position: absolute;
+  left: var(--space-10);
+  right: calc(var(--space-16) * -1);
+  bottom: calc(var(--space-12) * -1);
+  z-index: 2;
+}
+
+.floatingCard {
+  position: absolute;
+  top: calc(var(--space-6) * -1);
+  left: calc(var(--space-16) * -1);
+  z-index: 3;
+}
+
+@media (max-width: 1080px) {
+  .copy {
+    grid-column: 1 / -1;
+  }
+
+  .composition {
+    grid-column: 1 / -1;
+    margin-top: var(--space-10);
+    margin-bottom: var(--space-16);
+  }
+
+  .window {
+    left: var(--space-4);
+    right: var(--space-4);
+    bottom: calc(var(--space-10) * -1);
+  }
+
+  .floatingCard {
+    left: var(--space-4);
+    top: calc(var(--space-4) * -1);
+  }
+}
+
+@media (max-width: 700px) {
+  .photo {
+    display: none;
+  }
+
+  .window {
+    position: static;
+  }
+
+  .floatingCard {
+    display: none;
+  }
+
+  .composition {
+    margin-bottom: 0;
+  }
+}

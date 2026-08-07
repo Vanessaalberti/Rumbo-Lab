@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#F7F6F2" />
+
+    <title>Rumbo Lab · Organizá, documentá y hacé visible tu desarrollo profesional</title>
+    <meta
+      name="description"
+      content="Rumbo Lab reúne perfil, CV, objetivos, evidencias, feedback y mentorías en un único lugar, para que el crecimiento profesional deje de depender de la suerte y se convierta en un proceso."
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!--
+      Aplicación del tema antes del primer pintado.
+      Design System · sección 2: Light Mode es el modo predeterminado y se aplica
+      siempre en el primer ingreso, sin depender de prefers-color-scheme.
+      Dark Mode solo si el usuario lo eligió explícitamente antes.
+      Este script es bloqueante a propósito: evita el parpadeo de tema incorrecto.
+    -->
+    <script>
+      (function () {
+        try {
+          var stored = window.localStorage.getItem('rumbo-theme');
+          document.documentElement.setAttribute(
+            'data-theme',
+            stored === 'dark' ? 'dark' : 'light',
+          );
+        } catch (error) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

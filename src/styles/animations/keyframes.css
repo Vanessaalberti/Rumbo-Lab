@@ -1,0 +1,49 @@
+/**
+ * Keyframes compartidos.
+ *
+ * Movimiento discreto: ninguna animación supera unos pocos píxeles de recorrido
+ * ni compite con la lectura.
+ */
+
+/* Flotación muy leve de las tarjetas superpuestas sobre los mockups. */
+@keyframes rumbo-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/* Avance de una barra de progreso desde 0 hasta su valor final. */
+@keyframes rumbo-progress-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Latido del punto que marca actividad reciente del sistema. */
+@keyframes rumbo-pulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--halo-teal);
+  }
+  70% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@keyframes rumbo-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

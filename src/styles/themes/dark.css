@@ -1,0 +1,72 @@
+/**
+ * Tema Oscuro — identidad visual heredada de Rumbo Lab.
+ *
+ * Design System · sección 2: no fue rediseñado, solo integrado al sistema de temas.
+ * Mismos tokens, mismo layout, misma tipografía: únicamente cambian los valores.
+ *
+ * Diferencia intencional respecto al tema claro: --brand y --teal comparten el mismo
+ * acento pino/turquesa (#74BBA9), porque la identidad heredada usa un único acento
+ * y no dos colores de marca separados.
+ */
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* --- Fondos ---------------------------------------------------------- */
+  /* Nunca negro puro: el fondo heredado es un casi-negro cálido. */
+  --bg: #141310;
+  --bg-alt: #1b1913;
+  --surface: #1f1d17;
+  --surface-raised: #262319;
+  --surface-sunken: #1a1813;
+
+  /* --- Texto y bordes -------------------------------------------------- */
+  --text: #f3f0e4;
+  --text-soft: #a6a18e;
+  --text-faint: #8d8a79;
+  --border: #332f24;
+  --border-soft: #2a271e;
+
+  /* --- Marca ----------------------------------------------------------- */
+  --brand: #74bba9;
+  --brand-strong: #8fccbb; /* Hover: en oscuro los rellenos se aclaran. */
+  --brand-tint: #1c2530;
+  --teal: #74bba9;
+  --teal-solid: #74bba9;
+  --teal-strong: #8fccbb; /* Hover: en oscuro el relleno se aclara. */
+  --teal-ink: #8fccbb;
+  --teal-tint: #1e2a26;
+  --amber: #c7b788;
+  --amber-strong: #d9cba3;
+  --amber-tint: #2a2619;
+
+  /* El acento heredado es claro: la tinta que va encima debe ser oscura (7.7:1). */
+  --on-brand: #0f1e19;
+
+  /* --- Estados --------------------------------------------------------- */
+  --success: #74bba9;
+  --success-strong: #8fccbb;
+  --success-tint: #1e2a26;
+  --warning: #c7b788;
+  --warning-strong: #d9cba3;
+  --warning-tint: #2a2619;
+  --error: #c98b7c;
+  --error-strong: #dfa595;
+  --error-tint: #2e211e;
+
+  /* --- Sombras --------------------------------------------------------- */
+  /* Algo más presentes que en claro: hacen falta para dar profundidad sobre casi-negro. */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 14px 36px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 32px 72px rgba(0, 0, 0, 0.62), 0 10px 28px rgba(0, 0, 0, 0.45);
+
+  /* --- Efectos compuestos ---------------------------------------------- */
+  --scrim: rgba(0, 0, 0, 0.6);
+  --glass: rgba(31, 29, 23, 0.76);
+  --grid-line: rgba(243, 240, 228, 0.05);
+  --halo-brand: rgba(116, 187, 169, 0.12);
+  --halo-teal: rgba(116, 187, 169, 0.12);
+  --halo-amber: rgba(199, 183, 136, 0.1);
+}

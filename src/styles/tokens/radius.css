@@ -1,0 +1,18 @@
+/**
+ * Tokens de radio de borde.
+ *
+ * Design System · sección 4: las tarjetas usan 12px como radio de referencia.
+ * Las ventanas de producto de los mockups usan un radio mayor para leerse como
+ * aplicaciones reales, no como recortes de imagen.
+ */
+
+:root {
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px; /* card por defecto */
+  --radius-xl: 16px;
+  --radius-2xl: 20px; /* ventana de producto */
+  --radius-3xl: 28px;
+  --radius-full: 999px;
+}

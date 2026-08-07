@@ -1,0 +1,11 @@
+.note {
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--text-soft);
+  padding: var(--space-4) var(--space-5);
+  background-color: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--amber);
+  border-radius: var(--radius-lg);
+  max-width: var(--measure);
+}

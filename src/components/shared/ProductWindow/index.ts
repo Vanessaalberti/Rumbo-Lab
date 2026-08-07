@@ -1,0 +1,1 @@
+export { ProductWindow } from './ProductWindow';

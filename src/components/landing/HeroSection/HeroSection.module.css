@@ -1,0 +1,260 @@
+/**
+ * Hero — Storytelling · sección 4.
+ *
+ * Objetivo: identificación inmediata. No explica el producto ni lista
+ * funcionalidades: nombra la situación de la persona que está leyendo.
+ */
+
+.hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  /* Navbar + hero ocupan exactamente un viewport. `svh` evita que la barra de
+     direcciones de los navegadores móviles empuje el contenido fuera. */
+  min-height: calc(100vh - var(--navbar-height));
+  min-height: calc(100svh - var(--navbar-height));
+  padding-block: var(--space-12) var(--space-16);
+  overflow: hidden;
+}
+
+/* Halo de fondo: da profundidad sin introducir un bloque de color. */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -30%;
+  right: -10%;
+  width: 70vw;
+  height: 90vh;
+  background:
+    radial-gradient(closest-side, var(--halo-brand), transparent 70%),
+    radial-gradient(closest-side, var(--halo-teal), transparent 75%);
+  background-position:
+    30% 20%,
+    75% 60%;
+  background-repeat: no-repeat;
+  background-size: 70% 70%, 60% 60%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.inner {
+  position: relative;
+  z-index: 1;
+  align-items: center;
+  width: 100%;
+}
+
+/* --- Columna de texto --------------------------------------------------- */
+
+.copy {
+  grid-column: span 5;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: fit-content;
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--text-soft);
+  box-shadow: var(--shadow-xs);
+}
+
+.eyebrowDot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background-color: var(--teal);
+  animation: rumbo-pulse 3.2s var(--ease-in-out) infinite;
+}
+
+.title {
+  font-size: var(--text-5xl);
+  max-width: 15ch;
+}
+
+/* El acento tipográfico marca la promesa, sin recurrir a un color de relleno. */
+.titleAccent {
+  color: var(--brand);
+}
+
+.subtitle {
+  font-size: var(--text-lg);
+  line-height: var(--leading-relaxed);
+  color: var(--text-soft);
+  max-width: var(--measure);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.reassurance {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--text-soft);
+}
+
+.reassuranceIcon {
+  color: var(--teal);
+  flex-shrink: 0;
+}
+
+/* --- Composición de producto -------------------------------------------- */
+/**
+ * Límites de tamaño del elemento visual.
+ *
+ * La composición debe leerse como prueba de que existe un producto detrás, no
+ * dominar la pantalla. Por eso está acotada en ancho, se ancla a la derecha y
+ * no crece en monitores grandes: a partir de cierto punto sobra espacio en
+ * blanco, que es exactamente lo que se busca.
+ */
+.composition {
+  /**
+   * La composición se diseña a un ancho cómodo y se reduce con `zoom`, en lugar
+   * de angostarse. Comprimir la ventana haría que el contenido se envuelva y
+   * creciera en alto justo cuando lo que hay que contener es la altura.
+   *
+   * `--hero-design-width` es el ancho en el que la pantalla está diseñada;
+   * multiplicado por `--hero-zoom` da el tamaño real en pantalla.
+   */
+  --hero-design-width: 740px;
+  --hero-zoom: 0.76;
+
+  grid-column: 6 / -1;
+  position: relative;
+  justify-self: end;
+  width: 100%;
+  max-width: var(--hero-design-width);
+  zoom: var(--hero-zoom);
+  /* Perspectiva suave: las ventanas se leen como objetos, no como imágenes planas. */
+  perspective: 1600px;
+}
+
+.stage {
+  position: relative;
+  /* Necesario para que el translateZ de cada capa produzca paralaje real
+     cuando el conjunto rota siguiendo al puntero. */
+  transform-style: preserve-3d;
+  /* Reposo: inclinación mínima. La interacción suma hasta 4° más. */
+  rotate: y -2deg;
+}
+
+.mainWindow {
+  position: relative;
+  z-index: 2;
+}
+
+/* Ventana secundaria: la línea de evidencias, el diferencial del producto.
+   Se apoya sobre el vértice inferior derecho de la principal. */
+.evidenceWindow {
+  position: absolute;
+  right: calc(var(--space-8) * -1);
+  bottom: calc(var(--space-12) * -1);
+  width: 264px;
+  z-index: 3;
+  transform: translateZ(50px);
+}
+
+/* Las tarjetas de actividad montan sobre el borde de la ventana principal:
+   es la relación que tienen en el producto real. Su mayor translateZ hace que
+   se desplacen más que las ventanas al inclinar la composición. */
+.floatingFeedback {
+  position: absolute;
+  top: calc(var(--space-5) * -1);
+  right: var(--space-8);
+  z-index: 4;
+  transform: translateZ(90px);
+}
+
+.floatingMeeting {
+  position: absolute;
+  bottom: calc(var(--space-5) * -1);
+  left: calc(var(--space-6) * -1);
+  z-index: 4;
+  transform: translateZ(75px);
+}
+
+/* --- Adaptación --------------------------------------------------------- */
+
+/* Pantallas anchas pero bajas: la composición se reduce para que el conjunto
+   siga entrando en un viewport. Solo cambia el zoom — la composición interna,
+   que ya está resuelta, no se toca. */
+@media (min-width: 1181px) and (max-height: 900px) {
+  .composition {
+    --hero-zoom: 0.68;
+  }
+}
+
+@media (min-width: 1181px) and (max-height: 800px) {
+  .composition {
+    --hero-zoom: 0.6;
+  }
+}
+
+@media (min-width: 1181px) and (max-height: 700px) {
+  .composition {
+    --hero-zoom: 0.52;
+  }
+}
+
+@media (max-width: 1180px) {
+  .hero {
+    /* Apilado: dejar de forzar un viewport exacto evita cortar la composición. */
+    min-height: 0;
+    padding-block: var(--space-16) var(--space-24);
+  }
+
+  .copy {
+    grid-column: 1 / -1;
+    max-width: 640px;
+  }
+
+  .composition {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    --hero-zoom: 1;
+    max-width: 620px;
+    margin-top: var(--space-20);
+  }
+
+  .stage {
+    rotate: none;
+  }
+
+  .evidenceWindow {
+    right: calc(var(--space-4) * -1);
+    bottom: calc(var(--space-10) * -1);
+    transform: none;
+  }
+
+  .floatingFeedback,
+  .floatingMeeting {
+    transform: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .evidenceWindow,
+  .floatingFeedback,
+  .floatingMeeting {
+    display: none;
+  }
+
+  .hero {
+    padding-bottom: var(--space-16);
+  }
+}

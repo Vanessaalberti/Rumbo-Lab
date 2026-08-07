@@ -1,0 +1,12 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  /* Las composiciones de mockups exceden el contenedor a propósito: se recorta
+     el desborde horizontal sin afectar el sticky de la navbar. */
+  overflow-x: clip;
+}
+
+.main {
+  flex: 1;
+}
