@@ -10,7 +10,7 @@ import styles from './FinalCTA.module.css';
 /** Condiciones reales de entrada. Ninguna promete conseguir empleo. */
 const CONDITIONS: Array<{ icon: IconName; label: string }> = [
   { icon: 'check', label: 'Empezar es gratis' },
-  { icon: 'profile', label: 'No hace falta pertenecer a un programa' },
+  { icon: 'profile', label: 'No hace falta pertenecer a una organización' },
   { icon: 'shield', label: 'Tu recorrido es privado' },
 ];
 

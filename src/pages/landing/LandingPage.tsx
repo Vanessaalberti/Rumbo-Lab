@@ -1,4 +1,5 @@
 import {
+  AssistantSection,
   EvidenceSection,
   FeaturesSection,
   FinalCTA,
@@ -6,7 +7,7 @@ import {
   MentorSection,
   OrganizationSection,
   ProblemSection,
-  ProgramSection,
+  SpaceSection,
   SolutionSection,
   TestimonialsSection,
 } from '@/components/landing';
@@ -27,8 +28,9 @@ export function LandingPage() {
       <ProblemSection />
       <SolutionSection />
       <FeaturesSection />
+      <AssistantSection />
       <MentorSection />
-      <ProgramSection />
+      <SpaceSection />
       <OrganizationSection />
       <EvidenceSection />
       <TestimonialsSection />

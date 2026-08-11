@@ -14,7 +14,7 @@ const TESTIMONIALS = [
     quote:
       'Antes, cuando me preguntaban qué había hecho en el último año, contestaba de memoria y siempre me olvidaba de la mitad. Ahora lo abro y está todo, con fechas.',
     name: 'Camila Ferreyra',
-    role: 'Aprendiz · Programa Impulso Tech',
+    role: 'Aprendiz · Espacio Impulso Tech',
   },
   {
     quote:
@@ -24,7 +24,7 @@ const TESTIMONIALS = [
   },
   {
     quote:
-      'Podemos mostrar qué cambió en las personas que pasaron por nuestros programas. Antes teníamos asistencia; ahora tenemos evolución.',
+      'Podemos mostrar qué cambió en las personas que pasaron por nuestros espacios. Antes teníamos asistencia; ahora tenemos evolución.',
     name: 'Lucía Márquez',
     role: 'Coordinadora · Fundación Trayecto',
   },

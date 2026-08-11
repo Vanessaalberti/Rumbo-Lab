@@ -40,8 +40,47 @@
   line-height: 1.35;
 }
 
+/*
+ * Vista previa de máximo 3 líneas. Si el contenido excede ese límite, el
+ * registro ofrece expandirse en el mismo lugar — nunca un modal, un panel ni
+ * otra página.
+ */
 .entryBody {
   font-size: var(--text-2xs);
   color: var(--text);
   line-height: 1.6;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+
+.entryMore {
+  align-self: flex-start;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  color: var(--brand-strong);
+  line-height: 1.35;
+}
+
+/* Paginación del historial: 5 feedbacks por página. */
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding-top: var(--space-1);
+  font-size: var(--text-2xs);
+  color: var(--text-soft);
+}
+
+.pagerPage {
+  min-width: 18px;
+  text-align: center;
+}
+
+.pagerPageActive {
+  font-weight: var(--weight-semibold);
+  color: var(--text);
 }

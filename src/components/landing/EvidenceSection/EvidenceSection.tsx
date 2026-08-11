@@ -100,7 +100,7 @@ export function EvidenceSection() {
 
           <Reveal delay={120}>
             <ProductWindow
-              breadcrumb="Mi espacio"
+              breadcrumb="Mi Rumbo"
               breadcrumbCurrent="Feedback"
               depth="secondary"
             >

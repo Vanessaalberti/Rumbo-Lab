@@ -42,7 +42,7 @@ bibliotecas, oficinas contemporáneas.
 | --- | --- |
 | `mentoria-seguimiento.jpg` | Un mentor y una aprendiz revisando juntos un avance en pantalla. La atención está en el trabajo, no en la cámara. |
 | `aprendiz-portfolio.jpg` | Una persona trabajando sola en su portfolio, luz de ventana. |
-| `workshop-programa.jpg` | Taller reducido, sesión colaborativa de un programa. |
-| `revision-indicadores.jpg` | Equipo institucional revisando resultados de sus programas. |
+| `workshop-espacio.jpg` | Taller reducido, sesión colaborativa de un espacio. |
+| `revision-indicadores.jpg` | Equipo institucional revisando resultados de sus espacios. |
 
 Formato: JPG o WebP, lado largo ≥ 2000 px, relación 4:3 o 3:2.

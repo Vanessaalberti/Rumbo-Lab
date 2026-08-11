@@ -9,8 +9,9 @@ export const SECTION_ANCHORS = {
   problem: '#problema',
   solution: '#solucion',
   features: '#funcionalidades',
+  assistant: '#asistente',
   mentors: '#mentores',
-  programs: '#programas',
+  spaces: '#espacios',
   organizations: '#organizaciones',
   differentiator: '#diferencial',
   testimonials: '#testimonios',
@@ -28,7 +29,8 @@ export const START_ANCHOR = SECTION_ANCHORS.start;
 export const LANDING_NAVIGATION: NavigationItem[] = [
   { label: 'La plataforma', href: SECTION_ANCHORS.solution },
   { label: 'Para aprendices', href: SECTION_ANCHORS.features },
+  { label: 'Assistant', href: SECTION_ANCHORS.assistant },
   { label: 'Para mentores', href: SECTION_ANCHORS.mentors },
-  { label: 'Programas', href: SECTION_ANCHORS.programs },
+  { label: 'Espacios', href: SECTION_ANCHORS.spaces },
   { label: 'Organizaciones', href: SECTION_ANCHORS.organizations },
 ];

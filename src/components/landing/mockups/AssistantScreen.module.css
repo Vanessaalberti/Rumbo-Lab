@@ -1,0 +1,52 @@
+.thread {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 82%;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--text-2xs);
+  line-height: 1.55;
+}
+
+/* Lo que escribe la persona. */
+.fromPerson {
+  align-self: flex-end;
+  background-color: var(--brand);
+  color: var(--on-brand);
+  border-bottom-right-radius: var(--radius-xs);
+}
+
+/* Lo que responde Rumbo. Mismo dominio que la web, otra interfaz. */
+.fromRumbo {
+  align-self: flex-start;
+  background-color: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: var(--radius-xs);
+}
+
+/*
+ * Bloque estructurado: el registro creado o las opciones ofrecidas. Va
+ * separado del texto para que se lea como respuesta del sistema y no como
+ * parte de la frase.
+ */
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border-soft);
+}
+
+.blockLine {
+  font-size: var(--text-2xs);
+  color: var(--text-soft);
+  font-variant-numeric: tabular-nums;
+}

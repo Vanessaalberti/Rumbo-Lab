@@ -26,7 +26,7 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
     items: [
       { label: 'Aprendices', href: '#funcionalidades' },
       { label: 'Mentores', href: '#mentores' },
-      { label: 'Programas', href: '#programas' },
+      { label: 'Espacios', href: '#espacios' },
       { label: 'Organizaciones', href: '#organizaciones' },
     ],
   },

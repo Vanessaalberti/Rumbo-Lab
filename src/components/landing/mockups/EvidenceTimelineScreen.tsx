@@ -17,11 +17,19 @@ interface EvidenceTimelineScreenProps {
 }
 
 /**
- * Mockups Oficiales · 5.10 — Línea de Evidencias.
+ * Mockups Oficiales · 5.10 — Evidencias.
  *
- * Cronología privada del crecimiento profesional. Cada entrada corresponde a una
- * acción que la persona realizó: no hay eventos generados por el sistema para
- * llenar la vista.
+ * Línea cronológica de los acontecimientos relevantes para comprender la
+ * evolución del Aprendiz. Arranca en la creación de la cuenta, se genera
+ * automáticamente y es privada: no está pensada como vista para Mentores.
+ *
+ * No es un activity log. Solo entra lo que aporta significado al recorrido, y
+ * los cambios de estado de una postulación quedan fuera: viven en el historial
+ * propio de Postulaciones.
+ *
+ * El orden es fijo, del más reciente al más antiguo. El filtro temporal ofrece
+ * `Esta semana` —el valor por defecto del producto—, `Este mes` y `Todo`; acá
+ * se muestra `Todo` para que se lea el recorrido completo.
  */
 export function EvidenceTimelineScreen({
   limit,
@@ -33,10 +41,10 @@ export function EvidenceTimelineScreen({
     <div className={cx(screen.main, compact && screen.mainTight)}>
       <header className={screen.header}>
         <div>
-          <p className={screen.headerTitle}>Línea de evidencias</p>
-          <p className={screen.headerMeta}>47 registros · desde marzo de 2026</p>
+          <p className={screen.headerTitle}>Evidencias</p>
+          <p className={screen.headerMeta}>12 registros · desde marzo de 2026</p>
         </div>
-        <span className={cx(screen.action, screen.actionGhost)}>Este mes</span>
+        <span className={cx(screen.action, screen.actionGhost)}>Todo</span>
       </header>
 
       <ol className={styles.timeline}>

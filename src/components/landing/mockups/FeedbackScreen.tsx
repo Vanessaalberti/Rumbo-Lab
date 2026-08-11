@@ -10,10 +10,19 @@ interface FeedbackScreenProps {
 }
 
 /**
- * Mockups Oficiales · 5.7 — Historial de Feedback.
+ * Mockups Oficiales · 5.7 — Feedback.
  *
- * Registro profesional, no un chat: cada entrada tiene autor, contexto, fecha y
- * tema. Se consulta más tarde para entender la evolución, no para conversar.
+ * Historial de las devoluciones que el Aprendiz recibe de sus Mentores. No es
+ * un chat, ni una bandeja, ni un hilo de comentarios: el Aprendiz consulta, no
+ * responde. Tampoco hay estado de leído/no leído ni reacciones.
+ *
+ * Cada registro identifica de un vistazo sobre qué elemento es el feedback,
+ * qué Mentor lo creó, cuándo y qué dice. El elemento siempre es específico:
+ * qué CV, qué postulación — nunca "el CV" a secas.
+ *
+ * El contenido se muestra en una vista previa de tres líneas y se expande
+ * dentro del mismo registro. El historial va del más reciente al más antiguo,
+ * con un máximo de cinco por página.
  */
 export function FeedbackScreen({ compact = false, limit }: FeedbackScreenProps) {
   const entries = limit ? FEEDBACK_ENTRIES.slice(0, limit) : FEEDBACK_ENTRIES;
@@ -22,28 +31,41 @@ export function FeedbackScreen({ compact = false, limit }: FeedbackScreenProps) 
     <div className={cx(screen.main, compact && screen.mainTight)}>
       <header className={screen.header}>
         <div>
-          <p className={screen.headerTitle}>Feedback recibido</p>
-          <p className={screen.headerMeta}>18 registros · 3 personas</p>
+          <p className={screen.headerTitle}>Feedback</p>
+          <p className={screen.headerMeta}>12 recibidos · del más reciente</p>
         </div>
-        <span className={cx(screen.action, screen.actionGhost)}>Filtrar por tema</span>
       </header>
 
       <div className={styles.entries}>
         {entries.map((entry) => (
-          <article key={entry.context} className={styles.entry}>
+          <article key={entry.datetime} className={styles.entry}>
             <header className={styles.entryHeader}>
-              <Avatar name={entry.author} size="sm" />
+              <Avatar name={entry.mentor} size="sm" />
               <div className={styles.entryIdentity}>
-                <p className={styles.entryAuthor}>{entry.author}</p>
-                <p className={styles.entryContext}>{entry.context}</p>
+                {/* Elemento relacionado: siempre identificado de forma específica. */}
+                <p className={styles.entryAuthor}>{entry.subject}</p>
+                <p className={styles.entryContext}>
+                  {entry.mentor} · {entry.datetime}
+                </p>
               </div>
-              <span className={cx(screen.tag, screen.toneNeutral)}>{entry.tag}</span>
             </header>
 
             <p className={styles.entryBody}>{entry.body}</p>
+
+            <span className={styles.entryMore}>Ver feedback completo</span>
           </article>
         ))}
       </div>
+
+      {!compact && (
+        <div className={styles.pager}>
+          <span>←</span>
+          <span className={cx(styles.pagerPage, styles.pagerPageActive)}>1</span>
+          <span className={styles.pagerPage}>2</span>
+          <span className={styles.pagerPage}>3</span>
+          <span>→</span>
+        </div>
+      )}
     </div>
   );
 }

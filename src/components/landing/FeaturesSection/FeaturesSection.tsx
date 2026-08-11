@@ -80,7 +80,7 @@ export function FeaturesSection() {
 
         <Reveal className={styles.composition}>
           <ProductWindow
-            breadcrumb="Mi espacio"
+            breadcrumb="Mi Rumbo"
             breadcrumbCurrent="CV · Frontend v4"
             className={styles.cvWindow}
           >
@@ -88,12 +88,12 @@ export function FeaturesSection() {
           </ProductWindow>
 
           <ProductWindow
-            breadcrumb="Mi espacio"
+            breadcrumb="Mi Rumbo"
             breadcrumbCurrent="Postulaciones"
             depth="secondary"
             className={styles.applicationsWindow}
           >
-            <ApplicationsScreen compact withNextStep={false} />
+            <ApplicationsScreen compact />
           </ProductWindow>
 
           <FloatingCard

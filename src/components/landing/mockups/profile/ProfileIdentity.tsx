@@ -1,10 +1,15 @@
 import { Avatar } from '@/components/ui/Avatar';
-import { Icon } from '@/components/ui/Icon';
-import { ACTIVE_CV, LEARNER } from '../content';
+import { LEARNER } from '../content';
 import screen from '../screen.module.css';
 import styles from './profile.module.css';
 
-/** Identidad profesional y enlace al CV, que es la fuente de la experiencia. */
+/**
+ * Foto profesional e identidad: la imagen con la que la persona elige
+ * presentarse, su nombre y cómo se describe.
+ *
+ * No enlaza el CV: la referencia al CV desde Mi Perfil figura como
+ * `PENDIENTE DE UBICACIÓN` y no se resuelve desde un mockup.
+ */
 export function ProfileIdentity() {
   return (
     <header className={screen.header}>
@@ -15,14 +20,6 @@ export function ProfileIdentity() {
           <p className={styles.headline}>
             {LEARNER.headline} · {LEARNER.location}
           </p>
-        </div>
-      </div>
-
-      <div className={styles.cvCard}>
-        <Icon name="document" size={14} className={styles.cvIcon} />
-        <div className={styles.cvText}>
-          <span className={styles.cvLabel}>{ACTIVE_CV.label}</span>
-          <span className={styles.cvMeta}>{ACTIVE_CV.updated}</span>
         </div>
       </div>
     </header>

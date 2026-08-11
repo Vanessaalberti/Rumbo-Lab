@@ -63,7 +63,7 @@ export function SolutionSection() {
           {/* El perfil a tamaño completo: es donde se ve que no pide reescribir
               el currículum, sino identidad, enlaces, objetivos y acompañamiento. */}
           <ProductWindow
-            breadcrumb="Mi espacio"
+            breadcrumb="Mi Rumbo"
             breadcrumbCurrent="Perfil"
             depth="secondary"
             className={cx(styles.profileWindow)}
@@ -72,7 +72,7 @@ export function SolutionSection() {
           </ProductWindow>
 
           <ProductWindow
-            breadcrumb="Mi espacio"
+            breadcrumb="Mi Rumbo"
             breadcrumbCurrent="Evidencias"
             className={styles.evidenceWindow}
           >

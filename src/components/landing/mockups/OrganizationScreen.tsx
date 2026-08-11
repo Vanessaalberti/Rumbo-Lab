@@ -2,9 +2,9 @@ import { ScreenRail } from './ScreenRail';
 import { ORGANIZATION_RAIL } from './railItems';
 import {
   ORGANIZATION_KPIS,
-  ORGANIZATION_PROGRAMS,
+  ORGANIZATION_SPACES,
   ORGANIZATION_TREND,
-  PROGRAM,
+  SPACE,
 } from './content';
 import { cx } from '@/utils/classNames';
 import screen from './screen.module.css';
@@ -23,7 +23,7 @@ interface OrganizationScreenProps {
 /**
  * Mockups Oficiales · 5.6 — Dashboard de Organización.
  *
- * Vista institucional: consolida programas, mentores y personas para medir el
+ * Vista institucional: consolida espacios, mentores y personas para medir el
  * impacto real del acompañamiento a lo largo del tiempo.
  */
 export function OrganizationScreen({ withRail = true }: OrganizationScreenProps) {
@@ -33,7 +33,7 @@ export function OrganizationScreen({ withRail = true }: OrganizationScreenProps)
     <div className={screen.screen}>
       {withRail && (
         <ScreenRail
-          sectionLabel={PROGRAM.organization}
+          sectionLabel={SPACE.organization}
           items={ORGANIZATION_RAIL}
           activeItem="Panel"
         />
@@ -44,7 +44,7 @@ export function OrganizationScreen({ withRail = true }: OrganizationScreenProps)
           <div>
             <p className={screen.headerTitle}>Impacto institucional</p>
             <p className={screen.headerMeta}>
-              {PROGRAM.organization} · año en curso
+              {SPACE.organization} · año en curso
             </p>
           </div>
           <span className={cx(screen.action, screen.actionGhost)}>
@@ -65,33 +65,33 @@ export function OrganizationScreen({ withRail = true }: OrganizationScreenProps)
         <div className={styles.body}>
           <div className={screen.panel}>
             <p className={screen.panelTitle}>
-              Programas activos
+              Espacios activos
               <span className={screen.rowMeta}>Avance promedio</span>
             </p>
 
-            {ORGANIZATION_PROGRAMS.map((program) => (
-              <div key={program.name} className={screen.row}>
+            {ORGANIZATION_SPACES.map((space) => (
+              <div key={space.name} className={screen.row}>
                 <div className={screen.rowMain}>
-                  <span className={screen.rowTitle}>{program.name}</span>
-                  <span className={screen.rowMeta}>{program.people} personas</span>
+                  <span className={screen.rowTitle}>{space.name}</span>
+                  <span className={screen.rowMeta}>{space.people} personas</span>
                 </div>
 
                 <div className={screen.rowAside}>
                   <span
                     className={cx(
                       screen.tag,
-                      STATUS_TONE[program.status as keyof typeof STATUS_TONE],
+                      STATUS_TONE[space.status as keyof typeof STATUS_TONE],
                     )}
                   >
-                    {program.status}
+                    {space.status}
                   </span>
                   <div className={screen.miniTrack}>
                     <div
                       className={screen.miniFill}
-                      style={{ width: `${program.progress}%` }}
+                      style={{ width: `${space.progress}%` }}
                     />
                   </div>
-                  <span className={screen.miniValue}>{program.progress}%</span>
+                  <span className={screen.miniValue}>{space.progress}%</span>
                 </div>
               </div>
             ))}

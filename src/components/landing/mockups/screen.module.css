@@ -377,6 +377,27 @@
 /* --- Botones simulados -------------------------------------------------- */
 /* No son interactivos: representan la acción disponible en el producto real. */
 
+/*
+ * Acceso desde un resumen a la sección que es dueña de esa información.
+ * Vive dentro de `.panelTitle`, así que cancela sus mayúsculas.
+ */
+.panelLink {
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--brand-strong);
+  white-space: nowrap;
+}
+
+/* Barra de acciones de una vista: varias acciones alineadas a la derecha. */
+.headerActions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
 .action {
   display: inline-flex;
   align-items: center;

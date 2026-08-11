@@ -1,4 +1,4 @@
-/** Contenido del espacio del mentor y del programa que coordina. */
+/** Contenido del espacio del mentor: sus aprendices, su agenda y el espacio que coordina. */
 
 export const MENTOR_LEARNERS = [
   {
@@ -47,13 +47,13 @@ export const MENTOR_AGENDA = [
   { time: '16:00', title: 'Workshop de portfolio · Cohorte 04', kind: 'Grupal' },
 ] as const;
 
-export const PROGRAM_METRICS = [
+export const SPACE_METRICS = [
   { label: 'Participantes activos', value: '38', detail: 'de 42 inscriptos' },
   { label: 'Perfil completo promedio', value: '74%', detail: '+11 pts desde el inicio' },
   { label: 'Evidencias registradas', value: '1.284', detail: 'en 9 semanas' },
 ] as const;
 
-export const PROGRAM_ACTIVITIES = [
+export const SPACE_ACTIVITIES = [
   { title: 'Workshop de portfolio', date: 'Jueves 14 · 16:00', attendance: '31 confirmados' },
   { title: 'Ronda de mentorías individuales', date: 'Semana del 18', attendance: '38 agendadas' },
   { title: 'Revisión grupal de CV', date: 'Martes 26 · 18:00', attendance: '24 confirmados' },

@@ -1,5 +1,5 @@
 /**
- * Las personas y el programa que aparecen en todas las pantallas.
+ * Las personas y el espacio que aparecen en todas las pantallas.
  *
  * Todas las vistas comparten el mismo universo para que se lean como un único
  * producto y no como capturas sueltas.
@@ -20,7 +20,7 @@ export const MENTOR = {
   learnersCount: 14,
 } as const;
 
-export const PROGRAM = {
+export const SPACE = {
   name: 'Impulso Tech',
   cohort: 'Cohorte 04',
   organization: 'Fundación Trayecto',

@@ -25,7 +25,7 @@ export const ICON_PATHS = {
     'M4 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M2 12h20',
   mentorship:
     'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
-  program: 'M3 6h18M3 12h18M3 18h12M6 6v12',
+  space: 'M3 6h18M3 12h18M3 18h12M6 6v12',
   organization:
     'M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4M9 11h.01M15 11h.01M9 14h.01M15 14h.01',
   analytics:

@@ -34,7 +34,7 @@ const POINTS: Array<{ icon: IconName; title: string; text: string }> = [
  */
 export function MentorSection() {
   return (
-    <section className="section" id="mentores" aria-labelledby="mentores-titulo">
+    <section className="section section-alt" id="mentores" aria-labelledby="mentores-titulo">
       <div className={cx('container-wide', 'grid-12', styles.inner)}>
         <Reveal className={styles.copy}>
           <SectionHeading

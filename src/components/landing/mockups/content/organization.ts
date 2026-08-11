@@ -1,13 +1,13 @@
-/** Contenido de la vista institucional: programas, indicadores e impacto. */
+/** Contenido de la vista institucional: espacios, indicadores e impacto. */
 
 export const ORGANIZATION_KPIS = [
-  { label: 'Programas activos', value: '7', trend: '+2 este semestre' },
+  { label: 'Espacios activos', value: '7', trend: '+2 este semestre' },
   { label: 'Personas acompañadas', value: '412', trend: '+86 este año' },
   { label: 'Mentores', value: '34', trend: '+5 este trimestre' },
   { label: 'Perfil completo promedio', value: '71%', trend: '+9 pts' },
 ] as const;
 
-export const ORGANIZATION_PROGRAMS = [
+export const ORGANIZATION_SPACES = [
   { name: 'Impulso Tech · Cohorte 04', people: 38, progress: 74, status: 'En curso' },
   { name: 'Primer Empleo · Cohorte 11', people: 62, progress: 58, status: 'En curso' },
   { name: 'Reconversión Digital · Cohorte 02', people: 45, progress: 91, status: 'Cerrando' },

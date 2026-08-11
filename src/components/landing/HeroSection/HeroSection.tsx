@@ -82,7 +82,7 @@ export function HeroSection() {
           >
             <ProductWindow
               breadcrumb="Rumbo Lab"
-              breadcrumbCurrent="Mi espacio · Perfil"
+              breadcrumbCurrent="Mi Rumbo · Mi Perfil"
               className={styles.mainWindow}
             >
               <LearnerProfileScreen compact />

@@ -12,7 +12,7 @@ import styles from './OrganizationSection.module.css';
  */
 const CLAIMS = [
   {
-    value: '7 programas',
+    value: '7 espacios',
     text: 'funcionando en paralelo, con el mismo criterio de seguimiento y sin planillas intermedias.',
   },
   {
@@ -34,7 +34,7 @@ const CLAIMS = [
 export function OrganizationSection() {
   return (
     <section
-      className="section"
+      className="section section-alt"
       id="organizaciones"
       aria-labelledby="organizaciones-titulo"
     >
@@ -44,8 +44,8 @@ export function OrganizationSection() {
             <SectionHeading
               eyebrow="Organizaciones"
               titleId="organizaciones-titulo"
-              title="Y cuando ya no es un programa, sino siete"
-              description="Fundaciones, universidades, empresas y ONG necesitan saber si su acompañamiento está funcionando. Rumbo Lab consolida lo que ocurre en cada programa y lo convierte en información comparable."
+              title="Y cuando ya no es un espacio, sino siete"
+              description="Fundaciones, universidades, empresas y ONG necesitan saber si su acompañamiento está funcionando. Rumbo Lab consolida lo que ocurre en cada espacio y lo convierte en información comparable."
             />
           </Reveal>
 
@@ -70,7 +70,7 @@ export function OrganizationSection() {
           <FloatingCard
             icon="analytics"
             title="Reporte trimestral listo"
-            meta="7 programas · 412 personas"
+            meta="7 espacios · 412 personas"
             tone="brand"
             className={styles.floatingCard}
             floatDelay={1.4}
