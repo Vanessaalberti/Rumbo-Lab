@@ -12,7 +12,9 @@
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.3",
     "motion": "^13.0.0",
+    "pdfjs-dist": "^6.2.108",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.0"

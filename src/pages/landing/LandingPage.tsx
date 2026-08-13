@@ -20,6 +20,11 @@ import {
  * descubrimiento, comprensión, exploración, escalabilidad, diferenciación y
  * conversión. La página no hace más que componerlas: cada sección es
  * responsable de su propio contenido y de su propia composición visual.
+ *
+ * El diferencial (evidencias) cierra el bloque del aprendiz, antes de abrir
+ * la perspectiva hacia el resto del ecosistema: mentor, canal del Assistant
+ * (otra interfaz de la misma cuenta, no un actor nuevo), espacio y
+ * organización, en ese orden.
  */
 export function LandingPage() {
   return (
@@ -28,11 +33,11 @@ export function LandingPage() {
       <ProblemSection />
       <SolutionSection />
       <FeaturesSection />
-      <AssistantSection />
+      <EvidenceSection />
       <MentorSection />
+      <AssistantSection />
       <SpaceSection />
       <OrganizationSection />
-      <EvidenceSection />
       <TestimonialsSection />
       <FinalCTA />
     </>

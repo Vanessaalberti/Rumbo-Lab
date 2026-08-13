@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { ScreenRail } from './ScreenRail';
 import { ORGANIZATION_RAIL } from './railItems';
 import {
@@ -14,6 +15,13 @@ const STATUS_TONE = {
   'En curso': screen.toneSuccess,
   Cerrando: screen.toneBrand,
   Iniciando: screen.toneWarning,
+} as const;
+
+/** Mismo estado que el `tag`, leído de un vistazo en el borde de la fila. */
+const STATUS_ACCENT = {
+  'En curso': 'var(--success)',
+  Cerrando: 'var(--brand)',
+  Iniciando: 'var(--warning)',
 } as const;
 
 interface OrganizationScreenProps {
@@ -70,7 +78,16 @@ export function OrganizationScreen({ withRail = true }: OrganizationScreenProps)
             </p>
 
             {ORGANIZATION_SPACES.map((space) => (
-              <div key={space.name} className={screen.row}>
+              <div
+                key={space.name}
+                className={cx(screen.row, styles.spaceRow)}
+                style={
+                  {
+                    '--row-accent':
+                      STATUS_ACCENT[space.status as keyof typeof STATUS_ACCENT],
+                  } as CSSProperties
+                }
+              >
                 <div className={screen.rowMain}>
                   <span className={screen.rowTitle}>{space.name}</span>
                   <span className={screen.rowMeta}>{space.people} personas</span>
@@ -105,6 +122,7 @@ export function OrganizationScreen({ withRail = true }: OrganizationScreenProps)
             <div className={styles.chart}>
               {ORGANIZATION_TREND.map((point) => (
                 <div key={point.month} className={styles.bar}>
+                  <span className={styles.barValue}>{point.value}%</span>
                   <div
                     className={styles.barFill}
                     style={{ height: `${(point.value / maxValue) * 100}%` }}

@@ -58,6 +58,37 @@
   --error-strong: #b91c1c; /* 5.35:1 sobre --error-tint. */
   --error-tint: #fdebeb;
 
+  /* --- Estados de una postulación --------------------------------------- */
+  /*
+   * Los nueve estados de la taxonomía cerrada necesitan distinguirse entre sí
+   * de un vistazo, y los tonos semánticos genéricos no alcanzan: `success` y
+   * `teal` son el mismo color, igual que `warning` y `amber`.
+   *
+   * No es una paleta nueva: son nueve pares tinta/fondo construidos con la
+   * misma relación que el resto del tema —fondo muy claro, tinta oscura
+   * legible encima— y ordenados por el recorrido real de una búsqueda:
+   * gris al empezar, azul al enviar, violeta cuando miran el CV, ámbar en
+   * entrevista, verde al avanzar, rojo al cerrarse en contra.
+   */
+  --status-pendiente-tint: #f2f0e8;
+  --status-pendiente-ink: #6f6b59;
+  --status-postulado-tint: #eaf1fe;
+  --status-postulado-ink: #1d4ed8;
+  --status-cv-visto-tint: #efeafe;
+  --status-cv-visto-ink: #6d28d9;
+  --status-entrevista-tint: #fdf3e3;
+  --status-entrevista-ink: #b45309;
+  --status-oferta-tint: #e6f6f3;
+  --status-oferta-ink: #0f766e;
+  --status-contratado-tint: #e6f7ea;
+  --status-contratado-ink: #15803d;
+  --status-rechazado-tint: #fdebeb;
+  --status-rechazado-ink: #b91c1c;
+  --status-cerrado-tint: #eceef1;
+  --status-cerrado-ink: #475569;
+  --status-retirado-tint: #f3eee9;
+  --status-retirado-ink: #856243;
+
   /* --- Sombras --------------------------------------------------------- */
   /* En claro son casi imperceptibles: la profundidad la da el espacio, no la sombra. */
   --shadow-xs: 0 1px 2px rgba(23, 32, 51, 0.04);

@@ -4,6 +4,8 @@ import { TextLink } from '@/components/ui/TextLink';
 import { Icon, type IconName } from '@/components/ui/Icon';
 import { SECTION_ANCHORS } from '@/constants/navigation';
 import { ROUTES } from '@/constants/routes';
+import { useAuth } from '@/hooks/useAuth';
+import { resolvePanelDestination } from '@/services/data/experience/panels';
 import { cx } from '@/utils/classNames';
 import styles from './FinalCTA.module.css';
 
@@ -22,8 +24,18 @@ const CONDITIONS: Array<{ icon: IconName; label: string }> = [
  * Acá la acción se llama "Crear cuenta", no "Crear mi espacio": quien llegó
  * hasta el final ya decidió empezar, y lo que sigue es el trámite concreto de
  * registro. "Crear mi espacio" nombra la intención; "Crear cuenta", el paso.
+ *
+ * Con sesión activa nada de eso aplica: la cuenta ya existe. El mismo botón
+ * lleva a su espacio y desaparece la línea de "¿Ya tenés tu espacio?".
  */
 export function FinalCTA() {
+  const { isAuthenticated, loading, experiences } = useAuth();
+
+  const authenticated = !loading && isAuthenticated;
+  const primaryAction = authenticated
+    ? { href: resolvePanelDestination(experiences), label: 'Ir a mi espacio' }
+    : { href: ROUTES.createSpace, label: 'Crear cuenta' };
+
   return (
     <section
       className={cx('section', styles.section)}
@@ -44,11 +56,11 @@ export function FinalCTA() {
 
             <div className={styles.actions}>
               <LinkButton
-                href={ROUTES.createSpace}
+                href={primaryAction.href}
                 size="lg"
                 iconTrailing="arrowRight"
               >
-                Crear cuenta
+                {primaryAction.label}
               </LinkButton>
               <LinkButton
                 href={SECTION_ANCHORS.organizations}
@@ -59,9 +71,11 @@ export function FinalCTA() {
               </LinkButton>
             </div>
 
-            <p className={styles.signIn}>
-              ¿Ya tenés tu espacio? <TextLink href={ROUTES.signIn}>Iniciar sesión</TextLink>
-            </p>
+            {!authenticated && (
+              <p className={styles.signIn}>
+                ¿Ya tenés tu espacio? <TextLink href={ROUTES.signIn}>Iniciar sesión</TextLink>
+              </p>
+            )}
 
             <div className={styles.footnote}>
               {CONDITIONS.map((condition) => (

@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { Avatar } from '@/components/ui/Avatar';
 import { ScreenRail } from './ScreenRail';
 import { MENTOR_RAIL } from './railItems';
@@ -11,6 +12,16 @@ const TONE_CLASS = {
   warning: screen.toneWarning,
 } as const;
 
+/**
+ * Color del anillo de acompañamiento: la misma semántica de estado que ya usa
+ * el `tag` (éxito / atención), aplicada como progreso individual en vez de
+ * barra comparativa.
+ */
+const RING_COLOR = {
+  success: 'var(--success)',
+  warning: 'var(--warning)',
+} as const;
+
 interface MentorDashboardScreenProps {
   /** Oculta la navegación lateral cuando la ventana se muestra recortada. */
   withRail?: boolean;
@@ -21,6 +32,10 @@ interface MentorDashboardScreenProps {
  *
  * Comunica acompañamiento, no control: los indicadores sirven para detectar a
  * quién hace falta acompañar más de cerca, no para rankear personas.
+ *
+ * Por eso el progreso de cada aprendiz vive en un anillo alrededor de su
+ * propio avatar — un dato personal, leído de a uno — y no en barras alineadas
+ * en columna, que se leen como una tabla de posiciones.
  */
 export function MentorDashboardScreen({
   withRail = true,
@@ -65,7 +80,17 @@ export function MentorDashboardScreen({
 
             {MENTOR_LEARNERS.map((learner) => (
               <div key={learner.name} className={screen.row}>
-                <Avatar name={learner.name} size="sm" />
+                <span
+                  className={styles.ring}
+                  style={
+                    {
+                      '--ring-color': RING_COLOR[learner.tone as keyof typeof RING_COLOR],
+                      '--ring-pct': `${learner.progress}%`,
+                    } as CSSProperties
+                  }
+                >
+                  <Avatar name={learner.name} size="sm" />
+                </span>
 
                 <div className={screen.rowMain}>
                   <span className={screen.rowTitle}>{learner.name}</span>
@@ -84,14 +109,7 @@ export function MentorDashboardScreen({
                     <span className={screen.tagDot} />
                     {learner.signal}
                   </span>
-
-                  <div className={screen.miniTrack}>
-                    <div
-                      className={screen.miniFill}
-                      style={{ width: `${learner.progress}%` }}
-                    />
-                  </div>
-                  <span className={screen.miniValue}>{learner.progress}%</span>
+                  <span className={styles.ringValue}>{learner.progress}%</span>
                 </div>
               </div>
             ))}
@@ -99,15 +117,26 @@ export function MentorDashboardScreen({
 
           <div className={screen.panel}>
             <p className={screen.panelTitle}>Agenda de hoy</p>
-            {MENTOR_AGENDA.map((item) => (
-              <div key={item.title} className={screen.row}>
-                <span className={styles.time}>{item.time}</span>
-                <div className={screen.rowMain}>
-                  <span className={screen.rowTitle}>{item.title}</span>
-                  <span className={screen.rowMeta}>{item.kind}</span>
+
+            <div className={styles.agenda}>
+              {MENTOR_AGENDA.map((item, index) => (
+                <div key={item.title} className={styles.agendaItem}>
+                  <span className={styles.agendaTime}>{item.time}</span>
+
+                  <span className={styles.agendaRail} aria-hidden="true">
+                    <span className={styles.agendaDot} />
+                    {index < MENTOR_AGENDA.length - 1 && (
+                      <span className={styles.agendaLine} />
+                    )}
+                  </span>
+
+                  <div className={screen.rowMain}>
+                    <span className={screen.rowTitle}>{item.title}</span>
+                    <span className={screen.rowMeta}>{item.kind}</span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>

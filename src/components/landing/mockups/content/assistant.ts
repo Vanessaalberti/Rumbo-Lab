@@ -20,6 +20,8 @@
 export interface AssistantMessage {
   from: 'person' | 'rumbo';
   text: string;
+  /** Hora del mensaje, como la muestra cualquier chat. */
+  time: string;
   /** Bloque estructurado que devuelve el canal: un registro o unas opciones. */
   lines?: readonly string[];
 }
@@ -27,10 +29,12 @@ export interface AssistantMessage {
 export const ASSISTANT_CONVERSATION: readonly AssistantMessage[] = [
   {
     from: 'person',
+    time: '19:24',
     text: 'nubelostudio.com/jobs/frontend-jr',
   },
   {
     from: 'rumbo',
+    time: '19:24',
     text: 'Lo registré en tus postulaciones. Respondé con otro nombre si querés cambiarlo.',
     lines: [
       'Nombre · Postulación-6',
@@ -41,18 +45,22 @@ export const ASSISTANT_CONVERSATION: readonly AssistantMessage[] = [
   },
   {
     from: 'person',
+    time: '19:26',
     text: 'Nubelo Studio',
   },
   {
     from: 'rumbo',
+    time: '19:26',
     text: 'Listo. Cuando avances con el proceso, escribime y actualizamos el estado.',
   },
   {
     from: 'person',
+    time: '19:31',
     text: 'Nubelo Studio pasó a entrevista',
   },
   {
     from: 'rumbo',
+    time: '19:31',
     text: '¿Cuándo ocurrió?',
     lines: ['1 · Ahora', '2 · En otra fecha y hora'],
   },

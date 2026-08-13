@@ -1,0 +1,57 @@
+/**
+ * Chasis de teléfono.
+ *
+ * Contraparte de `ProductWindow` para las vistas que no ocurren en la web.
+ * Mismo lenguaje —superficie limpia, borde delicado, profundidad suave— pero
+ * con la proporción y el chasis de un dispositivo, para que se entienda de un
+ * vistazo que eso pasa en el celular y no en la aplicación.
+ */
+
+.phone {
+  position: relative;
+  width: 100%;
+  max-width: 312px;
+  margin-inline: auto;
+  padding: var(--space-2);
+  background-color: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-3xl);
+  box-shadow: var(--shadow-xl);
+  isolation: isolate;
+}
+
+/* Auricular y cámara: lo mínimo para leer "teléfono" sin dibujar un producto
+   de otra marca. */
+.notch {
+  position: absolute;
+  top: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.speaker {
+  width: 34px;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background-color: var(--border);
+}
+
+.camera {
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background-color: var(--border);
+}
+
+.screen {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-2xl);
+  background-color: var(--surface);
+  display: flex;
+  flex-direction: column;
+}

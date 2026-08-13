@@ -1,5 +1,5 @@
 import { Icon, type IconName } from '@/components/ui/Icon';
-import { EVIDENCE_TIMELINE } from './content';
+import { EVIDENCE_TIMELINE, EVIDENCE_TOTAL } from './content';
 import { cx } from '@/utils/classNames';
 import screen from './screen.module.css';
 import styles from './EvidenceTimelineScreen.module.css';
@@ -42,7 +42,9 @@ export function EvidenceTimelineScreen({
       <header className={screen.header}>
         <div>
           <p className={screen.headerTitle}>Evidencias</p>
-          <p className={screen.headerMeta}>12 registros · desde marzo de 2026</p>
+          <p className={screen.headerMeta}>
+            {EVIDENCE_TOTAL} registros · desde marzo de 2026
+          </p>
         </div>
         <span className={cx(screen.action, screen.actionGhost)}>Todo</span>
       </header>

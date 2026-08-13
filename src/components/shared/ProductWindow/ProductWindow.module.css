@@ -15,6 +15,20 @@
   overflow: hidden;
   /* Las ventanas nunca se comprimen por debajo de su composición interna. */
   isolation: isolate;
+  transition:
+    transform var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out);
+}
+
+/**
+ * El producto responde a la presencia del cursor, no solo el hero: la misma
+ * idea de "esto es real" se repite cada vez que aparece una ventana.
+ * Restringido a punteros finos: en táctil el hover queda pegado tras el toque.
+ */
+@media (hover: hover) and (pointer: fine) {
+  .window:hover {
+    transform: translateY(-5px);
+  }
 }
 
 /* Barra de título: identifica la vista del producto que se está mostrando. */

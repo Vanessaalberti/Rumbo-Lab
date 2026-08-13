@@ -1,0 +1,103 @@
+import { useOutletContext } from 'react-router-dom';
+import { Avatar } from '@/components/ui/Avatar';
+import type { ApprenticeShellContext } from '@/app/layouts/ApprenticeShell';
+import { formatLongDate } from './perfil/formatters';
+import screen from '@/app/layouts/appShell.module.css';
+
+/**
+ * Espacios en los que participa el Aprendiz.
+ *
+ * Son una **relación**, no una posesión (Notion 02 · Mi Rumbo §5: "no son
+ * hijos ni propiedad de Mi Rumbo"): esta vista responde "de qué espacios formo
+ * parte", nada más. Crear, editar o administrar un Espacio pertenece al
+ * contexto de Mentor y no se ofrece acá.
+ *
+ * Los mentores del Espacio salen de `space_mentors → mentors`, visibles para
+ * el Aprendiz por la política `mentors_select_by_shared_space`.
+ *
+ * No hay "entrar al Espacio": no existe todavía una ruta de detalle de Espacio
+ * en la aplicación, y no se inventa una que llevaría a una pantalla vacía.
+ */
+export function SpacesSection() {
+  const {
+    dashboard: { spaces, mentors, applications },
+  } = useOutletContext<ApprenticeShellContext>();
+
+  /** Postulaciones que la persona vinculó a cada Espacio. Dato real. */
+  const applicationsBySpace = new Map<string, number>();
+  for (const application of applications) {
+    if (application.spaceId) {
+      applicationsBySpace.set(
+        application.spaceId,
+        (applicationsBySpace.get(application.spaceId) ?? 0) + 1,
+      );
+    }
+  }
+
+  return (
+    <>
+      <div className={screen.header}>
+        <div>
+          <p className={screen.headerTitle}>Espacios</p>
+          <p className={screen.headerMeta}>
+            {spaces.length === 0
+              ? 'Todavía no participás de ninguno'
+              : `Participás de ${spaces.length} Espacio${spaces.length === 1 ? '' : 's'}`}
+          </p>
+        </div>
+      </div>
+
+      {spaces.length === 0 ? (
+        <p className={screen.emptyState}>
+          Acá van a aparecer los Espacios en los que un mentor te sume. No hace falta pertenecer a
+          uno para usar Mi Rumbo.
+        </p>
+      ) : (
+        spaces.map((space) => {
+          const spaceMentors = mentors.filter((mentor) => mentor.spaceName === space.name);
+          const linked = applicationsBySpace.get(space.id) ?? 0;
+
+          return (
+            <section key={space.id} className={screen.panel}>
+              <div className={screen.panelTitle}>
+                <span>{space.name}</span>
+                <span>Desde {formatLongDate(space.joinedAt)}</span>
+              </div>
+
+              {space.description && <p className={screen.rowMeta}>{space.description}</p>}
+
+              {spaceMentors.length > 0 &&
+                spaceMentors.map((mentor) => {
+                  const mentorName = mentor.fullName ?? 'Mentor';
+
+                  return (
+                    <div key={mentor.id} className={screen.row}>
+                      <Avatar name={mentorName} size="sm" />
+                      <div className={screen.rowMain}>
+                        <span className={screen.rowTitle}>{mentorName}</span>
+                        <span className={screen.rowMeta}>Mentor del Espacio</span>
+                      </div>
+                    </div>
+                  );
+                })}
+
+              {linked > 0 && (
+                <div className={screen.row}>
+                  <div className={screen.rowMain}>
+                    <span className={screen.rowTitle}>
+                      {linked} postulación{linked === 1 ? '' : 'es'} vinculada
+                      {linked === 1 ? '' : 's'}
+                    </span>
+                    <span className={screen.rowMeta}>
+                      Las registraste desde Mi Rumbo indicando este Espacio
+                    </span>
+                  </div>
+                </div>
+              )}
+            </section>
+          );
+        })
+      )}
+    </>
+  );
+}

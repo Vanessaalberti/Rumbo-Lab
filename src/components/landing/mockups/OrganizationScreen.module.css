@@ -5,12 +5,36 @@
   align-items: start;
 }
 
+/* Acento de estado en el borde de la fila: la misma lectura que el `tag`,
+   pero disponible de un vistazo al recorrer la lista completa (lectura de
+   reporte institucional, no de tarjeta por tarjeta). */
+.spaceRow {
+  border-left: 3px solid var(--row-accent, transparent);
+  padding-left: var(--space-3);
+  margin-left: calc(var(--space-3) * -1);
+}
+
 .chart {
   display: flex;
   align-items: flex-end;
   gap: var(--space-2);
   height: 96px;
   padding-top: var(--space-2);
+}
+
+.barValue {
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  color: var(--text-soft);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  padding-bottom: var(--space-1);
+}
+
+/* El mes en curso es el dato destacado del gráfico: mismo criterio de color
+   que su barra (marca, no turquesa de progreso histórico). */
+.bar:last-child .barValue {
+  color: var(--brand-strong);
 }
 
 .bar {

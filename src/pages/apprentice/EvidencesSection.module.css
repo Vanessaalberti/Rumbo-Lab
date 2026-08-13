@@ -1,0 +1,81 @@
+/**
+ * Evidencias — misma línea cronológica que el mockup de la landing
+ * (`components/landing/mockups/EvidenceTimelineScreen.module.css`), a escala
+ * real.
+ */
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  position: relative;
+}
+
+.event {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  position: relative;
+}
+
+/* Hilo que une los eventos: el crecimiento es acumulativo, no una lista suelta. */
+.event:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 17px;
+  top: 36px;
+  bottom: calc(var(--space-5) * -1);
+  width: 1px;
+  background-color: var(--border);
+}
+
+.marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  z-index: 1;
+  border: 1px solid var(--border);
+  background-color: var(--teal-tint);
+  color: var(--teal-ink);
+}
+
+.eventBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: var(--space-1);
+}
+
+.eventLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text);
+  line-height: 1.35;
+}
+
+.eventDetail {
+  font-size: var(--text-xs);
+  color: var(--text-soft);
+  line-height: 1.4;
+}
+
+.eventLink {
+  font-size: var(--text-xs);
+  color: var(--brand-strong);
+  align-self: flex-start;
+}
+
+.eventDate {
+  font-size: var(--text-xs);
+  /* La fecha es parte del registro: debe leerse, no insinuarse. */
+  color: var(--text-soft);
+  flex-shrink: 0;
+  padding-top: var(--space-2);
+  font-variant-numeric: tabular-nums;
+}

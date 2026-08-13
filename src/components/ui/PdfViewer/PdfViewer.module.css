@@ -1,0 +1,39 @@
+/**
+ * Visor de PDF.
+ *
+ * Solo las hojas: sin barra de herramientas, sin paginador, sin controles de
+ * zoom. Lo que se ve es el documento sobre un fondo neutro, como papel.
+ */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.pages {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-height: min(72vh, 860px);
+  overflow-y: auto;
+  padding: var(--space-4);
+  background-color: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+/* Cada hoja es una hoja: fondo blanco propio y una sombra que la despega. */
+.page {
+  display: block;
+  width: 100%;
+  height: auto;
+  background-color: #ffffff;
+  border-radius: var(--radius-xs);
+  box-shadow: var(--shadow-sm);
+}
+
+.message {
+  font-size: var(--text-sm);
+  color: var(--text-soft);
+}

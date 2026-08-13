@@ -33,6 +33,9 @@ export const ICON_PATHS = {
   link: 'M10 13a5 5 0 0 0 7.1 0l3-3a5 5 0 0 0-7.1-7.1L11.3 4.6M14 11a5 5 0 0 0-7.1 0l-3 3a5 5 0 0 0 7.1 7.1l1.7-1.7',
 
   // --- Interfaz ---
+  pencil: 'M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z',
+  filter: 'M3 5h18M7 12h10M11 19h2',
+  chevronDown: 'M6 9l6 6 6-6',
   arrowRight: 'M5 12h14M13 6l6 6-6 6',
   arrowUp: 'M12 19V5M6 11l6-6 6 6',
   arrowUpRight: 'M8 16 16 8M9 8h7v7',

@@ -10,18 +10,21 @@ conflicto entre este código y esos documentos, mandan los documentos.
 
 ## Alcance de este repositorio
 
-Contiene únicamente la experiencia de usuario: landing pública, vistas del
-producto, componentes y sistema visual.
+Contiene la experiencia de usuario —landing pública, vistas del producto,
+componentes y sistema visual— más identidad y sesión, que resuelve
+directamente contra Supabase Auth (ver [Autenticación](#autenticación)).
 
-**No** contiene lógica de negocio, acceso a base de datos, reglas de permisos ni
-procesamiento sensible: todo eso vive en `rumbo-lab-backend`, y este repositorio
-lo consume vía API.
+**No** contiene lógica de negocio ni operaciones privilegiadas: eso vive en
+`rumbo-lab-backend`, que este repositorio consume vía API enviando el
+`access_token` de la sesión. El acceso a datos que sí hace este repositorio
+—la sesión propia y el perfil de Aprendiz asociado— pasa siempre por RLS,
+nunca por un rol privilegiado.
 
 ## Stack
 
 React 19 · TypeScript · Vite 6 · CSS Modules sobre tokens en variables CSS ·
-React Router · Motion. Sin librería de componentes ni de estilos: el sistema
-visual es propio.
+React Router · Motion · `@supabase/supabase-js` (identidad y sesión). Sin
+librería de componentes ni de estilos: el sistema visual es propio.
 
 `motion` es la única dependencia de UI. Se sumó para dos interacciones concretas
 —el paralaje del hero y el arrastre de los fragmentos de la sección Problema—
@@ -46,13 +49,17 @@ npm run dev
 | `npm run lint` | ESLint sobre todo el proyecto |
 | `npm run typecheck` | Solo chequeo de tipos |
 
-Copiar `.env.example` a `.env` para apuntar a la API cuando exista el backend.
+Copiar `.env.example` a `.env`: completar `VITE_SUPABASE_URL` y
+`VITE_SUPABASE_ANON_KEY` con los del proyecto de Supabase (obligatorios, la
+app no arranca sin ellos — ver `src/config/environment.ts`) y
+`VITE_API_BASE_URL` para apuntar a `rumbo-lab-backend` cuando haga falta
+consumirlo.
 
 ## Estructura
 
 ```
 src/
-├── app/            Raíz: router, providers, layouts, tema, ErrorBoundary
+├── app/            Raíz: router, providers, layouts, tema, guards, ErrorBoundary
 ├── assets/         Fuentes, imágenes, ilustraciones, fotografías
 ├── components/
 │   ├── ui/         Primitivas: Button, Card, Badge, Input, Avatar, TextLink…
@@ -61,10 +68,10 @@ src/
 │   └── landing/    Una carpeta por sección + mockups/ (con content/ y profile/)
 ├── config/         Lectura única de variables de entorno
 ├── constants/      Rutas, navegación, claves de almacenamiento
-├── contexts/       Contextos de React
-├── hooks/          Hooks reutilizables
+├── contexts/       Contextos de React (tema, autenticación)
+├── hooks/          Hooks reutilizables (useTheme, useAuth…)
 ├── pages/          Composición de secciones por página
-├── services/       data/ (capa de datos) · scroll/ · storage/
+├── services/       data/ (capa de datos, por dominio) · supabase/ (cliente + errores) · scroll/ · storage/
 ├── styles/         tokens/ · themes/ · globals/ · animations/
 ├── types/          Tipos compartidos
 └── utils/          Utilidades puras
@@ -242,11 +249,23 @@ rankings.
 
 ## Rutas
 
-| Ruta | Página | Layout |
-| --- | --- | --- |
-| `/` | Landing | `PublicLayout` (navbar completa + pie) |
-| `/crear-espacio` | Entrada del onboarding | `AccessLayout` (navbar mínima) |
-| `/ingresar` | Ingreso de quien ya tiene su espacio | `AccessLayout` |
+| Ruta | Página | Layout | Acceso |
+| --- | --- | --- | --- |
+| `/` | Landing | `PublicLayout` (navbar completa + pie) | Pública |
+| `/crear-espacio` | Registro | `AccessLayout` (navbar mínima) | Pública, redirige a `/mi-rumbo` si ya hay sesión |
+| `/ingresar` | Ingreso de quien ya tiene su espacio | `AccessLayout` | Pública, idem |
+| `/elegir-experiencia` | Con cuál experiencia (Aprendiz, Mentor) entrar — también activa una segunda más adelante | `PrivateLayout` | Privada — `RequireAuth` |
+| `/mi-rumbo` | Panel del Aprendiz: perfil, CVs, postulaciones, espacios | `PrivateLayout` | Privada — `RequireAuth` + `RequireExperience("apprentice")` |
+| `/panel-mentor` | Placeholder de la experiencia Mentor (Fase 2, sin contenido todavía) | `PrivateLayout` | Privada — `RequireAuth` + `RequireExperience("mentor")` |
+
+`RequireAuth` y `RedirectIfAuthenticated` (`app/guards/`) deciden si una ruta
+exige o excluye sesión. `RequireExperience` decide, además, si la cuenta ya
+activó la experiencia que esa rama necesita — Aprendiz y Mentor **coexisten**
+en la misma cuenta (Notion 02 · Mi Rumbo §3 bis), no son una bifurcación
+única: `ExperienceSwitcher` (navbar del área privada) cambia entre las que ya
+están activadas, y `/elegir-experiencia` activa las que faltan. Perfil, CVs y
+postulaciones ya viven en `/mi-rumbo`; lo que se agregue después cuelga del
+mismo guard.
 
 ### Las CTA tienen dos niveles
 
@@ -260,8 +279,53 @@ rankings.
 primera es la promesa del producto, la segunda es el formulario. Registro e
 ingreso se mantienen siempre separados.
 
-Las dos páginas de acceso definen el flujo y lo que se le pide a la persona en
-cada paso; sus acciones están deshabilitadas hasta que exista la API.
+## Autenticación
+
+Supabase Auth es la única fuente de verdad de identidad y sesión — no hay
+sistema de contraseñas propio ni JWT hecho a mano.
+
+```
+Registro (/crear-espacio)          Ingreso (/ingresar)
+        │                                  │
+        ▼                                  ▼
+  supabase.auth.signUp        supabase.auth.signInWithPassword
+        │                                  │
+        └──────────────┬───────────────────┘
+                        ▼
+         AuthProvider recibe el cambio de sesión
+         (onAuthStateChange) y le pregunta a
+         rumbo-lab-backend qué experiencias
+         (Aprendiz, Mentor) ya tiene la cuenta
+                        │
+                        ▼
+   RedirectIfAuthenticated → /mi-rumbo, /panel-mentor
+                              o /elegir-experiencia
+                              (si no activó ninguna)
+```
+
+- `services/supabase/client.ts` — cliente único, con `persistSession` para
+  que la sesión sobreviva a un F5. Es lo único que este repositorio consulta
+  directo contra Supabase: identidad y sesión, nada de datos de negocio.
+- `services/api/httpClient.ts` — único punto de entrada hacia
+  `rumbo-lab-backend`: adjunta el `access_token` de la sesión activa como
+  `Authorization: Bearer` en cada request.
+- `app/providers/AuthProvider.tsx` + `contexts/AuthContext.ts` +
+  `hooks/useAuth.ts` — mismo patrón que `ThemeProvider`/`useTheme`. Expone
+  `experiences: { apprentice, mentor }`, resuelto contra el backend
+  (`GET /api/experiences`), no contra la tabla directamente.
+- `services/data/experience/` — activa una experiencia (`POST
+  /api/experiences/apprentice` o `/mentor`), idempotente.
+- `services/data/dashboard/` — datos de Mi Rumbo (`GET /api/me`) y edición de
+  perfil (`PATCH /api/me/profile`).
+- `app/guards/RequireAuth.tsx` / `RequireExperience.tsx` /
+  `RedirectIfAuthenticated.tsx` — deciden acceso por ruta. Mientras la sesión
+  o las experiencias se resuelven (`loading` / `experiences === null`),
+  muestran un estado neutro (`AuthLoadingScreen`) en lugar de dejar ver el
+  login o el contenido privado por un instante.
+
+Si el registro requiere confirmar el correo (configuración del proyecto de
+Supabase), la persona no queda autenticada de inmediato: `CreateSpacePage` lo
+muestra en lugar de simular una sesión que no existe.
 
 ## Seguridad
 
@@ -270,9 +334,11 @@ externos, cabeceras HTTP, auditoría de dependencias y prácticas de git.
 
 ## Estado
 
-Superficie pública completa. Las áreas privadas de aprendiz, mentor y
-organización se montarán como ramas propias del router, cada una con su layout,
-cuando exista el backend.
+Superficie pública completa. Autenticación de Aprendiz funcional de punta a
+punta (registro, ingreso, sesión persistente, logout, ruta privada). Falta
+componer Perfil, CVs y Postulaciones dentro de `/mi-rumbo`; mentor y
+organización se montarán como ramas propias del router, cada una con su
+layout y su propio guard.
 
 Falta incorporar las fotografías documentales de la landing: ver
 `src/assets/photos/README.md` para la dirección artística y las escenas

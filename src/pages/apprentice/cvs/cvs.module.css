@@ -1,0 +1,284 @@
+/**
+ * CVs — grilla de tarjetas.
+ *
+ * Cada CV es un objeto que se mira, no una fila de una tabla: por eso la
+ * grilla y no la lista. La tarjeta muestra el documento; el nombre va debajo,
+ * como en un explorador de archivos.
+ */
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+/* El contador ocupa el extremo opuesto de la barra. */
+.counter {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--text-soft);
+}
+
+.counterValue {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.counterFull {
+  color: var(--warning-strong);
+}
+
+/* --- Grilla --------------------------------------------------------------- */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-5);
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+/* La tarjeta es el documento. Proporción de hoja para que se lea como tal. */
+.card {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background-color: var(--surface);
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    border-color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard);
+}
+
+.card:hover {
+  border-color: var(--brand);
+  box-shadow: var(--shadow-md);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.cardPrimary {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 1px var(--brand);
+}
+
+.cardIcon {
+  color: var(--text-faint);
+}
+
+.thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Marca del CV principal, arriba a la izquierda. */
+.primaryFlag {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background-color: var(--brand-tint);
+  color: var(--brand-strong);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+}
+
+/* --- Menú "…" ------------------------------------------------------------- */
+/*
+ * El panel lo posiciona y estiliza el componente Popover, que lo saca a un
+ * portal: la tarjeta recorta con `overflow: hidden` y cortaba el menú.
+ */
+
+.menuRoot {
+  position: absolute;
+  bottom: var(--space-2);
+  right: var(--space-2);
+}
+
+.menuTrigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+  color: var(--text-soft);
+  font-size: var(--text-base);
+  line-height: 1;
+  cursor: pointer;
+  transition: var(--transition-colors);
+}
+
+.menuTrigger:hover,
+.menuTrigger[aria-expanded='true'] {
+  background-color: var(--bg-alt);
+  color: var(--text);
+}
+
+.menuTrigger:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  background: none;
+  border-radius: var(--radius-xs);
+  font: inherit;
+  font-size: var(--text-sm);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: var(--transition-colors);
+}
+
+.menuItem:hover {
+  background-color: var(--bg-alt);
+}
+
+.menuItem:disabled {
+  color: var(--text-faint);
+  cursor: default;
+}
+
+.menuItem:disabled:hover {
+  background: none;
+}
+
+.menuItemDanger {
+  color: var(--error-strong);
+}
+
+.menuItemDanger:hover {
+  background-color: var(--error-tint);
+}
+
+.menuIcon {
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.menuSeparator {
+  height: 1px;
+  margin: var(--space-1) 0;
+  background-color: var(--border-soft);
+  border: none;
+}
+
+/* --- Nombre y metadatos --------------------------------------------------- */
+
+.name {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text);
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  font-size: var(--text-xs);
+  color: var(--text-soft);
+  line-height: 1.35;
+}
+
+/* --- Previsualización ----------------------------------------------------- */
+
+.previewLoading {
+  padding: var(--space-6) var(--space-5);
+  font-size: var(--text-sm);
+  color: var(--text-soft);
+  text-align: center;
+}
+
+.previewUnsupported {
+  padding: var(--space-6) var(--space-5);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-alt);
+  color: var(--text-soft);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  text-align: center;
+}
+
+.previewImage {
+  display: block;
+  width: 100%;
+  max-height: min(70vh, 720px);
+  object-fit: contain;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-alt);
+}
+
+.previewNote {
+  margin-top: var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--text-soft);
+}
+
+.errorState {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background-color: var(--error-tint);
+  color: var(--error-strong);
+  font-size: var(--text-sm);
+}
+
+.notice {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background-color: var(--warning-tint);
+  color: var(--warning-strong);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+.noticeIcon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.hiddenInput {
+  display: none;
+}

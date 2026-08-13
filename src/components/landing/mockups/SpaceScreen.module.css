@@ -4,6 +4,39 @@
   gap: var(--space-3);
 }
 
+/* --- Recorrido semanal ---------------------------------------------------- */
+/* Cada semana de la cohorte es su propio segmento: se lee como etapas de un
+   proceso, no como el llenado de una sola barra. */
+.weeks {
+  display: flex;
+  gap: 3px;
+  flex: 1;
+}
+
+.week {
+  flex: 1;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background-color: var(--bg-alt);
+}
+
+.weekDone {
+  background-color: var(--teal);
+}
+
+/* La semana en curso se distingue de las ya completadas. */
+.weekCurrent {
+  background-color: var(--brand);
+}
+
+.weeksLabel {
+  font-size: var(--text-2xs);
+  color: var(--text-soft);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 .body {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);

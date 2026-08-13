@@ -1,12 +1,21 @@
+import { useState, type FormEvent } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { TextLink } from '@/components/ui/TextLink';
 import { Icon } from '@/components/ui/Icon';
-import { PendingNote } from '@/components/shared/PendingNote';
 import { ROUTES } from '@/constants/routes';
+import { useAuth } from '@/hooks/useAuth';
+import { isValidEmail } from '@/utils/validation';
 import { cx } from '@/utils/classNames';
 import { ONBOARDING_STEPS } from './onboardingSteps';
 import styles from './CreateSpacePage.module.css';
+
+interface FieldErrors {
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+}
 
 /**
  * Entrada del flujo de registro.
@@ -14,8 +23,55 @@ import styles from './CreateSpacePage.module.css';
  * Muestra qué va a contener el espacio antes de pedir nada: la persona entiende
  * qué obtiene antes de invertir esfuerzo, que es lo contrario a la fatiga de
  * completar otro perfil más.
+ *
+ * No navega manualmente al éxito: si el registro deja sesión activa,
+ * `RedirectIfAuthenticated` reacciona al cambio y lleva a Mi Rumbo. Si
+ * Supabase exige confirmar el correo primero, esta pantalla lo dice en lugar
+ * de simular que ya quedó adentro.
  */
 export function CreateSpacePage() {
+  const { signUp } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [formError, setFormError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [confirmationRequired, setConfirmationRequired] = useState(false);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setFormError(null);
+
+    const nextFieldErrors: FieldErrors = {};
+    if (!isValidEmail(email)) {
+      nextFieldErrors.email = 'Ingresá un correo válido.';
+    }
+    if (password.length < 6) {
+      nextFieldErrors.password = 'La contraseña debe tener al menos 6 caracteres.';
+    }
+    if (password !== confirmPassword) {
+      nextFieldErrors.confirmPassword = 'Las contraseñas no coinciden.';
+    }
+
+    setFieldErrors(nextFieldErrors);
+    if (Object.keys(nextFieldErrors).length > 0) return;
+
+    setSubmitting(true);
+    const result = await signUp(email, password);
+    setSubmitting(false);
+
+    if (!result.ok) {
+      setFormError(result.message);
+      return;
+    }
+
+    if (result.status === 'confirmation-required') {
+      setConfirmationRequired(true);
+    }
+    // Si `status` es 'signed-in', RedirectIfAuthenticated hace la redirección.
+  };
+
   return (
     <div className={cx('container', styles.page)}>
       <div className={styles.inner}>
@@ -29,17 +85,66 @@ export function CreateSpacePage() {
             desarrollo profesional queda organizado, acompañado y visible.
           </p>
 
-          <div className={styles.actions}>
-            <Button size="lg" iconTrailing="arrowRight" disabled>
-              Empezar con mi CV
-            </Button>
-          </div>
+          {confirmationRequired ? (
+            <p className={styles.confirmationNote}>
+              <Icon name="document" size={18} className={styles.confirmationIcon} />
+              Te enviamos un correo a <strong>{email}</strong> para confirmar tu
+              cuenta. Confirmalo y después iniciá sesión.
+            </p>
+          ) : (
+            <form className={styles.form} onSubmit={handleSubmit} noValidate>
+              <Input
+                label="Correo electrónico"
+                type="email"
+                autoComplete="email"
+                placeholder="tu@correo.com"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                error={fieldErrors.email}
+                disabled={submitting}
+                required
+              />
+              <Input
+                label="Contraseña"
+                type="password"
+                autoComplete="new-password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                error={fieldErrors.password}
+                disabled={submitting}
+                required
+              />
+              <Input
+                label="Confirmar contraseña"
+                type="password"
+                autoComplete="new-password"
+                placeholder="••••••••"
+                value={confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
+                error={fieldErrors.confirmPassword}
+                disabled={submitting}
+                required
+              />
 
-          <PendingNote>
-            El registro se habilita cuando se conecte la API de{' '}
-            <strong>rumbo-lab-backend</strong>. Esta pantalla ya define el flujo
-            y lo que se le pide a la persona en cada paso.
-          </PendingNote>
+              {formError && (
+                <p className={styles.formError} role="alert">
+                  {formError}
+                </p>
+              )}
+
+              <div className={styles.actions}>
+                <Button
+                  type="submit"
+                  size="lg"
+                  iconTrailing="arrowRight"
+                  disabled={submitting}
+                >
+                  {submitting ? 'Creando cuenta…' : 'Crear cuenta'}
+                </Button>
+              </div>
+            </form>
+          )}
 
           <p className={styles.signIn}>
             ¿Ya tenés tu espacio?{' '}

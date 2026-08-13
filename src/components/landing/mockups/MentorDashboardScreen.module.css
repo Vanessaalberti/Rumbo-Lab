@@ -5,13 +5,102 @@
   align-items: start;
 }
 
-.time {
+/* --- Anillo de acompañamiento -------------------------------------------- */
+/**
+ * Progreso individual alrededor del propio avatar en vez de una barra en
+ * columna: se lee persona por persona, no como una tabla de posiciones
+ * (Dirección Creativa · Mentor: "nunca ordena personas de mejor a peor").
+ */
+.ring {
+  --ring-size: 40px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ring-size);
+  height: var(--ring-size);
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  background: conic-gradient(var(--ring-color) var(--ring-pct), var(--border-soft) 0);
+}
+
+.ring::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: var(--radius-full);
+  background-color: var(--surface);
+}
+
+.ring > * {
+  position: relative;
+  z-index: 1;
+}
+
+.ringValue {
+  font-size: var(--text-2xs);
+  color: var(--text-soft);
+  font-variant-numeric: tabular-nums;
+  min-width: 28px;
+  text-align: right;
+}
+
+/* --- Agenda: línea de tiempo ---------------------------------------------- */
+
+.agenda {
+  display: flex;
+  flex-direction: column;
+}
+
+.agendaItem {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-3);
+  padding-block: var(--space-3);
+}
+
+.agendaItem:first-child {
+  padding-top: 0;
+}
+
+.agendaItem:last-child {
+  padding-bottom: 0;
+}
+
+.agendaTime {
   font-size: var(--text-2xs);
   font-weight: var(--weight-semibold);
   color: var(--brand-strong);
   font-variant-numeric: tabular-nums;
   flex-shrink: 0;
   min-width: 34px;
+  padding-top: 1px;
+}
+
+.agendaRail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 8px;
+  flex-shrink: 0;
+}
+
+.agendaDot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background-color: var(--amber);
+  box-shadow: 0 0 0 3px var(--amber-tint);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.agendaLine {
+  flex: 1;
+  width: 1px;
+  min-height: var(--space-3);
+  margin-top: var(--space-1);
+  background-color: var(--border);
 }
 
 @media (max-width: 900px) {

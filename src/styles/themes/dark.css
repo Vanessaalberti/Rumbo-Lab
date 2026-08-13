@@ -54,6 +54,31 @@
   --error-strong: #dfa595;
   --error-tint: #2e211e;
 
+  /* --- Estados de una postulación --------------------------------------- */
+  /*
+   * Mismos nueve estados que en claro, con el carácter apagado de este tema:
+   * fondos oscuros de baja saturación y tintas claras encima. No se copian los
+   * valores del tema claro — en oscuro invierten la relación.
+   */
+  --status-pendiente-tint: #2a2820;
+  --status-pendiente-ink: #a6a18e;
+  --status-postulado-tint: #1e2733;
+  --status-postulado-ink: #93b7dd;
+  --status-cv-visto-tint: #262233;
+  --status-cv-visto-ink: #b4a4dd;
+  --status-entrevista-tint: #2a2619;
+  --status-entrevista-ink: #d9cba3;
+  --status-oferta-tint: #1e2a26;
+  --status-oferta-ink: #8fccbb;
+  --status-contratado-tint: #1c2b22;
+  --status-contratado-ink: #93cfa6;
+  --status-rechazado-tint: #2e211e;
+  --status-rechazado-ink: #dfa595;
+  --status-cerrado-tint: #23262b;
+  --status-cerrado-ink: #a7b1be;
+  --status-retirado-tint: #2b2621;
+  --status-retirado-ink: #c6ad92;
+
   /* --- Sombras --------------------------------------------------------- */
   /* Algo más presentes que en claro: hacen falta para dar profundidad sobre casi-negro. */
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);

@@ -1,0 +1,53 @@
+/**
+ * Feedback — misma anatomía que el mockup de la landing
+ * (`components/landing/mockups/FeedbackScreen.module.css`), a escala real.
+ */
+
+.entries {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.entry {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  /* Filete lateral: marca que la entrada es una observación registrada. */
+  border-left: 2px solid var(--teal);
+}
+
+.entryHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.entryIdentity {
+  flex: 1;
+  min-width: 0;
+}
+
+.entryAuthor {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text);
+  line-height: 1.35;
+}
+
+.entryContext {
+  font-size: var(--text-xs);
+  color: var(--text-soft);
+  line-height: 1.35;
+}
+
+.entryBody {
+  font-size: var(--text-sm);
+  color: var(--text);
+  line-height: var(--leading-relaxed);
+  white-space: pre-wrap;
+}

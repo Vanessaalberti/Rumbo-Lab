@@ -34,9 +34,12 @@
   gap: var(--space-4);
 }
 
-.pending {
-  padding: var(--space-4);
+.formError {
+  padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
+  background-color: var(--error-tint);
+  color: var(--error-strong);
+  font-size: var(--text-sm);
 }
 
 .alternative {

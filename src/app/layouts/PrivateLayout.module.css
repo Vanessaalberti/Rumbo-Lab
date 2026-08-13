@@ -1,0 +1,21 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-x: clip;
+}
+
+/*
+ * Sin padding vertical: el área privada la comparten pantallas de composición
+ * muy distinta. Mi Rumbo es un shell a sangre —el rail arranca pegado al borde
+ * y el contenido lleva su propio espaciado interno—, así que un padding global
+ * acá le abría un hueco entre el header y la pantalla. Las vistas que sí
+ * necesitan aire lo declaran ellas mismas (`ChooseExperiencePage`,
+ * `MentorPanelPlaceholderPage`), que es donde esa decisión pertenece.
+ *
+ * Sin padding horizontal tampoco: el ancho lo resuelven las clases `container`
+ * de cada página y el propio shell de Mi Rumbo.
+ */
+.main {
+  flex: 1;
+}

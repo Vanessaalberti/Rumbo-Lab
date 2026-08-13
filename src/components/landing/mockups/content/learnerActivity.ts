@@ -124,24 +124,39 @@ export const MOST_USED_CV = (() => {
  * postulación—, nunca "el CV" a secas.
  *
  * Ordenados del más reciente al más antiguo.
+ *
+ * `datetime` es el dato de la sección Feedback, donde la anatomía pide fecha y
+ * hora. `date` es la forma corta para los resúmenes de otras vistas, que
+ * referencian el feedback sin reproducir su ficha completa.
  */
+/**
+ * Total real de devoluciones recibidas. `FEEDBACK_ENTRIES` solo guarda las
+ * últimas para no repetir contenido de vista previa en cada pantalla; el
+ * encabezado de Feedback y el resumen de Mi Perfil muestran este número, no
+ * `FEEDBACK_ENTRIES.length`.
+ */
+export const FEEDBACK_TOTAL = 12;
+
 export const FEEDBACK_ENTRIES = [
   {
     subject: 'CV · CV Frontend 2026',
     mentor: 'Julián Ocampo',
     datetime: '10/08/2026 · 14:32',
+    date: '10 ago',
     body: 'El CV tiene una estructura clara y buena selección de proyectos. Falta cuantificar el impacto de tu experiencia en soporte, que es tu mayor diferencial: cuántos casos resolvías, qué mejoraste. Ese dato es el que te separa del resto de los perfiles junior.',
   },
   {
     subject: 'Postulación · Nubelo Studio',
     mentor: 'Julián Ocampo',
     datetime: '04/08/2026 · 11:15',
+    date: '04 ago',
     body: 'Buena decisión presentarte con el CV de Frontend y no con el generalista. Para la entrevista técnica, practicá contar el proyecto de accesibilidad en dos minutos sin tecnicismos.',
   },
   {
     subject: 'Perfil · Objetivo profesional',
     mentor: 'Lucía Márquez',
     datetime: '28/07/2026 · 17:40',
+    date: '28 jul',
     body: 'El objetivo quedó concreto y se entiende hacia dónde vas. Revisalo de nuevo cuando cierres la primera búsqueda: va a cambiar, y está bien que cambie.',
   },
 ] as const;
@@ -160,6 +175,13 @@ export const FEEDBACK_ENTRIES = [
  *
  * Orden fijo: más reciente → más antigua.
  */
+/**
+ * Total real de eventos registrados desde la creación de la cuenta.
+ * `EVIDENCE_TIMELINE` guarda solo los más recientes; el encabezado de
+ * Evidencias y el resumen de Mi Perfil muestran este número.
+ */
+export const EVIDENCE_TOTAL = 12;
+
 export const EVIDENCE_TIMELINE = [
   {
     label: 'Feedback recibido',

@@ -9,6 +9,8 @@ import {
   LearnerProfileScreen,
 } from '@/components/landing/mockups';
 import { usePointerParallax } from '@/hooks/usePointerParallax';
+import { useAuth } from '@/hooks/useAuth';
+import { resolvePanelDestination } from '@/services/data/experience/panels';
 import { SECTION_ANCHORS, START_ANCHOR } from '@/constants/navigation';
 import { cx } from '@/utils/classNames';
 import styles from './HeroSection.module.css';
@@ -26,10 +28,20 @@ import styles from './HeroSection.module.css';
  * Interacción: la composición se inclina levemente siguiendo al puntero. Las
  * capas están separadas en profundidad, así que la rotación genera paralaje real
  * entre la ventana principal, la secundaria y las tarjetas de actividad.
+ *
+ * La llamada a la acción depende de la sesión real (`useAuth`), no de la URL:
+ * a quien ya tiene su espacio no se le vuelve a ofrecer crearlo. Es el mismo
+ * botón, en el mismo lugar, con el destino que corresponde.
  */
 export function HeroSection() {
   const { areaRef, rotateX, rotateY, shiftX, shiftY } =
     usePointerParallax<HTMLElement>();
+  const { isAuthenticated, loading, experiences } = useAuth();
+
+  const authenticated = !loading && isAuthenticated;
+  const primaryAction = authenticated
+    ? { href: resolvePanelDestination(experiences), label: 'Ir a mi espacio' }
+    : { href: START_ANCHOR, label: 'Crear mi espacio' };
 
   return (
     <section
@@ -57,8 +69,12 @@ export function HeroSection() {
           </p>
 
           <div className={styles.actions}>
-            <LinkButton href={START_ANCHOR} size="lg" iconTrailing="arrowRight">
-              Crear mi espacio
+            <LinkButton
+              href={primaryAction.href}
+              size="lg"
+              iconTrailing="arrowRight"
+            >
+              {primaryAction.label}
             </LinkButton>
             <LinkButton
               href={SECTION_ANCHORS.solution}
@@ -71,7 +87,9 @@ export function HeroSection() {
 
           <p className={styles.reassurance}>
             <Icon name="check" size={16} className={styles.reassuranceIcon} />
-            Empezás con el CV que ya tenés. Sin formularios interminables.
+            {authenticated
+              ? 'Tu sesión sigue abierta. Retomá donde lo dejaste.'
+              : 'Empezás con el CV que ya tenés. Sin formularios interminables.'}
           </p>
         </Reveal>
 

@@ -11,9 +11,14 @@
 # página se queda sin tema. Regenerarlo con:
 #
 #   node -e "const c=require('crypto'),f=require('fs');const s=f.readFileSync('index.html','utf8').match(/<script>([\s\S]*?)<\/script>/)[1];console.log('sha256-'+c.createHash('sha256').update(s,'utf8').digest('base64'))"
+#
+# connect-src incluye *.supabase.co (Supabase Auth + Postgres vía RLS, ver
+# SECURITY.md). Cuando rumbo-lab-backend tenga una URL pública de despliegue,
+# sumarla acá también — VITE_API_BASE_URL en desarrollo no queda cubierto por
+# este archivo, ver la nota de vite.config.ts.
 
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-TUK/SrKxI23KT5eGHMJx/HI87Rt5Br9dZmbBvhbHDz4='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-TUK/SrKxI23KT5eGHMJx/HI87Rt5Br9dZmbBvhbHDz4='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.supabase.co https://*.supabase.in; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin

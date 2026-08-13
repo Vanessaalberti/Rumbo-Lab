@@ -1,5 +1,5 @@
 import { Avatar } from '@/components/ui/Avatar';
-import { FEEDBACK_ENTRIES } from './content';
+import { FEEDBACK_ENTRIES, FEEDBACK_TOTAL } from './content';
 import { cx } from '@/utils/classNames';
 import screen from './screen.module.css';
 import styles from './FeedbackScreen.module.css';
@@ -32,7 +32,9 @@ export function FeedbackScreen({ compact = false, limit }: FeedbackScreenProps) 
       <header className={screen.header}>
         <div>
           <p className={screen.headerTitle}>Feedback</p>
-          <p className={screen.headerMeta}>12 recibidos · del más reciente</p>
+          <p className={screen.headerMeta}>
+            {FEEDBACK_TOTAL} recibidos · del más reciente
+          </p>
         </div>
       </header>
 

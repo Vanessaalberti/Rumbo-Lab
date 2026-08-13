@@ -1,9 +1,60 @@
-/** Complementos propios del perfil del aprendiz. */
+/**
+ * Mi Perfil · composición.
+ *
+ * La vista se lee como el inicio de un recorrido, no como un panel
+ * administrativo. Por eso casi nada es una tarjeta: la jerarquía la construyen
+ * la tipografía y el espacio, como en el resto de la marca, y las superficies
+ * aparecen solo donde separan de verdad un bloque del siguiente.
+ *
+ * Cuatro tiempos, en orden de lectura:
+ *   1 · identidad y hacia dónde va      — introducción, con una línea de aire
+ *   2 · su progreso, en cuatro números  — una franja liviana, no tarjetas de KPI
+ *   3 · objetivos y acompañamiento      — dos listas, separadas por un filete
+ *   4 · qué viene pasando               — dos listas más, mismo patrón que 3
+ *
+ * El verde de marca aparece **una sola vez** —en el objetivo profesional— y una
+ * segunda de forma tenue en el ícono del CV. Es jerarquía, no decoración.
+ *
+ * El mockup se muestra a anchos muy distintos según la sección de la landing
+ * que lo contenga, así que las columnas responden al ancho **del propio panel**
+ * y no al del viewport. El estado por defecto es apilado: si el navegador no
+ * soporta container queries, la vista degrada a una sola columna.
+ */
+
+.body {
+  container-type: inline-size;
+}
+
+/* --- 1 · Introducción ---------------------------------------------------- */
+
+/*
+ * La identidad ocupa el ancho completo y lo que sigue se apoya debajo: el
+ * nombre necesita aire para leerse como portada, y una columna angosta a su
+ * lado lo obligaba a competir por el espacio.
+ */
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--border);
+}
+
+/*
+ * Identidad y CV más usado comparten la primera línea: quién es, y con qué se
+ * está presentando. El resto de la introducción baja a ancho completo.
+ */
+.introTop {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: center;
+}
 
 .identity {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-4);
   min-width: 0;
 }
 
@@ -11,146 +62,215 @@
   min-width: 0;
 }
 
+/* El nombre es lo único que compite con el título de la ventana: es la portada
+   del recorrido de esta persona. Crece cuando el panel tiene ancho para
+   sostenerlo en una sola línea — partirlo en dos lo degrada más que achicarlo. */
 .name {
-  font-size: var(--text-md);
+  font-size: var(--text-lg);
   font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-tight);
   color: var(--text);
-  line-height: 1.25;
+  line-height: 1.15;
 }
 
 .headline {
-  font-size: var(--text-2xs);
+  font-size: var(--text-xs);
   color: var(--text-soft);
   line-height: 1.4;
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
-/* --- CV activo ----------------------------------------------------------- */
-/* El perfil enlaza el CV en lugar de transcribirlo: es la fuente de la
-   experiencia profesional, no un dato más del perfil. */
+.bio {
+  font-size: var(--text-xs);
+  color: var(--text-soft);
+  line-height: var(--leading-relaxed);
+  max-width: var(--measure);
+}
 
-.cvCard {
+/* El objetivo es la única afirmación en primera persona de la vista. El filete
+   verde es el acento de marca de toda la pantalla. */
+.objective {
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--teal);
+}
+
+.statement {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text);
+  line-height: 1.45;
+}
+
+.label {
+  display: block;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--text-soft);
+  margin-bottom: var(--space-2);
+  /*
+   * El tracking deja un espacio sobrante después del último carácter. En una
+   * columna justa alcanza para empujar la etiqueta a una segunda línea, así
+   * que se descuenta.
+   */
+  margin-right: calc(var(--tracking-widest) * -1);
+}
+
+.interests {
+  min-width: 0;
+}
+
+/* --- 2 · Mi progreso ------------------------------------------------------ */
+/**
+ * Cuatro números, no cuatro tarjetas: mantiene la regla de la vista de no
+ * convertirse en un panel administrativo. Cada valor sale del mismo dato que
+ * ya muestra su propia sección (Evidencias, Feedback, Postulaciones,
+ * Objetivos) — nunca se inventa un total nuevo acá.
+ */
+.progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--border);
+}
+
+.progressRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+}
+
+.progressItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.progressValue {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-tight);
+  color: var(--text);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.progressCaption {
+  font-size: var(--text-2xs);
+  color: var(--text-soft);
+}
+
+/* --- 3 y 4 · Objetivos, acompañamiento y actividad reciente --------------- */
+
+.activity {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.feed {
+  min-width: 0;
+}
+
+/*
+ * El acceso a la sección va al pie de la lista, no junto a la etiqueta: a los
+ * anchos en que se muestra este mockup, etiqueta y enlace compitiendo en la
+ * misma línea obligan a recortar una de las dos.
+ */
+.feedMore {
+  display: inline-block;
+  margin-top: var(--space-3);
+}
+
+/* Filete que separa las dos listas sin encerrarlas en sendas tarjetas. */
+.feedDivided {
+  border-top: 1px solid var(--border-soft);
+  padding-top: var(--space-5);
+}
+
+/* --- Con qué se está presentando ----------------------------------------- */
+/* Acompaña a la identidad: es un dato de cabecera, no una sección aparte. */
+
+.resource {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-3);
+  background-color: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  min-width: 0;
+}
+
+.resourceHead {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  background-color: var(--surface-sunken);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  flex-shrink: 0;
 }
 
-.cvIcon {
+/* La etiqueta comparte línea con el ícono: no necesita separación inferior. */
+.resourceHead .label {
+  margin-bottom: 0;
+}
+
+.resourceIcon {
   color: var(--teal-ink);
   flex-shrink: 0;
 }
 
-.cvText {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  min-width: 0;
-}
-
-.cvLabel {
-  font-size: var(--text-2xs);
+.resourceValue {
+  font-size: var(--text-xs);
   font-weight: var(--weight-semibold);
   color: var(--text);
   line-height: 1.3;
-}
-
-.cvMeta {
-  font-size: var(--text-2xs);
-  color: var(--text-soft);
-  line-height: 1.3;
-}
-
-/* --- Cómo me presento ---------------------------------------------------- */
-
-.statement {
-  font-size: var(--text-xs);
-  color: var(--text);
-  line-height: 1.5;
-}
-
-.bio {
-  font-size: var(--text-2xs);
-  color: var(--text-soft);
-  line-height: 1.55;
-}
-
-/* --- Enlaces ------------------------------------------------------------- */
-
-.link {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding-block: var(--space-2);
-  border-bottom: 1px solid var(--border-soft);
-  min-width: 0;
-}
-
-.link:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.linkIcon {
-  color: var(--text-soft);
-  flex-shrink: 0;
-}
-
-.linkLabel {
-  font-size: var(--text-2xs);
-  font-weight: var(--weight-medium);
-  color: var(--text);
-  flex-shrink: 0;
-}
-
-.linkHandle {
-  font-size: var(--text-2xs);
-  color: var(--text-soft);
-  margin-left: auto;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  min-width: 0;
 }
 
-/* --- Historial de acompañamiento ----------------------------------------- */
-
-.note {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding-block: var(--space-3);
-  border-bottom: 1px solid var(--border-soft);
-}
-
-.note:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.note:first-of-type {
-  padding-top: 0;
-}
-
-.noteHeader {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.noteMeta {
+.resourceMeta {
   font-size: var(--text-2xs);
   color: var(--text-soft);
   line-height: 1.3;
 }
 
-.noteBody {
-  font-size: var(--text-2xs);
-  color: var(--text);
-  line-height: 1.55;
+.resourceLink {
+  margin-top: 1px;
+}
+
+/* --- Dos columnas cuando el panel tiene aire para sostenerlas ------------ */
+
+@container (min-width: 400px) {
+  /* El bloque del CV se dimensiona por su contenido; el nombre se queda con
+     todo el resto de la línea. */
+  .introTop {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-5);
+  }
+
+  .activity {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-6);
+  }
+
+  /* En dos columnas el filete pasa de horizontal a vertical. */
+  .feedDivided {
+    border-top: none;
+    padding-top: 0;
+    border-left: 1px solid var(--border-soft);
+    padding-left: var(--space-6);
+  }
+}
+
+/*
+ * El nombre solo sube de escala cuando queda ancho suficiente para escribirlo
+ * en una línea al lado del bloque del CV.
+ */
+@container (min-width: 500px) {
+  .name {
+    font-size: var(--text-xl);
+  }
 }

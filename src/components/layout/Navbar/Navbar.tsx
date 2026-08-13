@@ -11,6 +11,8 @@ import {
 } from '@/constants/navigation';
 import { ROUTES } from '@/constants/routes';
 import { useScrollTrigger } from '@/hooks/useScrollTrigger';
+import { useAuth } from '@/hooks/useAuth';
+import { UserMenu } from '@/components/layout/UserMenu';
 import { cx } from '@/utils/classNames';
 import { NavbarMenu } from './NavbarMenu';
 import styles from './Navbar.module.css';
@@ -31,13 +33,27 @@ interface NavbarProps {
  *
  * "Crear mi espacio" no abre el registro: lleva al cierre de la landing. Quien
  * todavía no leyó el argumento no está en condiciones de decidir.
+ *
+ * Las acciones de la derecha dependen de la sesión, que se lee de `useAuth()`
+ * —la misma fuente global que usan las rutas protegidas—, nunca de la URL ni
+ * de un estado local: con sesión activa el header muestra únicamente el avatar
+ * y su menú, sin selector de paneles.
  */
 export function Navbar({ minimal = false }: NavbarProps) {
   const scrolled = useScrollTrigger('offset', 12);
+  const { isAuthenticated, loading } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuId = useId();
 
   const closeMenu = () => setMenuOpen(false);
+
+  /*
+   * Mientras Supabase restaura la sesión no se muestra ninguna de las dos
+   * versiones: mostrar "Iniciar sesión" para reemplazarlo por el avatar un
+   * instante después es peor que no mostrar nada.
+   */
+  const showPublicActions = !loading && !isAuthenticated;
+  const showUserMenu = !loading && isAuthenticated;
 
   if (minimal) {
     return (
@@ -51,7 +67,10 @@ export function Navbar({ minimal = false }: NavbarProps) {
             <Logo />
           </Link>
 
-          <ThemeToggle />
+          <div className={styles.actions}>
+            <ThemeToggle />
+            {showUserMenu && <UserMenu />}
+          </div>
         </nav>
       </header>
     );
@@ -80,17 +99,24 @@ export function Navbar({ minimal = false }: NavbarProps) {
 
         <div className={styles.actions}>
           <ThemeToggle />
-          <LinkButton
-            href={ROUTES.signIn}
-            variant="quiet"
-            size="sm"
-            className={styles.desktopOnly}
-          >
-            Iniciar sesión
-          </LinkButton>
-          <LinkButton href={START_ANCHOR} size="sm" className={styles.desktopOnly}>
-            Crear mi espacio
-          </LinkButton>
+
+          {showPublicActions && (
+            <>
+              <LinkButton
+                href={ROUTES.signIn}
+                variant="quiet"
+                size="sm"
+                className={styles.desktopOnly}
+              >
+                Iniciar sesión
+              </LinkButton>
+              <LinkButton href={START_ANCHOR} size="sm" className={styles.desktopOnly}>
+                Crear mi espacio
+              </LinkButton>
+            </>
+          )}
+
+          {showUserMenu && <UserMenu />}
 
           <button
             type="button"
@@ -105,7 +131,13 @@ export function Navbar({ minimal = false }: NavbarProps) {
         </div>
       </nav>
 
-      {menuOpen && <NavbarMenu id={menuId} onNavigate={closeMenu} />}
+      {menuOpen && (
+        <NavbarMenu
+          id={menuId}
+          onNavigate={closeMenu}
+          showPublicActions={showPublicActions}
+        />
+      )}
     </header>
   );
 }

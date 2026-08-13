@@ -1,0 +1,176 @@
+/**
+ * Menú de la cuenta.
+ *
+ * El header se mantiene limpio: la única pieza visible es el avatar. Todo lo
+ * demás —quién sos, a qué paneles entrás, cerrar sesión— vive dentro del
+ * desplegable. El cambio de panel **no** es un selector permanente del header.
+ */
+
+.root {
+  position: relative;
+  display: inline-flex;
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: var(--transition-colors);
+  border: 1px solid transparent;
+}
+
+.trigger:hover,
+.trigger[aria-expanded='true'] {
+  border-color: var(--border);
+  background-color: var(--bg-alt);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* --- Desplegable --------------------------------------------------------- */
+
+.panel {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  z-index: 200;
+  min-width: 244px;
+  padding: var(--space-2);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  animation: rumbo-fade-in var(--duration-fast) var(--ease-out);
+}
+
+/* --- Identidad ------------------------------------------------------------ */
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  min-width: 0;
+}
+
+.identityText {
+  min-width: 0;
+}
+
+.identityName {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.identityEmail {
+  font-size: var(--text-xs);
+  color: var(--text-soft);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* En qué panel está parada la persona ahora mismo. */
+.identityPanel {
+  display: inline-block;
+  margin-top: var(--space-2);
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  background-color: var(--brand-tint);
+  color: var(--brand-strong);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  line-height: 1.5;
+}
+
+/* --- Grupos --------------------------------------------------------------- */
+
+.separator {
+  height: 1px;
+  margin: var(--space-2) 0;
+  background-color: var(--border-soft);
+  border: none;
+}
+
+.groupLabel {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: var(--transition-colors);
+  background: none;
+  border: none;
+}
+
+.item:hover {
+  background-color: var(--bg-alt);
+}
+
+.item:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
+}
+
+/* El panel en el que la persona está parada ahora. */
+.itemCurrent {
+  color: var(--brand-strong);
+}
+
+.itemIcon {
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.itemLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Mismo indicador que usaba el selector: distingue el panel activo. */
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background-color: var(--brand);
+  flex-shrink: 0;
+}
+
+.itemDanger {
+  color: var(--error-strong);
+}
+
+.itemDanger:hover {
+  background-color: var(--error-tint);
+}

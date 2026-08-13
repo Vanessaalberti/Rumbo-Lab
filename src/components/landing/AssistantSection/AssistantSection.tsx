@@ -1,5 +1,5 @@
 import { FloatingCard } from '@/components/shared/FloatingCard';
-import { ProductWindow } from '@/components/shared/ProductWindow';
+import { PhoneFrame } from '@/components/shared/PhoneFrame';
 import { Reveal } from '@/components/shared/Reveal';
 import { SectionHeading } from '@/components/shared/SectionHeading';
 import { Icon } from '@/components/ui/Icon';
@@ -69,13 +69,9 @@ export function AssistantSection() {
         </Reveal>
 
         <Reveal className={styles.composition} delay={120}>
-          <ProductWindow
-            breadcrumb="Rumbo Assistant"
-            breadcrumbCurrent="WhatsApp"
-            className={styles.window}
-          >
+          <PhoneFrame className={styles.phone}>
             <AssistantScreen />
-          </ProductWindow>
+          </PhoneFrame>
 
           <FloatingCard
             icon="applications"

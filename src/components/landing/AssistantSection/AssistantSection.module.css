@@ -44,20 +44,23 @@
   font-weight: var(--weight-semibold);
 }
 
+/* Un teléfono es angosto: la columna lo centra en lugar de estirarlo. */
 .composition {
   grid-column: 7 / -1;
   position: relative;
+  display: flex;
+  justify-content: center;
 }
 
-.window {
+.phone {
   position: relative;
   z-index: 1;
 }
 
 .floatingCard {
   position: absolute;
-  left: calc(var(--space-10) * -1);
-  bottom: calc(var(--space-8) * -1);
+  left: 0;
+  bottom: var(--space-12);
   z-index: 2;
 }
 
@@ -72,7 +75,7 @@
   }
 
   .floatingCard {
-    left: var(--space-2);
+    left: 0;
   }
 }
 

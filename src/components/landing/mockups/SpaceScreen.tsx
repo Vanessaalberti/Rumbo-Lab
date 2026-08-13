@@ -21,8 +21,6 @@ interface SpaceScreenProps {
  * educativos, sin videos. Lo que se mide es el avance de las personas.
  */
 export function SpaceScreen({ compact = false }: SpaceScreenProps) {
-  const weekProgress = Math.round((SPACE.weeksElapsed / SPACE.weeksTotal) * 100);
-
   return (
     <div className={cx(screen.main, compact && screen.mainTight)}>
       <header className={screen.header}>
@@ -41,10 +39,28 @@ export function SpaceScreen({ compact = false }: SpaceScreenProps) {
         </span>
       </header>
 
+      {/* Recorrido de la cohorte semana a semana: un proceso con etapas, no una
+          barra de carga (Identidad · Espacio: "representa un proceso, no un curso"). */}
       <div className={styles.timeline}>
-        <div className={screen.miniTrack} style={{ width: '100%', height: '5px' }}>
-          <div className={screen.miniFill} style={{ width: `${weekProgress}%` }} />
+        <div
+          className={styles.weeks}
+          role="img"
+          aria-label={`Semana ${SPACE.weeksElapsed} de ${SPACE.weeksTotal}`}
+        >
+          {Array.from({ length: SPACE.weeksTotal }, (_, index) => (
+            <span
+              key={index}
+              className={cx(
+                styles.week,
+                index < SPACE.weeksElapsed && styles.weekDone,
+                index === SPACE.weeksElapsed - 1 && styles.weekCurrent,
+              )}
+            />
+          ))}
         </div>
+        <span className={styles.weeksLabel}>
+          Semana {SPACE.weeksElapsed} / {SPACE.weeksTotal}
+        </span>
       </div>
 
       <div className={screen.columns3}>
