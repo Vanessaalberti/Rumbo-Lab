@@ -67,6 +67,7 @@ export function PerfilSection() {
           apprentice={apprentice}
           cv={mostUsedCv(applications, cvs, applicationsTotal)}
           onEdit={() => setEditing(true)}
+          onAvatarChanged={refresh}
         />
       )}
 

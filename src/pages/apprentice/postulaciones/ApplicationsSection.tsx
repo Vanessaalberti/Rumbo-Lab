@@ -13,6 +13,9 @@ import { CvCell, StatusCell } from './TableCells';
 import screen from '@/app/layouts/appShell.module.css';
 import styles from './applications.module.css';
 
+/** Cuántas postulaciones entran en una página de la tabla. */
+const APPLICATIONS_PER_PAGE = 10;
+
 /**
  * Postulaciones — gestor personal del proceso de búsqueda.
  *
@@ -41,18 +44,31 @@ import styles from './applications.module.css';
  */
 export function ApplicationsSection() {
   const { dashboard, refresh } = useOutletContext<ApprenticeShellContext>();
-  const { applications, applicationsTotal, cvs, spaces } = dashboard;
+  const { applications, applicationsTotal, cvs } = dashboard;
 
   const [modalOpen, setModalOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<ApplicationStatus[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [rowError, setRowError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
 
   const visible =
     statusFilter.length === 0
       ? applications
       : applications.filter((application) => statusFilter.includes(application.status));
+
+  const totalPages = Math.max(1, Math.ceil(visible.length / APPLICATIONS_PER_PAGE));
+  /*
+   * La página se acota en el render en vez de sincronizarse con un efecto:
+   * filtrar o eliminar puede dejar el número apuntando a una página que ya no
+   * existe, y corregirlo acá evita mostrar una tabla vacía por un instante.
+   */
+  const currentPage = Math.min(page, totalPages);
+  const pageItems = visible.slice(
+    (currentPage - 1) * APPLICATIONS_PER_PAGE,
+    currentPage * APPLICATIONS_PER_PAGE,
+  );
 
   const selected = applications.find((application) => application.id === selectedId) ?? null;
 
@@ -92,7 +108,15 @@ export function ApplicationsSection() {
         <Button size="sm" iconLeading="plus" onClick={() => setModalOpen(true)}>
           Nueva postulación
         </Button>
-        <StatusFilter selected={statusFilter} onChange={setStatusFilter} />
+        <StatusFilter
+          selected={statusFilter}
+          onChange={(next) => {
+            setStatusFilter(next);
+            /* Filtrar cambia el conjunto: quedarse en la página 4 de un
+               resultado de 3 filas no tiene sentido. */
+            setPage(1);
+          }}
+        />
       </div>
 
       {rowError && (
@@ -125,7 +149,7 @@ export function ApplicationsSection() {
                   </tr>
                 </thead>
                 <tbody>
-                  {visible.map((application) => (
+                  {pageItems.map((application) => (
                     /*
                      * La fila entera abre el detalle: hacer puntería sobre el
                      * nombre era innecesariamente exigente. Los controles que
@@ -188,6 +212,38 @@ export function ApplicationsSection() {
               </table>
             </div>
           )}
+
+          {totalPages > 1 && (
+            <nav className={styles.pager} aria-label="Paginación de postulaciones">
+              <button
+                type="button"
+                className={styles.pagerButton}
+                /* Forma funcional y acotada: dos clicks seguidos dentro del
+                   mismo render tienen que contar como dos. */
+                onClick={() => setPage((value) => Math.max(1, Math.min(value, totalPages) - 1))}
+                disabled={currentPage === 1}
+                aria-label="Página anterior"
+              >
+                ←
+              </button>
+
+              <span className={styles.pagerStatus}>
+                Página {currentPage} de {totalPages}
+              </span>
+
+              <button
+                type="button"
+                className={styles.pagerButton}
+                onClick={() =>
+                  setPage((value) => Math.min(totalPages, Math.min(value, totalPages) + 1))
+                }
+                disabled={currentPage === totalPages}
+                aria-label="Página siguiente"
+              >
+                →
+              </button>
+            </nav>
+          )}
         </div>
 
         {/* Espacio reservado: existe aunque no haya nada seleccionado, para que
@@ -198,7 +254,6 @@ export function ApplicationsSection() {
               key={selected.id}
               application={selected}
               cvs={cvs}
-              spaces={spaces}
               onClose={() => setSelectedId(null)}
               onChanged={refresh}
               onDeleted={() => setSelectedId(null)}

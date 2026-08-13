@@ -2,6 +2,7 @@ import { useEffect, useId, useState, type FormEvent } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { Input } from '@/components/ui/Input';
+import { Modal } from '@/components/ui/Modal';
 import { cx } from '@/utils/classNames';
 import { isSafeExternalUrl } from '@/utils/validation';
 import {
@@ -13,7 +14,6 @@ import type {
   ApplicationStatusChange,
   ApplicationSummary,
   CvSummary,
-  SpaceSummary,
 } from '@/services/data/dashboard/dashboard.types';
 import { APPLICATION_STATUS_LABELS } from '../applicationStatus';
 import { StatusPill } from './TableCells';
@@ -24,7 +24,6 @@ import styles from './applications.module.css';
 interface ApplicationDetailProps {
   application: ApplicationSummary;
   cvs: CvSummary[];
-  spaces: SpaceSummary[];
   onClose: () => void;
   onChanged: () => void;
   onDeleted: () => void;
@@ -51,13 +50,11 @@ interface ApplicationDetailProps {
 export function ApplicationDetail({
   application,
   cvs,
-  spaces,
   onClose,
   onChanged,
   onDeleted,
 }: ApplicationDetailProps) {
   const cvFieldId = useId();
-  const spaceFieldId = useId();
   const notesFieldId = useId();
 
   const [editing, setEditing] = useState(false);
@@ -66,12 +63,12 @@ export function ApplicationDetail({
     url: application.url,
     position: application.position ?? '',
     cvId: application.cvId ?? '',
-    spaceId: application.spaceId ?? '',
     appliedAt: application.appliedAt ?? '',
     notes: application.notes ?? '',
   });
   const [saving, setSaving] = useState(false);
   const [removing, setRemoving] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [history, setHistory] = useState<ApplicationStatusChange[] | null>(null);
@@ -97,9 +94,6 @@ export function ApplicationDetail({
   const cvName = application.cvId
     ? (cvs.find((cv) => cv.id === application.cvId)?.name ?? 'CV eliminado')
     : 'No aplica';
-  const spaceName = application.spaceId
-    ? (spaces.find((space) => space.id === application.spaceId)?.name ?? '—')
-    : null;
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -116,7 +110,8 @@ export function ApplicationDetail({
       url: form.url.trim(),
       position: form.position.trim() || null,
       cvId: form.cvId || null,
-      spaceId: form.spaceId || null,
+      /* `spaceId` no se manda: la vista ya no lo edita, y omitirlo deja
+         intacto el que la postulación tuviera. */
       appliedAt: form.appliedAt || null,
       notes: form.notes.trim() || null,
     });
@@ -142,10 +137,12 @@ export function ApplicationDetail({
     setRemoving(false);
 
     if (result.status !== 'success') {
+      setConfirmingDelete(false);
       setError('No se pudo eliminar. Intentá de nuevo en unos minutos.');
       return;
     }
 
+    setConfirmingDelete(false);
     onChanged();
     onDeleted();
   };
@@ -165,15 +162,27 @@ export function ApplicationDetail({
 
         <div className={styles.detailHeadActions}>
           {!editing && (
-            <button
-              type="button"
-              className={styles.iconButton}
-              onClick={() => setEditing(true)}
-              aria-label="Editar esta postulación"
-              title="Editar esta postulación"
-            >
-              <Icon name="pencil" size={16} />
-            </button>
+            <>
+              <button
+                type="button"
+                className={cx(styles.iconButton, styles.iconButtonDanger)}
+                onClick={() => setConfirmingDelete(true)}
+                disabled={busy}
+                aria-label="Eliminar esta postulación"
+                title="Eliminar esta postulación"
+              >
+                <Icon name="trash" size={16} />
+              </button>
+              <button
+                type="button"
+                className={styles.iconButton}
+                onClick={() => setEditing(true)}
+                aria-label="Editar esta postulación"
+                title="Editar esta postulación"
+              >
+                <Icon name="pencil" size={16} />
+              </button>
+            </>
           )}
           <button
             type="button"
@@ -246,26 +255,6 @@ export function ApplicationDetail({
           </div>
 
           <div className={styles.field}>
-            <label className={styles.fieldLabel} htmlFor={spaceFieldId}>
-              Espacio
-            </label>
-            <select
-              id={spaceFieldId}
-              className={styles.select}
-              value={form.spaceId}
-              onChange={(event) => setForm((f) => ({ ...f, spaceId: event.target.value }))}
-              disabled={busy}
-            >
-              <option value="">Sin Espacio</option>
-              {spaces.map((space) => (
-                <option key={space.id} value={space.id}>
-                  {space.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className={styles.field}>
             <label className={styles.fieldLabel} htmlFor={notesFieldId}>
               Notas
             </label>
@@ -315,7 +304,6 @@ export function ApplicationDetail({
               )
             }
           />
-          <DetailRow label="Espacio" value={spaceName ?? 'Sin Espacio'} />
           <DetailRow
             label="Fecha de postulación"
             value={application.appliedAt ? formatLongDate(application.appliedAt) : '—'}
@@ -355,19 +343,52 @@ export function ApplicationDetail({
         )}
       </div>
 
-      {!editing && (
-        <div className={styles.detailFooter}>
+      {/*
+       * Eliminar es destructivo e irreversible y no hay papelera: la
+       * confirmación es explícita y dice exactamente qué se pierde
+       * (Notion `04 · Postulaciones` §27.2).
+       */}
+      <Modal
+        open={confirmingDelete}
+        title="¿Eliminar esta postulación?"
+        onClose={() => {
+          if (!removing) setConfirmingDelete(false);
+        }}
+      >
+        <p className={styles.confirmLead}>
+          Vas a eliminar <strong>{application.name}</strong>.
+        </p>
+
+        <p className={styles.confirmWarning}>
+          <Icon name="alert" size={18} className={styles.confirmIcon} />
+          <span>
+            <strong>No hay vuelta atrás.</strong> Se pierde toda su información: el estado, el CV
+            enviado, la URL, la fecha, las notas y todo su historial de estados. No queda en una
+            papelera ni se puede recuperar.
+          </span>
+        </p>
+
+        <div className={styles.confirmActions}>
           <Button
             type="button"
             variant="quiet"
             size="sm"
-            onClick={() => void handleDelete()}
-            disabled={busy}
+            onClick={() => setConfirmingDelete(false)}
+            disabled={removing}
           >
-            {removing ? 'Eliminando…' : 'Eliminar postulación'}
+            Cancelar
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            iconLeading="trash"
+            onClick={() => void handleDelete()}
+            disabled={removing}
+          >
+            {removing ? 'Eliminando…' : 'Eliminar definitivamente'}
           </Button>
         </div>
-      )}
+      </Modal>
     </section>
   );
 }

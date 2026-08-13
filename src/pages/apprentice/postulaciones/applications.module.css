@@ -133,9 +133,19 @@
     grid-template-columns: minmax(0, 1.7fr) minmax(320px, 1fr);
   }
 
+  /*
+   * El panel scrollea por dentro en vez de estirarse: con la ficha, el
+   * historial y las notas se hace mucho más alto que la tabla, y arrastraba la
+   * página entera. Acompaña el scroll pegado bajo el header y se limita a lo
+   * que queda de ventana.
+   */
   .detailColumn {
     position: sticky;
     top: calc(var(--navbar-height) + var(--space-5));
+    max-height: calc(100vh - var(--navbar-height) - var(--space-10));
+    overflow-y: auto;
+    /* Aire para que la sombra del panel no quede cortada contra el borde. */
+    padding-right: var(--space-1);
   }
 }
 
@@ -399,6 +409,93 @@
 .iconButton:hover {
   background-color: var(--bg-alt);
   color: var(--text);
+}
+
+.iconButton:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+}
+
+/* Eliminar es destructivo: el color lo anuncia antes de que se toque. */
+.iconButtonDanger:hover {
+  background-color: var(--error-tint);
+  color: var(--error-strong);
+}
+
+/* --- Paginación ----------------------------------------------------------- */
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding-top: var(--space-4);
+}
+
+.pagerButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+  color: var(--text-soft);
+  font: inherit;
+  cursor: pointer;
+  transition: var(--transition-colors);
+}
+
+.pagerButton:hover:not(:disabled) {
+  background-color: var(--bg-alt);
+  color: var(--text);
+}
+
+.pagerButton:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.pagerStatus {
+  font-size: var(--text-sm);
+  color: var(--text-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Confirmación de borrado ---------------------------------------------- */
+
+.confirmLead {
+  font-size: var(--text-base);
+  color: var(--text);
+  line-height: var(--leading-relaxed);
+  overflow-wrap: anywhere;
+}
+
+.confirmWarning {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background-color: var(--error-tint);
+  color: var(--error-strong);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+.confirmIcon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.confirmActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+  flex-wrap: wrap;
 }
 
 /* --- Lectura -------------------------------------------------------------- */

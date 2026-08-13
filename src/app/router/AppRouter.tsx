@@ -19,7 +19,6 @@ import {
 } from '@/pages/apprentice';
 import { MentorPanelPlaceholderPage } from '@/pages/mentor';
 import { SettingsPage } from '@/pages/settings';
-import { PdfViewerPreview } from '@/components/ui/PdfViewer/__preview';
 import { NotFoundPage } from '@/pages/errors';
 import { ROUTES } from '@/constants/routes';
 
@@ -39,9 +38,6 @@ export function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* TEMPORAL */}
-        <Route path="/__pdf" element={<PdfViewerPreview />} />
-
         <Route element={<PublicLayout />}>
           <Route path={ROUTES.landing} element={<LandingPage />} />
           <Route path={ROUTES.notFound} element={<NotFoundPage />} />

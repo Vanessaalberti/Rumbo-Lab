@@ -80,9 +80,20 @@ export function PdfViewer({ url, title }: PdfViewerProps) {
           if (!context) continue;
 
           container.append(canvas);
-          await page.render({ canvas, canvasContext: context, viewport, transform: [ratio, 0, 0, ratio, 0, 0] })
-            .promise;
-          page.cleanup();
+          await page.render({
+            canvas,
+            canvasContext: context,
+            viewport,
+            transform: [ratio, 0, 0, ratio, 0, 0],
+          }).promise;
+
+          /*
+           * No se libera cada página por separado: el documento se mantiene
+           * abierto solo mientras el modal está visible, y al cerrarlo se
+           * destruye la tarea entera —que suelta páginas, worker y recursos
+           * compartidos de una vez—. Liberarlas de a una acá no ahorraría nada
+           * y arriesga soltar fuentes que las páginas siguientes comparten.
+           */
         }
 
         if (!cancelled) setState({ status: 'ready', pages: pdf.numPages });

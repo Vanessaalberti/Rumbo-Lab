@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
-import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { ROUTES } from '@/constants/routes';
 import { cx } from '@/utils/classNames';
 import type { ApprenticeProfile } from '@/services/data/dashboard/dashboard.types';
 import type { MostUsedCv } from './mostUsedCv';
+import { AvatarPicker } from './AvatarPicker';
 import screen from '@/app/layouts/appShell.module.css';
 import styles from './perfil.module.css';
 
@@ -13,6 +13,8 @@ interface ProfileIntroProps {
   apprentice: ApprenticeProfile;
   cv: MostUsedCv | null;
   onEdit: () => void;
+  /** Vuelve a pedir el perfil tras cambiar o quitar la foto. */
+  onAvatarChanged: () => void;
 }
 
 /**
@@ -28,7 +30,12 @@ interface ProfileIntroProps {
  * campos que `03 · Mi Perfil` todavía no cerró. Cuando faltan, el bloque
  * conserva su lugar y su etiqueta: la estructura no depende de que haya dato.
  */
-export function ProfileIntro({ apprentice, cv, onEdit }: ProfileIntroProps) {
+export function ProfileIntro({
+  apprentice,
+  cv,
+  onEdit,
+  onAvatarChanged,
+}: ProfileIntroProps) {
   const displayName = apprentice.fullName ?? 'Sin nombre todavía';
   const subtitle = [apprentice.headline, apprentice.location].filter(Boolean).join(' · ');
 
@@ -36,7 +43,12 @@ export function ProfileIntro({ apprentice, cv, onEdit }: ProfileIntroProps) {
     <div className={styles.intro}>
       <div className={styles.introTop}>
         <div className={styles.identity}>
-          <Avatar name={displayName} src={apprentice.avatarUrl ?? undefined} size="lg" />
+          <AvatarPicker
+            apprenticeId={apprentice.id}
+            name={displayName}
+            avatarUrl={apprentice.avatarUrl}
+            onChanged={onAvatarChanged}
+          />
           <div className={styles.identityText}>
             <h1 className={styles.name}>{displayName}</h1>
             <p className={styles.headline}>

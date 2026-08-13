@@ -156,6 +156,8 @@ export interface MyRumboDashboard {
 export interface ProfilePatch {
   fullName?: string;
   headline?: string | null;
+  /** URL pública de la foto en el bucket `avatars`. `null` la quita. */
+  avatarUrl?: string | null;
   bio?: string | null;
   goal?: string | null;
   location?: string | null;
