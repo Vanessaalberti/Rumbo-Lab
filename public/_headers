@@ -5,25 +5,42 @@
 #   Nginx   → directivas add_header
 #   Apache  → Header always set
 #
-# IMPORTANTE — Content-Security-Policy:
-# El hash de script-src corresponde al script de arranque del tema que vive
+# ── Content-Security-Policy ────────────────────────────────────────────────
+#
+# script-src: el hash corresponde al script de arranque del tema que vive
 # inline en index.html. Si ese script cambia, el hash deja de coincidir y la
 # página se queda sin tema. Regenerarlo con:
 #
 #   node -e "const c=require('crypto'),f=require('fs');const s=f.readFileSync('index.html','utf8').match(/<script>([\s\S]*?)<\/script>/)[1];console.log('sha256-'+c.createHash('sha256').update(s,'utf8').digest('base64'))"
 #
-# connect-src incluye *.supabase.co (Supabase Auth + Postgres vía RLS, ver
-# SECURITY.md). Cuando rumbo-lab-backend tenga una URL pública de despliegue,
-# sumarla acá también — VITE_API_BASE_URL en desarrollo no queda cubierto por
-# este archivo, ver la nota de vite.config.ts.
+# **Sin 'unsafe-eval'**: es lo que impide que una cadena de texto se convierta
+# en código ejecutable. pdf.js lo pediría para acelerar ciertas funciones de
+# color y tipografía — por eso se lo desactiva explícitamente en
+# `PdfViewer.tsx` (`isEvalSupported: false`), en vez de aflojar la política.
+#
+# img-src incluye *.supabase.co porque el bucket `avatars` es de lectura
+# pública y la foto de perfil se sirve desde ahí. Sin esto el navegador
+# bloquea todas las fotos de perfil y el header queda con iniciales.
+#
+# worker-src cubre el worker de pdf.js: Vite lo emite como asset propio
+# ('self') y pdf.js puede recrearlo como blob si el asset queda en otro origen.
+#
+# ⚠️ connect-src — PENDIENTE DE CONFIGURACIÓN EN PRODUCCIÓN
+# Cubre 'self' (mismo origen) y Supabase. **Si `rumbo-lab-backend` se despliega
+# en un dominio distinto al del frontend, hay que sumarlo acá o el navegador va
+# a bloquear todas las llamadas a la API.** Agregar el origen exacto —nunca un
+# comodín de dominio— junto a los de Supabase. Si la API queda detrás del mismo
+# dominio (proxy en /api), 'self' ya alcanza y no hay nada que tocar.
 
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-TUK/SrKxI23KT5eGHMJx/HI87Rt5Br9dZmbBvhbHDz4='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.supabase.co https://*.supabase.in; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-TUK/SrKxI23KT5eGHMJx/HI87Rt5Br9dZmbBvhbHDz4='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.supabase.co https://*.supabase.in; connect-src 'self' https://*.supabase.co https://*.supabase.in; worker-src 'self' blob:; child-src 'self' blob:; manifest-src 'self'; frame-src 'none'; media-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Cross-Origin-Opener-Policy: same-origin
+  X-Permitted-Cross-Domain-Policies: none
 
 # Los assets con hash en el nombre son inmutables.
 /assets/*

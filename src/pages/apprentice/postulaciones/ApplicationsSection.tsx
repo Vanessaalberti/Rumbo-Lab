@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { cx } from '@/utils/classNames';
-import { isSafeExternalUrl } from '@/utils/validation';
 import type { ApprenticeShellContext } from '@/app/layouts/ApprenticeShell';
 import { updateApplication } from '@/services/data/dashboard/applications.service';
 import type { ApplicationStatus } from '@/services/data/dashboard/dashboard.types';
@@ -10,6 +9,7 @@ import { ApplicationDetail } from './ApplicationDetail';
 import { NewApplicationModal } from './NewApplicationModal';
 import { StatusFilter } from './StatusFilter';
 import { CvCell, StatusCell } from './TableCells';
+import { ContactCell } from './ContactCell';
 import screen from '@/app/layouts/appShell.module.css';
 import styles from './applications.module.css';
 
@@ -37,7 +37,8 @@ const APPLICATIONS_PER_PAGE = 10;
  * tapar nada ni navegar (§18bis.2). El único modal de la vista es el alta.
  *
  * La tabla tiene **exactamente cinco columnas, en orden fijo**:
- * `Nombre · Puesto · CV enviado · URL · Estado` (§18bis.4). No se agregan, no
+ * `Nombre · Puesto · CV enviado · Dónde · Estado` (§18bis.4, con `URL`
+ * renombrada a `Dónde` porque ya no solo admite enlaces). No se agregan, no
  * se quitan y no se reordenan — no existe configuración de columnas
  * (§18bis.7). Empresa, Espacio, fecha y notas existen como datos y viven en el
  * panel de detalle, nunca como columnas.
@@ -75,7 +76,7 @@ export function ApplicationsSection() {
   /** Edición en línea desde la tabla: estado y CV enviado. */
   const patchRow = async (
     id: string,
-    patch: { status?: ApplicationStatus; cvId?: string | null },
+    patch: { status?: ApplicationStatus; cvChoice?: string },
   ) => {
     setRowError(null);
     setBusyId(id);
@@ -129,8 +130,8 @@ export function ApplicationsSection() {
         <div className={styles.tableColumn}>
           {applications.length === 0 ? (
             <p className={screen.emptyState}>
-              Acá van a aparecer las postulaciones que registres. Alcanza con pegar la URL de la
-              oportunidad.
+              Acá van a aparecer las postulaciones que registres. Alcanza con saber dónde
+              postularte: un enlace, un correo o un teléfono.
             </p>
           ) : visible.length === 0 ? (
             <p className={screen.emptyState}>
@@ -144,7 +145,7 @@ export function ApplicationsSection() {
                     <th>Nombre</th>
                     <th>Puesto</th>
                     <th>CV enviado</th>
-                    <th>URL</th>
+                    <th>Dónde</th>
                     <th>Estado</th>
                   </tr>
                 </thead>
@@ -178,26 +179,14 @@ export function ApplicationsSection() {
                       <td className={screen.cellSoft}>{application.position ?? '—'}</td>
                       <td>
                         <CvCell
-                          cvId={application.cvId}
+                          application={application}
                           cvs={cvs}
                           busy={busyId === application.id}
-                          onChange={(cvId) => void patchRow(application.id, { cvId })}
+                          onChange={(cvChoice) => void patchRow(application.id, { cvChoice })}
                         />
                       </td>
                       <td className={screen.cellSoft}>
-                        {isSafeExternalUrl(application.url) ? (
-                          <a
-                            className={styles.externalLink}
-                            href={application.url}
-                            target="_blank"
-                            rel="noreferrer noopener"
-                            onClick={(event) => event.stopPropagation()}
-                          >
-                            {new URL(application.url).hostname}
-                          </a>
-                        ) : (
-                          '—'
-                        )}
+                        <ContactCell value={application.url} />
                       </td>
                       <td>
                         <StatusCell

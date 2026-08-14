@@ -3,12 +3,15 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { updateApprenticeProfile } from '@/services/data/dashboard/dashboard.service';
 import type { ApprenticeProfile } from '@/services/data/dashboard/dashboard.types';
+import { AvatarPicker } from './AvatarPicker';
 import styles from './perfil.module.css';
 
 interface ProfileEditFormProps {
   apprentice: ApprenticeProfile;
   onCancel: () => void;
   onSaved: () => void;
+  /** La foto se guarda al instante, sin pasar por "Guardar". */
+  onAvatarChanged: () => void;
 }
 
 /**
@@ -22,7 +25,12 @@ interface ProfileEditFormProps {
  * Nombre y presentación son columnas de `apprentices`; el resto viaja a
  * `profile_data`, que el backend mezcla con lo que ya hubiera.
  */
-export function ProfileEditForm({ apprentice, onCancel, onSaved }: ProfileEditFormProps) {
+export function ProfileEditForm({
+  apprentice,
+  onCancel,
+  onSaved,
+  onAvatarChanged,
+}: ProfileEditFormProps) {
   const bioId = useId();
   const [fullName, setFullName] = useState(apprentice.fullName ?? '');
   const [headline, setHeadline] = useState(apprentice.headline ?? '');
@@ -66,6 +74,22 @@ export function ProfileEditForm({ apprentice, onCancel, onSaved }: ProfileEditFo
 
   return (
     <form className={styles.editForm} onSubmit={handleSubmit} noValidate>
+      {/*
+       * La foto vive acá y no en la vista de lectura: en lectura es la imagen
+       * con la que la persona se presenta, y las herramientas para cambiarla
+       * —formatos, tamaño, quitarla— son ruido alrededor de esa imagen.
+       *
+       * Se guarda sola al elegirla, sin esperar a "Guardar": subir un archivo
+       * ya es una acción confirmada, y dejarla pendiente de otro botón haría
+       * que cancelar el formulario tuviera que deshacer una subida.
+       */}
+      <AvatarPicker
+        apprenticeId={apprentice.id}
+        name={apprentice.fullName ?? 'Aprendiz'}
+        avatarUrl={apprentice.avatarUrl}
+        onChanged={onAvatarChanged}
+      />
+
       <Input
         label="Nombre"
         value={fullName}

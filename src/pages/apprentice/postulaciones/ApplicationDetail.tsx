@@ -4,7 +4,8 @@ import { Icon } from '@/components/ui/Icon';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { cx } from '@/utils/classNames';
-import { isSafeExternalUrl } from '@/utils/validation';
+import { contactKindOf } from './contact';
+import { ContactCell } from './ContactCell';
 import {
   deleteApplication,
   getApplicationHistory,
@@ -15,7 +16,9 @@ import type {
   ApplicationSummary,
   CvSummary,
 } from '@/services/data/dashboard/dashboard.types';
+import { cvChoiceOf } from '@/services/data/dashboard/dashboard.types';
 import { APPLICATION_STATUS_LABELS } from '../applicationStatus';
+import { cvChoiceLabel } from './cvChoice';
 import { StatusPill } from './TableCells';
 import { formatLongDate } from '../perfil/formatters';
 import screen from '@/app/layouts/appShell.module.css';
@@ -62,7 +65,7 @@ export function ApplicationDetail({
     name: application.name,
     url: application.url,
     position: application.position ?? '',
-    cvId: application.cvId ?? '',
+    cvChoice: cvChoiceOf(application),
     appliedAt: application.appliedAt ?? '',
     notes: application.notes ?? '',
   });
@@ -91,16 +94,14 @@ export function ApplicationDetail({
   }, [application.id]);
 
   const busy = saving || removing;
-  const cvName = application.cvId
-    ? (cvs.find((cv) => cv.id === application.cvId)?.name ?? 'CV eliminado')
-    : 'No aplica';
+  const cvName = cvChoiceLabel(application, cvs);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
 
-    if (!isSafeExternalUrl(form.url.trim())) {
-      setError('La URL tiene que empezar con http:// o https://');
+    if (contactKindOf(form.url) === null) {
+      setError('Poné un enlace, un correo o un teléfono.');
       return;
     }
 
@@ -109,7 +110,7 @@ export function ApplicationDetail({
       name: form.name.trim() || undefined,
       url: form.url.trim(),
       position: form.position.trim() || null,
-      cvId: form.cvId || null,
+      cvChoice: form.cvChoice,
       /* `spaceId` no se manda: la vista ya no lo edita, y omitirlo deja
          intacto el que la postulación tuviera. */
       appliedAt: form.appliedAt || null,
@@ -218,8 +219,8 @@ export function ApplicationDetail({
             disabled={busy}
           />
           <Input
-            label="URL"
-            type="url"
+            label="Dónde postularte"
+            hint="Un enlace, el correo al que mandás el CV, o un teléfono."
             value={form.url}
             onChange={(event) => setForm((f) => ({ ...f, url: event.target.value }))}
             disabled={busy}
@@ -241,11 +242,12 @@ export function ApplicationDetail({
             <select
               id={cvFieldId}
               className={styles.select}
-              value={form.cvId}
-              onChange={(event) => setForm((f) => ({ ...f, cvId: event.target.value }))}
+              value={form.cvChoice}
+              onChange={(event) => setForm((f) => ({ ...f, cvChoice: event.target.value }))}
               disabled={busy}
             >
-              <option value="">No aplica</option>
+              <option value="none">No aplica</option>
+              <option value="custom">Personalizado</option>
               {cvs.map((cv) => (
                 <option key={cv.id} value={cv.id}>
                   {cv.name}
@@ -287,23 +289,7 @@ export function ApplicationDetail({
         <dl className={styles.readList}>
           <DetailRow label="Puesto" value={application.position ?? '—'} />
           <DetailRow label="CV enviado" value={cvName} />
-          <DetailRow
-            label="URL"
-            value={
-              isSafeExternalUrl(application.url) ? (
-                <a
-                  className={styles.externalLink}
-                  href={application.url}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  {new URL(application.url).hostname}
-                </a>
-              ) : (
-                '—'
-              )
-            }
-          />
+          <DetailRow label="Dónde postularte" value={<ContactCell value={application.url} />} />
           <DetailRow
             label="Fecha de postulación"
             value={application.appliedAt ? formatLongDate(application.appliedAt) : '—'}

@@ -79,3 +79,117 @@
   padding-top: var(--space-2);
   font-variant-numeric: tabular-nums;
 }
+
+/* --- Filtro temporal ------------------------------------------------------ */
+/* No es una decisión visual: acota cuántos registros se consultan. */
+
+.rangeTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 34px;
+  padding-inline: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+  color: var(--text-soft);
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: var(--transition-colors);
+}
+
+.rangeTrigger:hover,
+.rangeTrigger[aria-expanded='true'] {
+  color: var(--text);
+  background-color: var(--bg-alt);
+}
+
+.rangeOption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  background: none;
+  border-radius: var(--radius-xs);
+  font: inherit;
+  font-size: var(--text-sm);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: var(--transition-colors);
+}
+
+.rangeOption:hover {
+  background-color: var(--bg-alt);
+}
+
+.rangeOptionCurrent {
+  background-color: var(--bg-alt);
+}
+
+.rangeCheck {
+  color: var(--brand-strong);
+  flex-shrink: 0;
+}
+
+/* --- Contexto del acontecimiento ------------------------------------------ */
+
+.eventSpace {
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+  line-height: 1.4;
+}
+
+/* --- Paginación ----------------------------------------------------------- */
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding-top: var(--space-5);
+}
+
+.pagerButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+  color: var(--text-soft);
+  font: inherit;
+  cursor: pointer;
+  transition: var(--transition-colors);
+}
+
+.pagerButton:hover:not(:disabled) {
+  background-color: var(--bg-alt);
+  color: var(--text);
+}
+
+.pagerButton:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.pagerStatus {
+  font-size: var(--text-sm);
+  color: var(--text-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.errorState {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background-color: var(--error-tint);
+  color: var(--error-strong);
+  font-size: var(--text-sm);
+}

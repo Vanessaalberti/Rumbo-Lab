@@ -1,6 +1,8 @@
-import { useOutletContext } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import { Avatar } from '@/components/ui/Avatar';
+import { ROUTES } from '@/constants/routes';
 import type { ApprenticeShellContext } from '@/app/layouts/ApprenticeShell';
+import type { FeedbackSummary } from '@/services/data/dashboard/dashboard.types';
 import { formatLongDate } from './perfil/formatters';
 import screen from '@/app/layouts/appShell.module.css';
 
@@ -15,13 +17,34 @@ import screen from '@/app/layouts/appShell.module.css';
  * Los mentores del Espacio salen de `space_mentors → mentors`, visibles para
  * el Aprendiz por la política `mentors_select_by_shared_space`.
  *
+ * **El feedback se lee acá.** Dejó de ser una sección propia del rail: siempre
+ * viene de un Mentor y casi siempre dentro de un Espacio, así que tenerlo
+ * separado obligaba a ir y volver entre dos pantallas para entender una sola
+ * conversación. Cada Espacio muestra sus devoluciones más recientes; el
+ * historial completo tiene su propia pantalla.
+ *
  * No hay "entrar al Espacio": no existe todavía una ruta de detalle de Espacio
  * en la aplicación, y no se inventa una que llevaría a una pantalla vacía.
  */
 export function SpacesSection() {
   const {
-    dashboard: { spaces, mentors, applications },
+    dashboard: { spaces, mentors, applications, feedbacks, feedbacksTotal },
   } = useOutletContext<ApprenticeShellContext>();
+
+  /** Devoluciones agrupadas por Espacio, para leerlas en su contexto. */
+  const feedbackBySpace = new Map<string, typeof feedbacks>();
+  for (const feedback of feedbacks) {
+    if (!feedback.spaceName) continue;
+    const list = feedbackBySpace.get(feedback.spaceName);
+    if (list) list.push(feedback);
+    else feedbackBySpace.set(feedback.spaceName, [feedback]);
+  }
+
+  /*
+   * Un feedback puede no tener Espacio: la columna es nullable. Si se mostrara
+   * solo lo agrupado, esas devoluciones desaparecerían de la vista.
+   */
+  const withoutSpace = feedbacks.filter((feedback) => !feedback.spaceName);
 
   /** Postulaciones que la persona vinculó a cada Espacio. Dato real. */
   const applicationsBySpace = new Map<string, number>();
@@ -94,10 +117,55 @@ export function SpacesSection() {
                   </div>
                 </div>
               )}
+
+              <SpaceFeedback entries={feedbackBySpace.get(space.name) ?? []} />
             </section>
           );
         })
       )}
+
+      {/* Devoluciones sin Espacio: existen y no pueden quedar invisibles. */}
+      {withoutSpace.length > 0 && (
+        <section className={screen.panel}>
+          <div className={screen.panelTitle}>
+            <span>Feedback sin Espacio</span>
+          </div>
+          <SpaceFeedback entries={withoutSpace} />
+        </section>
+      )}
+
+      {feedbacksTotal > 0 && (
+        <Link to={ROUTES.myRumboFeedback} className={screen.panelLink}>
+          Ver las {feedbacksTotal} devoluciones
+        </Link>
+      )}
+    </>
+  );
+}
+
+/** Devoluciones de un Espacio, en su contexto. Solo lectura: no es un chat. */
+function SpaceFeedback({ entries }: { entries: FeedbackSummary[] }) {
+  if (entries.length === 0) {
+    return (
+      <p className={screen.emptyState}>
+        Todavía no recibiste devoluciones en este Espacio.
+      </p>
+    );
+  }
+
+  return (
+    <>
+      {entries.map((feedback) => (
+        <div key={feedback.id} className={screen.row}>
+          <Avatar name={feedback.mentorName ?? 'Mentor'} size="sm" />
+          <div className={screen.rowMain}>
+            <span className={screen.rowTitle}>{feedback.content}</span>
+            <span className={screen.rowMeta}>
+              {[feedback.mentorName ?? 'Mentor', formatLongDate(feedback.createdAt)].join(' · ')}
+            </span>
+          </div>
+        </div>
+      ))}
     </>
   );
 }

@@ -56,6 +56,21 @@
   font-size: var(--text-xl);
 }
 
+/* Retrato: en Mi Perfil la foto es con lo que la persona se presenta, no un
+   adorno al costado del nombre. */
+.xxl {
+  width: 112px;
+  height: 112px;
+  font-size: var(--text-3xl);
+}
+
+/* Retrato: es la foto con la que la persona se presenta, no un adorno. */
+.xl {
+  width: 112px;
+  height: 112px;
+  font-size: var(--text-3xl);
+}
+
 /* --- Tonos ------------------------------------------------------------- */
 /* Se asignan de forma determinística a partir del nombre, para que una misma
    persona conserve siempre el mismo color en todas las pantallas. */

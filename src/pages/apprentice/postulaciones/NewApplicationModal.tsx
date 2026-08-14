@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { cx } from '@/utils/classNames';
-import { isSafeExternalUrl } from '@/utils/validation';
+import { contactKindOf } from './contact';
 import { createApplication } from '@/services/data/dashboard/applications.service';
 import type { CvSummary } from '@/services/data/dashboard/dashboard.types';
 import styles from './applications.module.css';
@@ -37,7 +37,7 @@ export function NewApplicationModal({ open, cvs, onClose, onCreated }: NewApplic
   const [url, setUrl] = useState('');
   const [name, setName] = useState('');
   const [position, setPosition] = useState('');
-  const [cvId, setCvId] = useState('');
+  const [cvChoice, setCvChoice] = useState('none');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,7 +46,7 @@ export function NewApplicationModal({ open, cvs, onClose, onCreated }: NewApplic
     setUrl('');
     setName('');
     setPosition('');
-    setCvId('');
+    setCvChoice('none');
     setError(null);
   };
 
@@ -61,8 +61,8 @@ export function NewApplicationModal({ open, cvs, onClose, onCreated }: NewApplic
     setError(null);
 
     const trimmed = url.trim();
-    if (!isSafeExternalUrl(trimmed)) {
-      setError('Pegá una URL válida que empiece con http:// o https://');
+    if (contactKindOf(trimmed) === null) {
+      setError('Poné un enlace, un correo o un teléfono.');
       return;
     }
 
@@ -75,7 +75,7 @@ export function NewApplicationModal({ open, cvs, onClose, onCreated }: NewApplic
         ? {
             name: name.trim() || undefined,
             position: position.trim() || null,
-            cvId: cvId || null,
+            cvChoice,
           }
         : {}),
     });
@@ -99,7 +99,7 @@ export function NewApplicationModal({ open, cvs, onClose, onCreated }: NewApplic
     <Modal
       open={open}
       title="Nueva postulación"
-      description="Alcanza con la URL. El resto lo podés completar cuando quieras."
+      description="Alcanza con saber dónde postularte. El resto lo podés completar cuando quieras."
       onClose={handleClose}
     >
       <form onSubmit={handleSubmit} noValidate>
@@ -111,7 +111,7 @@ export function NewApplicationModal({ open, cvs, onClose, onCreated }: NewApplic
             aria-pressed={!detailed}
             disabled={saving}
           >
-            Solo la URL
+            Solo eso
           </button>
           <button
             type="button"
@@ -126,10 +126,10 @@ export function NewApplicationModal({ open, cvs, onClose, onCreated }: NewApplic
 
         <div className={styles.modalFields}>
           <Input
-            label="URL de la oportunidad"
-            type="url"
+            label="Dónde postularte"
+            hint="Un enlace a la publicación, el correo al que mandás el CV, o un teléfono."
             inputMode="url"
-            placeholder="https://empresa.com/empleos/frontend-jr"
+            placeholder="https://empresa.com/empleo · rrhh@empresa.com · +54 9 341 555-1234"
             value={url}
             onChange={(event) => setUrl(event.target.value)}
             disabled={saving}
@@ -165,11 +165,12 @@ export function NewApplicationModal({ open, cvs, onClose, onCreated }: NewApplic
                 <select
                   id="nueva-cv"
                   className={styles.select}
-                  value={cvId}
-                  onChange={(event) => setCvId(event.target.value)}
+                  value={cvChoice}
+                  onChange={(event) => setCvChoice(event.target.value)}
                   disabled={saving}
                 >
-                  <option value="">No aplica</option>
+                  <option value="none">No aplica</option>
+                  <option value="custom">Personalizado</option>
                   {cvs.map((cv) => (
                     <option key={cv.id} value={cv.id}>
                       {cv.name}

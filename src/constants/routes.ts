@@ -25,9 +25,16 @@ export const ROUTES = {
   myRumbo: '/mi-rumbo',
   myRumboApplications: '/mi-rumbo/postulaciones',
   myRumboCvs: '/mi-rumbo/cvs',
+  myRumboGoals: '/mi-rumbo/objetivos',
   myRumboSpaces: '/mi-rumbo/espacios',
+  /**
+   * Feedback ya no es una sección propia del rail: se lee dentro de Espacios,
+   * que es donde ocurre el acompañamiento. La ruta sigue existiendo porque el
+   * historial completo necesita su propia pantalla.
+   */
   myRumboFeedback: '/mi-rumbo/feedback',
   myRumboEvidences: '/mi-rumbo/evidencias',
+  myRumboPreparation: '/mi-rumbo/preparacion',
   mentorPanel: '/panel-mentor',
   /** Ajustes de la cuenta — no del perfil de Aprendiz, que vive en Mi Rumbo. */
   settings: '/configuracion',

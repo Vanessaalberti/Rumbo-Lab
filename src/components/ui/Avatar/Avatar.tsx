@@ -6,7 +6,7 @@ interface AvatarProps {
   name: string;
   /** Fotografía de perfil, cuando la persona ya cargó una. */
   src?: string;
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
   /** Anillo del color de la superficie, para avatares apilados. */
   bordered?: boolean;
   className?: string;

@@ -64,8 +64,24 @@ export interface ApplicationSummary {
   position: string | null;
   status: ApplicationStatus;
   url: string;
-  /** CV enviado. `null` = "No aplica". */
+  /** CV enviado, de los guardados en la plataforma. `null` si no es uno de esos. */
   cvId: string | null;
+  /**
+   * Se envió un CV hecho a medida, que no está guardado acá. Distinto de "No
+   * aplica" (`cvId === null && !customCv`), que significa que no hacía falta.
+   */
+  customCv: boolean;
+  /**
+   * Lo más lejos que llegó el proceso, según `application_status_history`.
+   * `null` si nunca pasó de `pendiente`. No es el estado actual: una
+   * postulación rechazada pudo haber llegado a entrevista.
+   */
+  furthestStatus: ApplicationStatus | null;
+  /**
+   * Cuándo pasó a `postulado` por primera vez. `null` si nunca se envió.
+   * Sale del historial, así que no se puede editar a mano.
+   */
+  firstAppliedAt: string | null;
   /** Una postulación de Mi Rumbo puede no estar ligada a ningún Espacio. */
   spaceId: string | null;
   appliedAt: string | null;
@@ -83,13 +99,33 @@ export interface ApplicationStatusChange {
 }
 
 /** Alta y edición. `url` es lo único obligatorio en el alta rápida. */
+/**
+ * Con qué CV se presentó la persona. Un único campo con tres respuestas
+ * excluyentes, para que no puedan convivir un CV elegido y la marca de
+ * "personalizado".
+ *
+ *   `'none'`   — no hacía falta CV
+ *   `'custom'` — mandó uno a medida, que no está guardado acá
+ *   `<uuid>`   — uno de sus CVs de la plataforma
+ */
+export type CvChoice = 'none' | 'custom' | (string & {});
+
+/** El valor que le corresponde a una postulación ya guardada. */
+export function cvChoiceOf(application: {
+  cvId: string | null;
+  customCv: boolean;
+}): CvChoice {
+  if (application.cvId) return application.cvId;
+  return application.customCv ? 'custom' : 'none';
+}
+
 export interface ApplicationInput {
   url: string;
   name?: string | null;
   company?: string | null;
   position?: string | null;
   status?: ApplicationStatus;
-  cvId?: string | null;
+  cvChoice?: CvChoice;
   spaceId?: string | null;
   appliedAt?: string | null;
   notes?: string | null;
@@ -97,13 +133,19 @@ export interface ApplicationInput {
 
 export type ApplicationPatch = Partial<ApplicationInput>;
 
+/**
+ * Alta de un CV.
+ *
+ * No lleva `mimeType` ni `sizeBytes` a propósito: el backend los ignora y
+ * consulta el objeto real en Storage. Nada de lo que el navegador afirma sobre
+ * un archivo es verificable desde el navegador, así que mandarlo solo serviría
+ * para que alguien creyera que sí lo es.
+ */
 export interface CvInput {
   name: string;
   storagePath?: string | null;
   isPrimary?: boolean;
   source?: CvSource;
-  mimeType?: string;
-  sizeBytes?: number;
 }
 
 /** Solo el nombre y cuál es el principal se pueden cambiar después. */

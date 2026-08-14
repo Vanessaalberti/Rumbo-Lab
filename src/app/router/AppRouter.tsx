@@ -13,6 +13,8 @@ import {
   ApplicationsSection,
   CvsSection,
   EvidencesSection,
+  GoalsSection,
+  PreparationSection,
   FeedbackSection,
   PerfilSection,
   SpacesSection,
@@ -60,7 +62,9 @@ export function AppRouter() {
                 <Route index element={<PerfilSection />} />
                 <Route path="postulaciones" element={<ApplicationsSection />} />
                 <Route path="cvs" element={<CvsSection />} />
+                <Route path="objetivos" element={<GoalsSection />} />
                 <Route path="espacios" element={<SpacesSection />} />
+                <Route path="preparacion" element={<PreparationSection />} />
                 <Route path="feedback" element={<FeedbackSection />} />
                 <Route path="evidencias" element={<EvidencesSection />} />
               </Route>

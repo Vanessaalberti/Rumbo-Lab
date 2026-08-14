@@ -193,6 +193,13 @@
   color: var(--text-soft);
 }
 
+/* Valor que no se reconoce como enlace, correo ni teléfono: se muestra tal
+   cual, sin fingir que lleva a algún lado. */
+.contactPlain {
+  color: var(--text-soft);
+  overflow-wrap: anywhere;
+}
+
 .externalLink:hover {
   color: var(--brand-strong);
   text-decoration: underline;

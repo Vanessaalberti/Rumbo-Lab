@@ -2,10 +2,12 @@ import { useRef, useState } from 'react';
 import { Icon } from '@/components/ui/Icon';
 import { Popover } from '@/components/ui/Popover';
 import { cx } from '@/utils/classNames';
-import type {
-  ApplicationStatus,
-  CvSummary,
+import {
+  cvChoiceOf,
+  type ApplicationStatus,
+  type CvSummary,
 } from '@/services/data/dashboard/dashboard.types';
+import { cvChoiceLabel, cvChoiceOptions } from './cvChoice';
 import {
   APPLICATION_STATUS_LABELS,
   APPLICATION_STATUS_ORDER,
@@ -110,10 +112,10 @@ export function StatusCell({ status, busy, onChange }: StatusCellProps) {
 }
 
 interface CvCellProps {
-  cvId: string | null;
+  application: { cvId: string | null; customCv: boolean };
   cvs: CvSummary[];
   busy: boolean;
-  onChange: (cvId: string | null) => void;
+  onChange: (choice: string) => void;
 }
 
 /**
@@ -125,25 +127,24 @@ interface CvCellProps {
  *
  * Solo se muestra el nombre: **el documento no se abre desde la tabla**.
  */
-export function CvCell({ cvId, cvs, busy, onChange }: CvCellProps) {
+export function CvCell({ application, cvs, busy, onChange }: CvCellProps) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
-  const current = cvId ? cvs.find((cv) => cv.id === cvId) : null;
-
-  /*
-   * Es una referencia histórica: si el CV se editó o se eliminó, la
-   * postulación sigue indicando el que se usó. Cuando ya no está entre los
-   * CVs actuales no se muestra un hueco.
-   */
-  const label = cvId ? (current?.name ?? 'CV eliminado') : 'No aplica';
+  const current = cvChoiceOf(application);
+  const label = cvChoiceLabel(application, cvs);
+  const options = cvChoiceOptions(cvs);
 
   return (
     <span className={styles.cellRoot}>
       <button
         ref={triggerRef}
         type="button"
-        className={cx(styles.cvButton, !cvId && styles.cvButtonEmpty, busy && styles.cellBusy)}
+        className={cx(
+          styles.cvButton,
+          current === 'none' && styles.cvButtonEmpty,
+          busy && styles.cellBusy,
+        )}
         onClick={(event) => {
           event.stopPropagation();
           setOpen((value) => !value);
@@ -164,36 +165,23 @@ export function CvCell({ cvId, cvs, busy, onChange }: CvCellProps) {
         role="listbox"
         label="CV enviado"
       >
-        <button
-          type="button"
-          role="option"
-          aria-selected={cvId === null}
-          className={cx(styles.option, cvId === null && styles.optionCurrent)}
-          onClick={(event) => {
-            event.stopPropagation();
-            setOpen(false);
-            if (cvId !== null) onChange(null);
-          }}
-        >
-          <span className={styles.optionText}>No aplica</span>
-          {cvId === null && <Icon name="check" size={14} className={styles.optionCheck} />}
-        </button>
-
-        {cvs.map((cv) => (
+        {options.map((option) => (
           <button
-            key={cv.id}
+            key={option.value}
             type="button"
             role="option"
-            aria-selected={cv.id === cvId}
-            className={cx(styles.option, cv.id === cvId && styles.optionCurrent)}
+            aria-selected={option.value === current}
+            className={cx(styles.option, option.value === current && styles.optionCurrent)}
             onClick={(event) => {
               event.stopPropagation();
               setOpen(false);
-              if (cv.id !== cvId) onChange(cv.id);
+              if (option.value !== current) onChange(option.value);
             }}
           >
-            <span className={styles.optionText}>{cv.name}</span>
-            {cv.id === cvId && <Icon name="check" size={14} className={styles.optionCheck} />}
+            <span className={styles.optionText}>{option.label}</span>
+            {option.value === current && (
+              <Icon name="check" size={14} className={styles.optionCheck} />
+            )}
           </button>
         ))}
       </Popover>

@@ -74,6 +74,14 @@
   opacity: 0.85;
 }
 
+/* Separa las secciones que registran el recorrido de las que entrenan. */
+.railDivider {
+  height: 1px;
+  margin: var(--space-4) var(--space-3);
+  background-color: var(--border);
+  border: none;
+}
+
 .main {
   flex: 1;
   min-width: 0;
