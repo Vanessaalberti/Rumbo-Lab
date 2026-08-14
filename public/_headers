@@ -5,6 +5,10 @@
 #   Nginx   → directivas add_header
 #   Apache  → Header always set
 #
+# ⚠️ El despliegue actual es en Vercel, que NO lee este archivo: la copia que
+# de verdad se aplica vive en `vercel.json` (raíz del proyecto). Todo cambio
+# acá hay que replicarlo allá, incluido el hash de script-src.
+#
 # ── Content-Security-Policy ────────────────────────────────────────────────
 #
 # script-src: el hash corresponde al script de arranque del tema que vive
