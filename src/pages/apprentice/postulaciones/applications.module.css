@@ -131,21 +131,41 @@
 @media (min-width: 1100px) {
   .split {
     grid-template-columns: minmax(0, 1.7fr) minmax(320px, 1fr);
+    /*
+     * `stretch` en lugar de `start`: la columna del panel toma el alto de la
+     * fila, que lo define la tabla. Es lo que ata una medida a la otra.
+     */
+    align-items: stretch;
   }
 
   /*
-   * El panel scrollea por dentro en vez de estirarse: con la ficha, el
-   * historial y las notas se hace mucho más alto que la tabla, y arrastraba la
-   * página entera. Acompaña el scroll pegado bajo el header y se limita a lo
-   * que queda de ventana.
+   * El panel no puede pasar el alto de la tabla que tiene al lado.
+   *
+   * Antes se limitaba a lo que quedaba de ventana
+   * (`100vh - navbar - space-10`), una medida que no tiene nada que ver con lo
+   * que hay en pantalla: en un monitor alto el panel se estiraba muy por debajo
+   * del final de la tabla y las dos columnas terminaban en lugares distintos.
+   *
+   * El truco es sacar al panel del flujo (`absolute`): así no puede empujar el
+   * alto de la fila —si pudiera, se agrandaría a sí mismo y la restricción no
+   * cerraría nunca— y la fila queda definida solo por la tabla. `max-height`
+   * y no `height`: una ficha corta ocupa lo que necesita, no se estira.
    */
   .detailColumn {
-    position: sticky;
-    top: calc(var(--navbar-height) + var(--space-5));
-    max-height: calc(100vh - var(--navbar-height) - var(--space-10));
+    position: relative;
+    min-height: 0;
+  }
+
+  .detail,
+  .detailPlaceholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    max-height: 100%;
     overflow-y: auto;
     /* Aire para que la sombra del panel no quede cortada contra el borde. */
-    padding-right: var(--space-1);
+    margin-right: var(--space-1);
   }
 }
 
@@ -778,4 +798,69 @@
   .table td:last-child {
     text-align: right;
   }
+}
+
+/* --- Aire lateral de las celdas ------------------------------------------- */
+
+/*
+ * `.table td` del shell solo declara `padding-block`, así que el contenido
+ * quedaba pegado al borde de la celda. No se nota en una fila común —no hay
+ * borde que lo delate— pero sí en la seleccionada, que tiene fondo propio y un
+ * filete de 2px: el texto arrancaba encima del filete.
+ *
+ * El aire va acá y no en el shell porque esta es la única tabla con filas
+ * seleccionables; tocar la primitiva movería también las tablas de las otras
+ * secciones sin motivo.
+ */
+.table th,
+.table td {
+  padding-inline: var(--space-3);
+}
+
+/* Las de los extremos despegan del borde de la fila, y la primera además del
+   filete de selección. */
+.table th:first-child,
+.table td:first-child {
+  padding-left: var(--space-4);
+}
+
+.table th:last-child,
+.table td:last-child {
+  padding-right: var(--space-4);
+}
+
+/* --- Notas ---------------------------------------------------------------- */
+
+/*
+ * `pre-wrap` preserva los saltos de línea que la persona escribió en el
+ * textarea. Sin esto el navegador los colapsaba a un espacio y una nota con
+ * varios párrafos se leía como un bloque corrido.
+ */
+.notes {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Cinco líneas. El scroll es del panel, no de esta caja. */
+.notesClamped {
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.notesToggle {
+  align-self: flex-start;
+  margin-top: var(--space-1);
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--brand);
+  cursor: pointer;
+}
+
+.notesToggle:hover {
+  text-decoration: underline;
 }

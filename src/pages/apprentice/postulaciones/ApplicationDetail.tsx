@@ -294,7 +294,9 @@ export function ApplicationDetail({
             label="Fecha de postulación"
             value={application.appliedAt ? formatLongDate(application.appliedAt) : '—'}
           />
-          {application.notes && <DetailRow label="Notas" value={application.notes} />}
+          {application.notes && (
+            <DetailRow label="Notas" value={<Notes text={application.notes} />} />
+          )}
         </dl>
       )}
 
@@ -376,6 +378,54 @@ export function ApplicationDetail({
         </div>
       </Modal>
     </section>
+  );
+}
+
+/**
+ * Notas, recortadas a cinco líneas.
+ *
+ * Son el único campo libre de la ficha y el único que puede ser largo: sin
+ * recorte empujaban el historial fuera de vista y obligaban a scrollear el
+ * panel entero para llegar a algo que está debajo.
+ *
+ * El recorte es visual (`-webkit-line-clamp`), así que el texto completo sigue
+ * en el DOM: se puede buscar en la página y un lector de pantalla lo lee entero.
+ * "Ver más" solo lo despliega. **No lleva scroll propio**: una caja que
+ * scrollea dentro de un panel que también scrollea deja a la persona sin saber
+ * cuál de los dos está moviendo.
+ */
+function Notes({ text }: { text: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const [clamped, setClamped] = useState(false);
+
+  /*
+   * El botón aparece solo si el texto realmente no entra. Cinco líneas no es lo
+   * mismo que cinco saltos de línea: depende del ancho del panel, así que se
+   * mide el elemento en lugar de contar caracteres.
+   */
+  const measure = (node: HTMLParagraphElement | null) => {
+    if (node) setClamped(node.scrollHeight > node.clientHeight + 1);
+  };
+
+  return (
+    <>
+      <p
+        ref={expanded ? undefined : measure}
+        className={cx(styles.notes, !expanded && styles.notesClamped)}
+      >
+        {text}
+      </p>
+
+      {(clamped || expanded) && (
+        <button
+          type="button"
+          className={styles.notesToggle}
+          onClick={() => setExpanded((open) => !open)}
+        >
+          {expanded ? 'Ver menos' : 'Ver más'}
+        </button>
+      )}
+    </>
   );
 }
 

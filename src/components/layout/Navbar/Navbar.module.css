@@ -114,3 +114,17 @@
     display: inline-flex;
   }
 }
+
+/*
+ * Header del área privada y de acceso: a ancho completo.
+ *
+ * La versión pública alinea la barra con el `container-wide` del contenido, que
+ * es lo correcto en la landing. Adentro no: Mi Rumbo es un shell a sangre —el
+ * rail arranca pegado al borde izquierdo— y un header centrado dejaba la marca
+ * y el avatar flotando hacia el medio, sin alinearse con nada. Acá los extremos
+ * son el borde de la ventana.
+ */
+.innerFull {
+  max-width: none;
+  margin-inline: 0;
+}

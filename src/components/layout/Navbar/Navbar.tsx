@@ -58,7 +58,10 @@ export function Navbar({ minimal = false }: NavbarProps) {
   if (minimal) {
     return (
       <header className={cx(styles.navbar, scrolled && styles.scrolled)}>
-        <nav className={cx('container-wide', styles.inner)} aria-label="Principal">
+        <nav
+          className={cx('container-wide', styles.inner, styles.innerFull)}
+          aria-label="Principal"
+        >
           <Link
             to={ROUTES.landing}
             className={styles.brand}
