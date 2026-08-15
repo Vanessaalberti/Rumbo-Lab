@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Card } from '@/components/ui/Card';
 import { Icon, type IconName } from '@/components/ui/Icon';
 import { ROUTES } from '@/constants/routes';
 import { cx } from '@/utils/classNames';
@@ -12,23 +13,38 @@ import styles from './PendingSection.module.css';
  * lo tienen no dejan de existir en la pantalla — se ven, con su nombre y su
  * descripción, pero bloqueadas: es la promesa de que van llegando una por una,
  * no una lista que aparece de golpe el día que estén las tres.
+ *
+ * `tone` solo diferencia visualmente las tarjetas — igual que el color de un
+ * ícono de aplicación — y usa los tres acentos que ya existen en el sistema
+ * (`ProgressBar` los llama `brand`/`progress`/`attention`); no es un dato del
+ * producto, así que no importa si dos herramientas terminan compartiendo tono
+ * el día que haya más de tres.
  */
-const TOOLS: Array<{ icon: IconName; name: string; text: string; href?: string }> = [
+const TOOLS: Array<{
+  icon: IconName;
+  name: string;
+  text: string;
+  tone: 'brand' | 'teal' | 'amber';
+  href?: string;
+}> = [
   {
     icon: 'document',
     name: 'Comparar tu CV con una oferta',
     text: 'Ver qué pide la búsqueda, qué de eso ya está en tu CV y qué te falta nombrar.',
+    tone: 'brand',
     href: ROUTES.myRumboCvMatch,
   },
   {
     icon: 'feedback',
     name: 'Práctica de oratoria',
     text: 'Ensayar cómo contás tu recorrido y recibir devoluciones sobre cómo sonaste.',
+    tone: 'teal',
   },
   {
     icon: 'mentorship',
     name: 'Practicar respuestas de entrevista',
     text: 'Responder preguntas típicas del puesto y revisar lo que contestaste.',
+    tone: 'amber',
   },
 ];
 
@@ -44,6 +60,10 @@ const TOOLS: Array<{ icon: IconName; name: string; text: string; href?: string }
  * click: se van destapando a medida que cada una se construye de verdad. Una
  * simulación de entrevista falsa sería peor que no tenerla, porque quien la
  * use va a creer que se preparó.
+ *
+ * Las tarjetas no estiran para llenar el ancho disponible (`auto-fill` en vez
+ * de columnas `1fr`): hoy son tres, pero la grilla ya está pensada para
+ * cuando haya más sin tener que retocar el layout.
  */
 export function PreparationSection() {
   return (
@@ -57,33 +77,37 @@ export function PreparationSection() {
 
       <div className={styles.tools}>
         {TOOLS.map((tool) => {
-          const content = (
-            <>
-              <Icon name={tool.icon} size={18} className={styles.toolIcon} />
-              <div>
-                <p className={styles.toolName}>{tool.name}</p>
-                <p className={styles.toolText}>{tool.text}</p>
-              </div>
-            </>
+          const card = (
+            <Card
+              padding="lg"
+              interactive={Boolean(tool.href)}
+              className={styles.tool}
+            >
+              <span className={cx(styles.toolIcon, styles[`toolIcon-${tool.tone}`])}>
+                <Icon name={tool.icon} size={22} />
+              </span>
+
+              <p className={styles.toolName}>{tool.name}</p>
+              <p className={styles.toolText}>{tool.text}</p>
+
+              {!tool.href && (
+                <div className={styles.toolLock}>
+                  <span className={styles.toolLockBadge}>
+                    <Icon name="clock" size={13} />
+                    Próximamente
+                  </span>
+                </div>
+              )}
+            </Card>
           );
 
-          if (tool.href) {
-            return (
-              <Link key={tool.name} to={tool.href} className={cx(styles.tool, styles.toolLink)}>
-                {content}
-              </Link>
-            );
-          }
-
-          return (
-            <div key={tool.name} className={styles.tool} aria-disabled="true">
-              {content}
-              <div className={styles.toolLock}>
-                <span className={styles.toolLockBadge}>
-                  <Icon name="clock" size={13} />
-                  Próximamente
-                </span>
-              </div>
+          return tool.href ? (
+            <Link key={tool.name} to={tool.href} className={styles.toolLinkWrap}>
+              {card}
+            </Link>
+          ) : (
+            <div key={tool.name} aria-disabled="true">
+              {card}
             </div>
           );
         })}
