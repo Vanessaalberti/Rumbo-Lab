@@ -31,54 +31,46 @@
   }
 }
 
-/* Barra de título: identifica la vista del producto que se está mostrando. */
-.titlebar {
+/*
+ * Header de la plataforma, replicando `Navbar minimal` del área privada: marca a
+ * la izquierda, tema y avatar a la derecha. Nada en el medio — el nombre de la
+ * sección lo dice el rail, no una barra de ruta.
+ */
+/*
+ * Colores del área privada en reposo: la navbar real es **transparente** sobre
+ * el fondo de página (`--bg`) mientras no se desplaza, y no lleva filete. Solo
+ * al scrollear se apoya en `--glass` y aparece el borde.
+ *
+ * Estaba puesto en `--surface` con filete, que es el blanco del contenido: se
+ * veía como una barra de aplicación que Rumbo Lab no tiene. El escalón tonal
+ * entre este `--bg` y el `--surface` del shell de abajo es el mismo que se ve
+ * al entrar a Aprendiz.
+ */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--bg);
+}
+
+/* La escala del header dentro de una ventana reducida es menor que la real, y
+   el logo tiene que acompañarla en vez de dominar la vista. */
+.logo {
+  transform: scale(0.78);
+  transform-origin: left center;
+}
+
+.actions {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  background-color: var(--bg-alt);
-  border-bottom: 1px solid var(--border);
-}
-
-.dots {
-  display: flex;
-  gap: 5px;
   flex-shrink: 0;
 }
 
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: var(--radius-full);
-  background-color: var(--border);
-}
-
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin-inline: auto;
-  padding: 3px var(--space-4);
-  background-color: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  font-size: var(--text-2xs);
+.themeIcon {
   color: var(--text-soft);
-  letter-spacing: var(--tracking-normal);
-  max-width: 62%;
-  min-width: 0;
-  white-space: nowrap;
-}
-
-/* `text-overflow` no actúa sobre un contenedor flex: el recorte tiene que
-   ocurrir en el tramo de texto, que es el que puede crecer. */
-.breadcrumbAccent {
-  color: var(--text);
-  font-weight: var(--weight-medium);
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .body {

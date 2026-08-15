@@ -31,7 +31,9 @@ const CHAIN: Array<{
     title: 'La evidencia construye evolución',
     text: 'La suma de esos registros es tu recorrido: algo que se puede leer, revisar y mostrar.',
     exampleLabel: 'Se convierte en',
-    example: '47 registros que cuentan tus últimos cinco meses.',
+    /* Acá decía "47 registros que cuentan tus últimos cinco meses". El número no
+       salía de ningún lado y se leía como el promedio real de una cuenta. */
+    example: 'Una línea de tiempo que podés recorrer hacia atrás.',
   },
 ];
 
@@ -100,8 +102,6 @@ export function EvidenceSection() {
 
           <Reveal delay={120}>
             <ProductWindow
-              breadcrumb="Mi Rumbo"
-              breadcrumbCurrent="Feedback"
               depth="secondary"
             >
               <FeedbackScreen />

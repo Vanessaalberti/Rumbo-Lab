@@ -1,12 +1,7 @@
 import type { CSSProperties } from 'react';
 import { ScreenRail } from './ScreenRail';
 import { ORGANIZATION_RAIL } from './railItems';
-import {
-  ORGANIZATION_KPIS,
-  ORGANIZATION_SPACES,
-  ORGANIZATION_TREND,
-  SPACE,
-} from './content';
+import { ORGANIZATION_SPACES, SPACE } from './content';
 import { cx } from '@/utils/classNames';
 import screen from './screen.module.css';
 import styles from './OrganizationScreen.module.css';
@@ -29,113 +24,68 @@ interface OrganizationScreenProps {
 }
 
 /**
- * Mockups Oficiales · 5.6 — Dashboard de Organización.
+ * Vista institucional — los espacios de una organización, juntos.
  *
- * Vista institucional: consolida espacios, mentores y personas para medir el
- * impacto real del acompañamiento a lo largo del tiempo.
+ * Antes esto era una fila de cuatro KPIs, cuatro barras de progreso y un gráfico
+ * de barras de siete meses. Ninguno de esos números existía: el panel
+ * institucional no está construido y la plataforma no midió resultados. Era, con
+ * exactitud, el dashboard genérico que puede ilustrar cualquier SaaS.
+ *
+ * Lo que quedó es la única afirmación verdadera de la sección —una institución
+ * ve todos sus espacios en un lugar— y se sostiene con la estructura real de un
+ * espacio, sin métricas de impacto. Que la lista sea sobria es el punto: lo que
+ * escala no es un tablero, es que cada espacio ya está registrando lo suyo.
  */
 export function OrganizationScreen({ withRail = true }: OrganizationScreenProps) {
-  const maxValue = Math.max(...ORGANIZATION_TREND.map((point) => point.value));
-
   return (
     <div className={screen.screen}>
       {withRail && (
         <ScreenRail
           sectionLabel={SPACE.organization}
           items={ORGANIZATION_RAIL}
-          activeItem="Panel"
+          activeItem="Espacios"
         />
       )}
 
       <div className={screen.main}>
         <header className={screen.header}>
           <div>
-            <p className={screen.headerTitle}>Impacto institucional</p>
+            <p className={screen.headerTitle}>Espacios de la organización</p>
             <p className={screen.headerMeta}>
-              {SPACE.organization} · año en curso
+              {SPACE.organization} · {ORGANIZATION_SPACES.length} espacios
             </p>
           </div>
-          <span className={cx(screen.action, screen.actionGhost)}>
-            Exportar reporte
-          </span>
         </header>
 
-        <div className={screen.columns4}>
-          {ORGANIZATION_KPIS.map((kpi) => (
-            <div key={kpi.label} className={screen.stat}>
-              <span className={screen.statValue}>{kpi.value}</span>
-              <span className={screen.statLabel}>{kpi.label}</span>
-              <span className={screen.statTrend}>{kpi.trend}</span>
+        <div className={screen.panel}>
+          {ORGANIZATION_SPACES.map((space) => (
+            <div
+              key={space.name}
+              className={cx(screen.row, styles.spaceRow)}
+              style={
+                {
+                  '--row-accent':
+                    STATUS_ACCENT[space.status as keyof typeof STATUS_ACCENT],
+                } as CSSProperties
+              }
+            >
+              <div className={screen.rowMain}>
+                <span className={screen.rowTitle}>{space.name}</span>
+                <span className={screen.rowMeta}>{space.people} personas</span>
+              </div>
+
+              <div className={screen.rowAside}>
+                <span
+                  className={cx(
+                    screen.tag,
+                    STATUS_TONE[space.status as keyof typeof STATUS_TONE],
+                  )}
+                >
+                  {space.status}
+                </span>
+              </div>
             </div>
           ))}
-        </div>
-
-        <div className={styles.body}>
-          <div className={screen.panel}>
-            <p className={screen.panelTitle}>
-              Espacios activos
-              <span className={screen.rowMeta}>Avance promedio</span>
-            </p>
-
-            {ORGANIZATION_SPACES.map((space) => (
-              <div
-                key={space.name}
-                className={cx(screen.row, styles.spaceRow)}
-                style={
-                  {
-                    '--row-accent':
-                      STATUS_ACCENT[space.status as keyof typeof STATUS_ACCENT],
-                  } as CSSProperties
-                }
-              >
-                <div className={screen.rowMain}>
-                  <span className={screen.rowTitle}>{space.name}</span>
-                  <span className={screen.rowMeta}>{space.people} personas</span>
-                </div>
-
-                <div className={screen.rowAside}>
-                  <span
-                    className={cx(
-                      screen.tag,
-                      STATUS_TONE[space.status as keyof typeof STATUS_TONE],
-                    )}
-                  >
-                    {space.status}
-                  </span>
-                  <div className={screen.miniTrack}>
-                    <div
-                      className={screen.miniFill}
-                      style={{ width: `${space.progress}%` }}
-                    />
-                  </div>
-                  <span className={screen.miniValue}>{space.progress}%</span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Evolución del perfil completo promedio: el indicador que resume si
-              el acompañamiento está funcionando. */}
-          <div className={screen.panel}>
-            <p className={screen.panelTitle}>Perfil completo promedio</p>
-
-            <div className={styles.chart}>
-              {ORGANIZATION_TREND.map((point) => (
-                <div key={point.month} className={styles.bar}>
-                  <span className={styles.barValue}>{point.value}%</span>
-                  <div
-                    className={styles.barFill}
-                    style={{ height: `${(point.value / maxValue) * 100}%` }}
-                  />
-                  <span className={styles.barLabel}>{point.month}</span>
-                </div>
-              ))}
-            </div>
-
-            <p className={styles.chartCaption}>
-              De 38% a 71% en siete meses de acompañamiento.
-            </p>
-          </div>
         </div>
       </div>
     </div>

@@ -57,13 +57,6 @@
   z-index: 1;
 }
 
-.floatingCard {
-  position: absolute;
-  left: 0;
-  bottom: var(--space-12);
-  z-index: 2;
-}
-
 @media (max-width: 1080px) {
   .copy {
     grid-column: 1 / -1;
@@ -73,14 +66,18 @@
     grid-column: 1 / -1;
     margin-top: var(--space-10);
   }
-
-  .floatingCard {
-    left: 0;
-  }
 }
 
+/*
+ * En pantallas chicas el teléfono no se achica hasta volverse ilegible: se
+ * mantiene en un ancho donde la conversación todavía se lee. Es el único mockup
+ * que puede conservar su tamaño casi intacto en mobile, justamente porque el
+ * objeto que representa es del tamaño de la pantalla donde se lo está mirando.
+ */
 @media (max-width: 700px) {
-  .floatingCard {
-    display: none;
+  .phone {
+    /* Casi todo el ancho disponible: el alto del aparato está atado al ancho por
+       la proporción, así que cada píxel de ancho es alto de conversación. */
+    max-width: min(300px, 100%);
   }
 }

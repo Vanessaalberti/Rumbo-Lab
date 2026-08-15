@@ -1,4 +1,3 @@
-import { FloatingCard } from '@/components/shared/FloatingCard';
 import { ProductWindow } from '@/components/shared/ProductWindow';
 import { Reveal } from '@/components/shared/Reveal';
 import { SectionHeading } from '@/components/shared/SectionHeading';
@@ -7,21 +6,28 @@ import { cx } from '@/utils/classNames';
 import styles from './OrganizationSection.module.css';
 
 /**
- * Lo que una institución puede afirmar cuando el seguimiento deja de ser manual.
- * Los valores coinciden con los del panel que se muestra debajo.
+ * Lo que una institución puede hacer cuando el seguimiento deja de ser manual.
+ *
+ * Acá había tres cifras —"7 espacios", "412 personas", "+9 puntos de mejora"—
+ * que se leían como tracción real de Rumbo Lab y no lo son: la plataforma acaba
+ * de salir y el panel institucional todavía no existe como pantalla. Una landing
+ * no puede afirmar resultados que el producto no midió.
+ *
+ * Lo que sí se puede afirmar es la capacidad, y es lo que quedó: qué deja de
+ * hacerse a mano. No lleva número porque el número sería inventado.
  */
 const CLAIMS = [
   {
-    value: '7 espacios',
-    text: 'funcionando en paralelo, con el mismo criterio de seguimiento y sin planillas intermedias.',
+    value: 'Varios espacios a la vez',
+    text: 'con el mismo criterio de seguimiento y sin planillas intermedias entre una cohorte y la siguiente.',
   },
   {
-    value: '412 personas',
-    text: 'acompañadas este año, cada una con su propio recorrido documentado.',
+    value: 'Un recorrido por persona',
+    text: 'documentado mientras ocurre, que no hay que reconstruir al final para saber qué pasó.',
   },
   {
-    value: '+9 puntos',
-    text: 'de mejora en el perfil completo promedio. El impacto deja de ser una estimación.',
+    value: 'Lo mismo, consolidado',
+    text: 'La institución lee lo que ya registran sus espacios. No pide datos nuevos a nadie.',
   },
 ];
 
@@ -59,22 +65,14 @@ export function OrganizationSection() {
           </Reveal>
         </div>
 
+        {/* La tarjeta flotante que había acá ("Reporte trimestral listo · 7
+            espacios · 412 personas") repetía las mismas cifras inventadas que se
+            sacaron del panel, y era el séptimo uso del mismo recurso en la
+            landing. */}
         <Reveal className={cx(styles.composition)}>
-          <ProductWindow
-            breadcrumb="Fundación Trayecto"
-            breadcrumbCurrent="Panel · Impacto institucional"
-          >
+          <ProductWindow>
             <OrganizationScreen />
           </ProductWindow>
-
-          <FloatingCard
-            icon="analytics"
-            title="Reporte trimestral listo"
-            meta="7 espacios · 412 personas"
-            tone="brand"
-            className={styles.floatingCard}
-            floatDelay={1.4}
-          />
         </Reveal>
       </div>
     </section>

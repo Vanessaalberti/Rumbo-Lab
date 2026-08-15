@@ -8,28 +8,30 @@ export interface RailItem {
 /**
  * Mi Rumbo: el entorno personal del aprendiz.
  *
- * Las secciones y su orden siguen la numeración de `01 · Producto → Aprendiz`:
- * Mi Perfil (03), Postulaciones (04), CVs (05), Feedback (06), Evidencias (07)
- * y Espacios (08). Mi Rumbo (02) es el entorno que las contiene, y lo nombra el
- * rótulo del rail.
+ * **Esta lista tiene que ser idéntica a `app/layouts/apprenticeRail.ts`**, que
+ * es el rail que la persona ve al entrar. Si la landing muestra otra navegación,
+ * el mockup deja de ser una ventana al producto y pasa a ser una ilustración.
  *
- * No incluye Objetivos ni Mentorías: `02 · Mi Rumbo` los deja como elementos
- * sin ubicación asignada en el modelo. El objetivo profesional sí aparece
- * dentro de Mi Perfil, que es otra cosa.
- *
- * No lleva una entrada de inicio: el rótulo del rail ya nombra el entorno, y si
- * Mi Rumbo tiene además una vista propia de inicio sigue sin decidirse.
- *
- * La estructura interna de Mi Rumbo todavía no está cerrada: esta lista es la
- * propuesta de trabajo documentada, no una decisión vigente.
+ * Quedó desactualizada una vez: mostraba `Feedback` como sección propia —dejó de
+ * serlo, ahora se lee dentro de Espacios— y le faltaban `Objetivos` y
+ * `Preparación`. Además el orden no coincidía.
  */
 export const LEARNER_RAIL: RailItem[] = [
   { label: 'Mi Perfil', icon: 'profile' },
   { label: 'Postulaciones', icon: 'applications' },
   { label: 'CVs', icon: 'document' },
-  { label: 'Feedback', icon: 'feedback' },
-  { label: 'Evidencias', icon: 'evidence' },
+  { label: 'Objetivos', icon: 'goal' },
   { label: 'Espacios', icon: 'space' },
+  { label: 'Evidencias', icon: 'evidence' },
+];
+
+/**
+ * Preparación va aparte, separada por un filete, igual que en el rail real: las
+ * otras seis secciones **registran** lo que la persona hizo y esta la **entrena**
+ * para lo que viene.
+ */
+export const LEARNER_RAIL_PRACTICE: RailItem[] = [
+  { label: 'Preparación', icon: 'spark' },
 ];
 
 /** Espacio del mentor: acompañamiento, nunca supervisión de tareas. */

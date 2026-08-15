@@ -7,6 +7,11 @@ interface ScreenRailProps {
   /** Rol cuyo espacio de trabajo se está mostrando. */
   sectionLabel: string;
   items: RailItem[];
+  /**
+   * Segundo grupo, debajo de un filete. En Mi Rumbo lo ocupa Preparación, que
+   * está separada del resto en el rail real.
+   */
+  practiceItems?: RailItem[];
   /** Etiqueta del ítem activo. Debe coincidir con la vista en pantalla. */
   activeItem: string;
 }
@@ -17,23 +22,37 @@ interface ScreenRailProps {
  * Se repite en todas las pantallas para que las vistas se lean como partes de
  * una misma aplicación, no como capturas independientes.
  */
-export function ScreenRail({ sectionLabel, items, activeItem }: ScreenRailProps) {
+export function ScreenRail({
+  sectionLabel,
+  items,
+  practiceItems,
+  activeItem,
+}: ScreenRailProps) {
+  const renderItem = (item: RailItem) => (
+    <span
+      key={item.label}
+      className={cx(
+        styles.railItem,
+        item.label === activeItem && styles.railItemActive,
+      )}
+    >
+      <Icon name={item.icon} size={14} className={styles.railIcon} />
+      {item.label}
+    </span>
+  );
+
   return (
     <nav className={styles.rail}>
       <p className={styles.railLabel}>{sectionLabel}</p>
 
-      {items.map((item) => (
-        <span
-          key={item.label}
-          className={cx(
-            styles.railItem,
-            item.label === activeItem && styles.railItemActive,
-          )}
-        >
-          <Icon name={item.icon} size={14} className={styles.railIcon} />
-          {item.label}
-        </span>
-      ))}
+      {items.map(renderItem)}
+
+      {practiceItems && practiceItems.length > 0 && (
+        <>
+          <hr className={styles.railDivider} />
+          {practiceItems.map(renderItem)}
+        </>
+      )}
     </nav>
   );
 }

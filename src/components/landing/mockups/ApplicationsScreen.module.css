@@ -1,0 +1,191 @@
+/**
+ * Postulaciones — vista de dos columnas.
+ *
+ * Tabla a la izquierda, ficha de la fila elegida a la derecha. Es la forma en
+ * que la vista se usa de verdad: se recorre la lista y se lee el detalle sin
+ * cambiar de pantalla.
+ */
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+/* Sin ficha: la tabla ocupa todo. */
+.splitSingle {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.tableColumn {
+  min-width: 0;
+}
+
+/* --- Fila ----------------------------------------------------------------- */
+
+.row {
+  cursor: default;
+}
+
+/*
+ * La fila elegida se marca con un recuadro completo, no con un fondo: es lo que
+ * la ata visualmente a la ficha que se abrió al costado.
+ */
+.rowSelected td {
+  background-color: var(--brand-tint);
+  border-top: 1px solid var(--brand);
+  border-bottom: 1px solid var(--brand);
+}
+
+.rowSelected td:first-child {
+  border-left: 1px solid var(--brand);
+}
+
+.rowSelected td:last-child {
+  border-right: 1px solid var(--brand);
+}
+
+/*
+ * Celdas que se editan desde la propia fila: el indicador lo dice.
+ *
+ * `inline-flex` sobre un `span` interno. Estaba puesto como `display: flex`
+ * directamente sobre el `<td>`, lo que reemplaza su `display: table-cell` y
+ * saca la celda del algoritmo de tabla: la columna dejaba de compartir la línea
+ * de base y el alto de la fila, y se veía corrida respecto del resto.
+ */
+.editable {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  max-width: 100%;
+}
+
+.filter {
+  padding-inline: var(--space-2);
+}
+
+/*
+ * Versión reducida: las celdas no envuelven. Lo que la tabla tiene que
+ * comunicar a ese tamaño es su forma —cinco columnas, un estado por fila—, y
+ * una fila de tres líneas la convierte en un bloque de texto. Lo que no entra
+ * se corta con puntos suspensivos, como en cualquier tabla real.
+ */
+.splitSingle td {
+  max-width: 96px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --- Ficha ---------------------------------------------------------------- */
+
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xs);
+  min-width: 0;
+}
+
+.detailHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.detailTitle {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text);
+  line-height: 1.3;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detailIcons {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+.detailMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.detailList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.detailField {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.detailLabel {
+  font-size: 8px;
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
+.detailValue {
+  font-size: var(--text-2xs);
+  color: var(--text);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.historyRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+
+/* --- Paginado ------------------------------------------------------------- */
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: auto;
+  padding-top: var(--space-2);
+}
+
+.pageButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+}
+
+/* No existe una flecha a la izquierda en el set: se gira la que hay. */
+.pagePrev {
+  transform: rotate(180deg);
+}

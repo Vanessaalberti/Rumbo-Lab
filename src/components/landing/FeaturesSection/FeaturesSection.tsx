@@ -1,9 +1,8 @@
-import { FloatingCard } from '@/components/shared/FloatingCard';
 import { ProductWindow } from '@/components/shared/ProductWindow';
 import { Reveal } from '@/components/shared/Reveal';
 import { SectionHeading } from '@/components/shared/SectionHeading';
 import { FeatureCard, type Feature } from '@/components/landing/FeatureCards';
-import { ApplicationsScreen, CvBuilderScreen } from '@/components/landing/mockups';
+import { ApplicationsScreen } from '@/components/landing/mockups';
 import styles from './FeaturesSection.module.css';
 
 /**
@@ -78,32 +77,20 @@ export function FeaturesSection() {
           ))}
         </div>
 
+        {/*
+          Acá había dos ventanas superpuestas: un constructor de CV y, apoyada
+          encima, Postulaciones. El constructor se fue porque **ese servicio no
+          existe**: Rumbo Lab guarda y versiona el CV que la persona ya tiene, no
+          lo arma. Mostrar un editor de currículums prometía una funcionalidad
+          que nadie va a encontrar al entrar.
+
+          Queda Postulaciones sola y a tamaño completo. Sin una segunda ventana
+          detrás, tampoco hace falta el desfase: es una vista, no una pila.
+        */}
         <Reveal className={styles.composition}>
-          <ProductWindow
-            breadcrumb="Mi Rumbo"
-            breadcrumbCurrent="CV · Frontend v4"
-            className={styles.cvWindow}
-          >
-            <CvBuilderScreen />
+          <ProductWindow>
+            <ApplicationsScreen />
           </ProductWindow>
-
-          <ProductWindow
-            breadcrumb="Mi Rumbo"
-            breadcrumbCurrent="Postulaciones"
-            depth="secondary"
-            className={styles.applicationsWindow}
-          >
-            <ApplicationsScreen compact />
-          </ProductWindow>
-
-          <FloatingCard
-            icon="document"
-            title="CV actualizado"
-            meta="Frontend v4 · vinculado a 2 postulaciones"
-            tone="brand"
-            className={styles.floatingCard}
-            floatDelay={0.8}
-          />
         </Reveal>
       </div>
     </section>

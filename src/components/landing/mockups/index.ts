@@ -3,7 +3,6 @@
  * Ver: Notion · Arquitectura Visual del Producto · Mockups Oficiales, sección 5.
  */
 export { LearnerProfileScreen } from './LearnerProfileScreen';
-export { CvBuilderScreen } from './CvBuilderScreen';
 export { ApplicationsScreen } from './ApplicationsScreen';
 export { MentorDashboardScreen } from './MentorDashboardScreen';
 export { SpaceScreen } from './SpaceScreen';

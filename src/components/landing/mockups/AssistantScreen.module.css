@@ -18,11 +18,18 @@
 
 /* --- Barra de estado del teléfono --------------------------------------- */
 
+/*
+ * Alto fijo y contenido centrado: la barra tiene que alinearse con la isla que
+ * dibuja `PhoneFrame`, que ocupa la franja de 9px a 31px. La hora queda a la
+ * izquierda de la isla y los indicadores a la derecha, como en el aparato real.
+ */
 .status {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-2) var(--space-4) var(--space-1);
+  flex-shrink: 0;
+  height: 40px;
+  padding: 0 var(--space-4);
   background-color: var(--bg-alt);
   font-size: 9px;
   font-weight: var(--weight-semibold);
@@ -78,6 +85,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  flex-shrink: 0;
   padding: var(--space-2) var(--space-3) var(--space-3);
   background-color: var(--bg-alt);
   border-bottom: 1px solid var(--border);
@@ -125,14 +133,21 @@
  * El fondo del chat es apenas más cálido que la superficie, como el empapelado
  * de la app. Sin textura: a este tamaño sería ruido.
  */
+/*
+ * El hilo se apoya abajo (`flex-end`). La proporción del teléfono es fija, así
+ * que cuando la conversación no entra hay que decidir qué se pierde: en un chat
+ * real lo último es lo que importa, y lo viejo se va por arriba.
+ */
 .thread {
   flex: 1;
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
   gap: var(--space-2);
   padding: var(--space-3);
   background-color: var(--bg);
   min-height: 0;
+  overflow: hidden;
 }
 
 /* Separador de fecha del hilo. */
@@ -217,12 +232,30 @@
   margin-left: -5px;
 }
 
+/*
+ * En mobile el teléfono es más chico y la conversación completa no entra: se
+ * recortaban por arriba los dos primeros mensajes, que son justamente los que
+ * arman la escena (mandar el enlace y verlo registrado). Sin ellos el hilo
+ * empieza por el medio y no se entiende nada.
+ *
+ * Se recorta por el otro lado: quedan los cuatro primeros —el caso de uso
+ * completo, de enlace a registro con nombre— y se va el segundo caso, el cambio
+ * de estado. No es la misma conversación más chica; es la parte que se sostiene
+ * sola. El texto de la sección sigue nombrando los dos casos.
+ */
+@media (max-width: 700px) {
+  .thread .message:nth-last-child(-n + 2) {
+    display: none;
+  }
+}
+
 /* --- Barra de escritura -------------------------------------------------- */
 
 .composer {
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  flex-shrink: 0;
   padding: var(--space-2) var(--space-3) var(--space-3);
   background-color: var(--bg-alt);
   border-top: 1px solid var(--border);

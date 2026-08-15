@@ -5,7 +5,7 @@ import { Reveal } from '@/components/shared/Reveal';
 import { LinkButton } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import {
-  EvidenceTimelineScreen,
+  ApplicationsScreen,
   LearnerProfileScreen,
 } from '@/components/landing/mockups';
 import { usePointerParallax } from '@/hooks/usePointerParallax';
@@ -52,11 +52,6 @@ export function HeroSection() {
     >
       <div className={cx('container-wide', 'grid-12', styles.inner)}>
         <Reveal className={styles.copy}>
-          <p className={styles.eyebrow}>
-            <span className={styles.eyebrowDot} aria-hidden="true" />
-            El sistema operativo de tu desarrollo profesional
-          </p>
-
           <h1 id="hero-titulo" className={styles.title}>
             Tu crecimiento profesional ya está pasando.{' '}
             <span className={styles.titleAccent}>Falta que se vea.</span>
@@ -99,21 +94,28 @@ export function HeroSection() {
             style={{ rotateX, rotateY, x: shiftX, y: shiftY }}
           >
             <ProductWindow
-              breadcrumb="Rumbo Lab"
-              breadcrumbCurrent="Mi Rumbo · Mi Perfil"
               className={styles.mainWindow}
             >
               <LearnerProfileScreen compact />
             </ProductWindow>
 
+            {/* Postulaciones y no Evidencias: es la funcionalidad más central
+                del recorrido, y la que la persona abre todos los días. */}
             <ProductWindow
-              breadcrumb="Evidencias"
               depth="secondary"
-              className={styles.evidenceWindow}
+              className={styles.applicationsWindow}
             >
-              <EvidenceTimelineScreen compact limit={4} />
+              <ApplicationsScreen compact rows={3} />
             </ProductWindow>
 
+            {/*
+              Queda una sola. El recurso se usaba en siete de las once secciones
+              y ahí dejó de leerse como "algo que el producto te avisa" para
+              pasar a leerse como relleno: el adorno que delata una landing
+              generada. Sobrevive únicamente acá, donde el paralaje necesita una
+              capa en primer plano y donde una notificación de feedback es
+              exactamente lo que el producto empuja.
+            */}
             <FloatingCard
               icon="feedback"
               title="Nuevo feedback"
@@ -121,15 +123,6 @@ export function HeroSection() {
               tone="brand"
               className={styles.floatingFeedback}
               floatDelay={0}
-            />
-
-            <FloatingCard
-              icon="calendar"
-              title="Mentoría mañana, 16:00"
-              meta="Preparación de entrevista técnica"
-              tone="attention"
-              className={styles.floatingMeeting}
-              floatDelay={2.5}
             />
           </motion.div>
         </Reveal>

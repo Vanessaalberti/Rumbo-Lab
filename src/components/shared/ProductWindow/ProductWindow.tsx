@@ -1,12 +1,12 @@
 import type { CSSProperties, ReactNode } from 'react';
+import { Logo } from '@/components/shared/Logo';
+import { Avatar } from '@/components/ui/Avatar';
+import { Icon } from '@/components/ui/Icon';
+import { LEARNER } from '@/components/landing/mockups/content';
 import { cx } from '@/utils/classNames';
 import styles from './ProductWindow.module.css';
 
 interface ProductWindowProps {
-  /** Ruta de la vista dentro del producto, tal como la mostraría la app. */
-  breadcrumb: string;
-  /** Último tramo de la ruta, resaltado. */
-  breadcrumbCurrent?: string;
   children: ReactNode;
   /** Jerarquía dentro de una composición de varias ventanas. */
   depth?: 'primary' | 'secondary' | 'tertiary';
@@ -21,10 +21,16 @@ interface ProductWindowProps {
  *
  * Toda pantalla mostrada en material público se monta acá dentro: garantiza que
  * las distintas vistas se lean como partes del mismo ecosistema.
+ *
+ * **Arriba va el header real de la plataforma**, no cromo de navegador. Antes
+ * había una barra de título con tres puntos y una píldora de ruta
+ * (`Mi Rumbo / Perfil`): esa navegación no existe en ningún lado de Rumbo Lab.
+ * Era el recurso de mockup genérico que puede envolver a cualquier SaaS, y
+ * encima afirmaba una interfaz falsa. Lo que la persona ve de verdad al entrar
+ * es lo que se replica acá: la marca a la izquierda, el cambio de tema y su
+ * avatar a la derecha — `Navbar minimal`, el header del área privada.
  */
 export function ProductWindow({
-  breadcrumb,
-  breadcrumbCurrent,
   children,
   depth = 'primary',
   recessed = false,
@@ -43,21 +49,12 @@ export function ProductWindow({
       style={style}
       aria-hidden="true"
     >
-      <div className={styles.titlebar}>
-        <span className={styles.dots}>
-          <span className={styles.dot} />
-          <span className={styles.dot} />
-          <span className={styles.dot} />
-        </span>
+      <div className={styles.header}>
+        <Logo size="sm" className={styles.logo} />
 
-        <span className={styles.breadcrumb}>
-          {breadcrumb}
-          {breadcrumbCurrent && (
-            <>
-              <span>/</span>
-              <span className={styles.breadcrumbAccent}>{breadcrumbCurrent}</span>
-            </>
-          )}
+        <span className={styles.actions}>
+          <Icon name="moon" size={15} className={styles.themeIcon} />
+          <Avatar name={LEARNER.name} size="xs" />
         </span>
       </div>
 

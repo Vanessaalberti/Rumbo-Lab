@@ -1,4 +1,3 @@
-import { FloatingCard } from '@/components/shared/FloatingCard';
 import { ProductWindow } from '@/components/shared/ProductWindow';
 import { Reveal } from '@/components/shared/Reveal';
 import { SectionHeading } from '@/components/shared/SectionHeading';
@@ -61,10 +60,10 @@ export function SolutionSection() {
 
         <Reveal className={styles.composition}>
           {/* El perfil a tamaño completo: es donde se ve que no pide reescribir
-              el currículum, sino identidad, enlaces, objetivos y acompañamiento. */}
+              el currículum, sino identidad, objetivo profesional y áreas de
+              interés — más cómo viene la búsqueda, leída sobre las
+              postulaciones. */}
           <ProductWindow
-            breadcrumb="Mi Rumbo"
-            breadcrumbCurrent="Perfil"
             depth="secondary"
             className={cx(styles.profileWindow)}
           >
@@ -72,21 +71,10 @@ export function SolutionSection() {
           </ProductWindow>
 
           <ProductWindow
-            breadcrumb="Mi Rumbo"
-            breadcrumbCurrent="Evidencias"
             className={styles.evidenceWindow}
           >
             <EvidenceTimelineScreen />
           </ProductWindow>
-
-          <FloatingCard
-            icon="goal"
-            title="Objetivo completado"
-            meta="Reescribir la experiencia laboral del CV"
-            tone="progress"
-            className={styles.floatingCard}
-            floatDelay={1.2}
-          />
         </Reveal>
       </div>
     </section>

@@ -12,13 +12,6 @@
   z-index: 1;
 }
 
-.floatingCard {
-  position: absolute;
-  right: calc(var(--space-10) * -1);
-  bottom: calc(var(--space-8) * -1);
-  z-index: 2;
-}
-
 .copy {
   grid-column: 9 / -1;
   display: flex;
@@ -70,15 +63,5 @@
   .composition {
     grid-column: 1 / -1;
     margin-top: var(--space-10);
-  }
-
-  .floatingCard {
-    right: var(--space-2);
-  }
-}
-
-@media (max-width: 700px) {
-  .floatingCard {
-    display: none;
   }
 }

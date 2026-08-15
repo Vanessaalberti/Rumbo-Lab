@@ -77,13 +77,6 @@
   z-index: 2;
 }
 
-.floatingCard {
-  position: absolute;
-  left: 42%;
-  bottom: calc(var(--space-8) * -1);
-  z-index: 3;
-}
-
 @media (max-width: 900px) {
   .steps {
     grid-template-columns: minmax(0, 1fr);
@@ -96,9 +89,5 @@
 
   .profileWindow {
     margin-top: 0;
-  }
-
-  .floatingCard {
-    display: none;
   }
 }

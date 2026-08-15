@@ -11,51 +11,16 @@
 
 /* --- Composición de producto -------------------------------------------- */
 
+/* Una sola ventana, a ancho completo. `.cvWindow` y `.applicationsWindow`
+   sostenían la superposición de dos ventanas; el constructor de CV se eliminó
+   —no existe ese servicio— y con él la pila. */
 .composition {
   position: relative;
-  padding-bottom: var(--space-12);
-}
-
-.cvWindow {
-  position: relative;
-  z-index: 1;
-  width: 82%;
-}
-
-/* La ventana de postulaciones se apoya sobre la del CV: el CV que se envió es
-   el mismo que se está editando. */
-.applicationsWindow {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 58%;
-  z-index: 2;
-}
-
-.floatingCard {
-  position: absolute;
-  top: var(--space-12);
-  right: var(--space-4);
-  z-index: 3;
 }
 
 @media (max-width: 1080px) {
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .cvWindow {
-    width: 100%;
-  }
-
-  .applicationsWindow {
-    position: static;
-    width: 100%;
-    margin-top: var(--space-6);
-  }
-
-  .floatingCard {
-    display: none;
   }
 }
 

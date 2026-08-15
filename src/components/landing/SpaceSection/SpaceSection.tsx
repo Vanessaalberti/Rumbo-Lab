@@ -1,4 +1,3 @@
-import { FloatingCard } from '@/components/shared/FloatingCard';
 import { ProductWindow } from '@/components/shared/ProductWindow';
 import { Reveal } from '@/components/shared/Reveal';
 import { SectionHeading } from '@/components/shared/SectionHeading';
@@ -32,21 +31,10 @@ export function SpaceSection() {
       <div className={cx('container-wide', 'grid-12', styles.inner)}>
         <Reveal className={styles.composition}>
           <ProductWindow
-            breadcrumb="Espacios"
-            breadcrumbCurrent="Impulso Tech · Cohorte 04"
             className={styles.window}
           >
             <SpaceScreen />
           </ProductWindow>
-
-          <FloatingCard
-            icon="space"
-            title="4 personas se sumaron esta semana"
-            meta="Impulso Tech · Cohorte 04"
-            tone="brand"
-            className={styles.floatingCard}
-            floatDelay={2.1}
-          />
         </Reveal>
 
         <Reveal className={styles.copy} delay={120}>

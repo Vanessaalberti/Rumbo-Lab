@@ -2,56 +2,159 @@
  * Chasis de teléfono.
  *
  * Contraparte de `ProductWindow` para las vistas que no ocurren en la web.
- * Mismo lenguaje —superficie limpia, borde delicado, profundidad suave— pero
- * con la proporción y el chasis de un dispositivo, para que se entienda de un
- * vistazo que eso pasa en el celular y no en la aplicación.
+ *
+ * A diferencia de una ventana de producto, esto no es una superficie del sistema
+ * de diseño: es un **objeto físico**. Por eso el chasis es grafito en los dos
+ * temas y no una superficie tematizada — un teléfono no cambia de color cuando
+ * la persona prefiere el modo claro, y dibujarlo del color de las tarjetas es
+ * justo lo que lo convertía en una tarjeta con una antena dibujada.
+ *
+ * Tres cosas hacen que se lea como dispositivo y no como rectángulo:
+ *
+ * 1. **Proporción fija.** `aspect-ratio` en la pantalla ata el alto al ancho en
+ *    19.5:9, la proporción real de un teléfono actual. El contenido ya no puede
+ *    achatar el aparato hasta volverlo una tarjeta.
+ * 2. **Radios concéntricos.** El radio interior es el exterior menos el marco.
+ *    Cuando no coinciden, el ojo lee "borde grueso"; cuando coinciden, lee
+ *    "pantalla dentro de un aparato".
+ * 3. **Marco parejo y delgado.** El mismo grosor en los cuatro lados, más los
+ *    botones laterales sobresaliendo del canto.
  */
 
 .phone {
+  /* Grafito. Valores literales a propósito: describen un material, no un rol. */
+  --phone-body: #1d2029;
+  --phone-edge: rgba(255, 255, 255, 0.14);
+  --phone-bezel: 10px;
+  --phone-radius: 46px;
+
   position: relative;
   width: 100%;
-  max-width: 312px;
+  max-width: 296px;
   margin-inline: auto;
-  padding: var(--space-2);
-  background-color: var(--bg-alt);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-3xl);
-  box-shadow: var(--shadow-xl);
+  padding: var(--phone-bezel);
+  background-color: var(--phone-body);
+  border-radius: var(--phone-radius);
   isolation: isolate;
+
+  /*
+   * Dos sombras con propósitos distintos: la amplia apoya el aparato en la
+   * sección, la corta lo pega al piso para que no parezca flotando. El canto
+   * claro interior es el bisel de aluminio.
+   */
+  box-shadow:
+    var(--shadow-xl),
+    0 4px 10px rgba(23, 32, 51, 0.18),
+    inset 0 0 0 1px var(--phone-edge);
 }
 
-/* Auricular y cámara: lo mínimo para leer "teléfono" sin dibujar un producto
-   de otra marca. */
-.notch {
+/* En oscuro el grafito se aclara: contra un fondo casi negro, el chasis real
+   desaparecería y el teléfono volvería a leerse como un rectángulo flotante. */
+:global([data-theme='dark']) .phone {
+  --phone-body: #2b2f39;
+  --phone-edge: rgba(255, 255, 255, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme='light'])) .phone {
+    --phone-body: #2b2f39;
+    --phone-edge: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* --- Botones laterales ---------------------------------------------------- */
+
+/*
+ * Sobresalen del canto un par de píxeles, como en el aparato real. Es el detalle
+ * que más barato compra la lectura de "objeto": un rectángulo no tiene botones.
+ */
+.button {
   position: absolute;
-  top: var(--space-4);
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
+  width: 2px;
+  border-radius: 2px;
+  background-color: var(--phone-body);
+  box-shadow: inset 0 0 0 1px var(--phone-edge);
 }
 
-.speaker {
-  width: 34px;
-  height: 4px;
-  border-radius: var(--radius-full);
-  background-color: var(--border);
+/* Silencio y volumen, sobre el canto izquierdo. */
+.buttonMute {
+  left: -2px;
+  top: 92px;
+  height: 26px;
 }
 
-.camera {
-  width: 5px;
-  height: 5px;
-  border-radius: var(--radius-full);
-  background-color: var(--border);
+.buttonVolumeUp {
+  left: -2px;
+  top: 132px;
+  height: 46px;
 }
+
+.buttonVolumeDown {
+  left: -2px;
+  top: 190px;
+  height: 46px;
+}
+
+/* Bloqueo, sobre el canto derecho y más abajo. */
+.buttonPower {
+  right: -2px;
+  top: 152px;
+  height: 68px;
+}
+
+/* --- Pantalla ------------------------------------------------------------- */
 
 .screen {
   position: relative;
+  /* Concéntrico con el exterior: mismo centro de curvatura que el chasis. */
+  border-radius: calc(var(--phone-radius) - var(--phone-bezel));
   overflow: hidden;
-  border-radius: var(--radius-2xl);
   background-color: var(--surface);
   display: flex;
   flex-direction: column;
+  /* Proporción de un teléfono actual. Lo que no entra, se recorta. */
+  aspect-ratio: 9 / 19.5;
+}
+
+/*
+ * Isla: va **dentro** de la pantalla, encima del contenido, no colgada del
+ * marco. Ese es el orden real de las capas, y es lo que hacía que el auricular
+ * dibujado sobre el borde se leyera como un adorno pegado.
+ */
+.island {
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  width: 74px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  background-color: #05070c;
+}
+
+/* Barra de gesto. Sobre el contenido, como en el sistema operativo. */
+.home {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  width: 34%;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background-color: var(--text);
+  opacity: 0.28;
+}
+
+/*
+ * El contenido arranca debajo de la isla y termina arriba de la barra de gesto,
+ * igual que una aplicación respetando las áreas seguras del sistema.
+ */
+.safe {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 14px;
 }

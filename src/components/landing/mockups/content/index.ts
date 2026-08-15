@@ -23,5 +23,6 @@ export * from './assistant';
 export * from './learnerProfile';
 export * from './curriculum';
 export * from './learnerActivity';
+export * from './profileProgress';
 export * from './mentorship';
 export * from './organization';

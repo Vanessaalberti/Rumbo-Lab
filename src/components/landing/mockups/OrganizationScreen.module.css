@@ -1,80 +1,15 @@
-.body {
-  display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
-  gap: var(--space-3);
-  align-items: start;
-}
+/*
+ * Acento de estado en el borde de la fila: la misma lectura que el `tag`, pero
+ * disponible de un vistazo al recorrer la lista completa.
+ *
+ * El resto de esta hoja era el gráfico de barras del panel institucional
+ * (`.chart`, `.bar`, `.barFill`, `.barValue`, `.barLabel`, `.chartCaption`) y la
+ * grilla de dos columnas que lo acomodaba al lado de la lista. Se fue con los
+ * datos que dibujaba: la serie mensual no existía en ningún lado del producto.
+ */
 
-/* Acento de estado en el borde de la fila: la misma lectura que el `tag`,
-   pero disponible de un vistazo al recorrer la lista completa (lectura de
-   reporte institucional, no de tarjeta por tarjeta). */
 .spaceRow {
   border-left: 3px solid var(--row-accent, transparent);
   padding-left: var(--space-3);
   margin-left: calc(var(--space-3) * -1);
-}
-
-.chart {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--space-2);
-  height: 96px;
-  padding-top: var(--space-2);
-}
-
-.barValue {
-  font-size: var(--text-2xs);
-  font-weight: var(--weight-semibold);
-  color: var(--text-soft);
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-  padding-bottom: var(--space-1);
-}
-
-/* El mes en curso es el dato destacado del gráfico: mismo criterio de color
-   que su barra (marca, no turquesa de progreso histórico). */
-.bar:last-child .barValue {
-  color: var(--brand-strong);
-}
-
-.bar {
-  flex: 1;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.barFill {
-  width: 100%;
-  background-color: var(--teal);
-  border-radius: var(--radius-xs) var(--radius-xs) 0 0;
-  min-height: 4px;
-}
-
-/* La última barra es el dato actual: se marca con el color de marca. */
-.bar:last-child .barFill {
-  background-color: var(--brand);
-}
-
-.barLabel {
-  font-size: var(--text-2xs);
-  color: var(--text-soft);
-  line-height: 1;
-}
-
-.chartCaption {
-  font-size: var(--text-2xs);
-  color: var(--text-soft);
-  line-height: 1.5;
-  padding-top: var(--space-2);
-  border-top: 1px solid var(--border-soft);
-}
-
-@media (max-width: 900px) {
-  .body {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }

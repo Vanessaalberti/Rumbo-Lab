@@ -1,4 +1,3 @@
-import { FloatingCard } from '@/components/shared/FloatingCard';
 import { PhotoFrame } from '@/components/shared/PhotoFrame';
 import { ProductWindow } from '@/components/shared/ProductWindow';
 import { Reveal } from '@/components/shared/Reveal';
@@ -61,21 +60,10 @@ export function MentorSection() {
           <PhotoFrame className={styles.photo} />
 
           <ProductWindow
-            breadcrumb="Mentoría"
-            breadcrumbCurrent="Panel · Cohorte 04"
             className={styles.window}
           >
             <MentorDashboardScreen withRail={false} />
           </ProductWindow>
-
-          <FloatingCard
-            icon="clock"
-            title="Malena lleva 12 días sin actividad"
-            meta="Sugerido: proponer una mentoría"
-            tone="attention"
-            className={styles.floatingCard}
-            floatDelay={1.8}
-          />
         </Reveal>
       </div>
     </section>

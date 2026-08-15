@@ -1,4 +1,3 @@
-import { FloatingCard } from '@/components/shared/FloatingCard';
 import { PhoneFrame } from '@/components/shared/PhoneFrame';
 import { Reveal } from '@/components/shared/Reveal';
 import { SectionHeading } from '@/components/shared/SectionHeading';
@@ -68,19 +67,17 @@ export function AssistantSection() {
           </p>
         </Reveal>
 
+        {/*
+          El teléfono va solo. La tarjeta flotante que había acá duplicaba en un
+          rectángulo lo que la conversación ya muestra —el registro creado— y era
+          lo que devolvía la composición al mismo patrón que el resto de las
+          secciones. Lo que prueba que el canal funciona es el hilo, no un cartel
+          al lado del hilo.
+        */}
         <Reveal className={styles.composition} delay={120}>
           <PhoneFrame className={styles.phone}>
             <AssistantScreen />
           </PhoneFrame>
-
-          <FloatingCard
-            icon="applications"
-            title="Postulación registrada"
-            meta="Nubelo Studio · Frontend Jr."
-            tone="brand"
-            className={styles.floatingCard}
-            floatDelay={1.4}
-          />
         </Reveal>
       </div>
     </section>

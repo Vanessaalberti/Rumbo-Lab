@@ -38,13 +38,6 @@
   margin-top: var(--space-16);
 }
 
-.floatingCard {
-  position: absolute;
-  left: calc(var(--space-10) * -1);
-  bottom: calc(var(--space-8) * -1);
-  z-index: 2;
-}
-
 @media (max-width: 1080px) {
   .heading,
   .claims {
@@ -53,15 +46,5 @@
 
   .claims {
     padding-top: 0;
-  }
-
-  .floatingCard {
-    left: var(--space-2);
-  }
-}
-
-@media (max-width: 700px) {
-  .floatingCard {
-    display: none;
   }
 }
