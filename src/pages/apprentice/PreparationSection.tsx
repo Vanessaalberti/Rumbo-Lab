@@ -6,14 +6,12 @@ import screen from '@/app/layouts/appShell.module.css';
 import styles from './PendingSection.module.css';
 
 /**
- * Herramientas previstas para Preparación.
+ * Herramientas de Preparación.
  *
- * Son las que definió producto, con el alcance que se enunció y nada más. No
- * se agregan por parecer razonables: cada una necesita su propia decisión.
- *
- * `href` solo en la que tiene algo real construido detrás — "Comparar tu CV
- * con una oferta" — el resto sigue siendo la enunciación del alcance, no un
- * enlace a una pantalla que no existe.
+ * `href` solo en la que tiene algo real construido detrás. Las que todavía no
+ * lo tienen no dejan de existir en la pantalla — se ven, con su nombre y su
+ * descripción, pero bloqueadas: es la promesa de que van llegando una por una,
+ * no una lista que aparece de golpe el día que estén las tres.
  */
 const TOOLS: Array<{ icon: IconName; name: string; text: string; href?: string }> = [
   {
@@ -41,10 +39,11 @@ const TOOLS: Array<{ icon: IconName; name: string; text: string; href?: string }
  * vive separada del resto en el rail.
  *
  * De las tres herramientas previstas, **una sola está construida** —Comparar
- * tu CV con una oferta, en `preparacion/CvMatchSection`—; las otras dos siguen
- * siendo la enunciación del alcance que fijó producto. Una simulación de
- * entrevista falsa sería peor que no tenerla, porque quien la use va a creer
- * que se preparó.
+ * tu CV con una oferta, en `preparacion/CvMatchSection`—; las otras dos se
+ * muestran con su nombre y su propósito, tapadas con "Próximamente" y sin
+ * click: se van destapando a medida que cada una se construye de verdad. Una
+ * simulación de entrevista falsa sería peor que no tenerla, porque quien la
+ * use va a creer que se preparó.
  */
 export function PreparationSection() {
   return (
@@ -56,37 +55,38 @@ export function PreparationSection() {
         </div>
       </div>
 
-      <div className={styles.panel}>
-        <Icon name="spark" size={28} className={styles.panelIcon} />
-        <p className={styles.panelTitle}>Preparate para lo que viene</p>
-        <p className={styles.panelText}>
-          Herramientas interactivas para tu búsqueda. Las que todavía no tienen enlace están en
-          construcción.
-        </p>
+      <div className={styles.tools}>
+        {TOOLS.map((tool) => {
+          const content = (
+            <>
+              <Icon name={tool.icon} size={18} className={styles.toolIcon} />
+              <div>
+                <p className={styles.toolName}>{tool.name}</p>
+                <p className={styles.toolText}>{tool.text}</p>
+              </div>
+            </>
+          );
 
-        <div className={styles.tools}>
-          {TOOLS.map((tool) => {
-            const content = (
-              <>
-                <Icon name={tool.icon} size={18} className={styles.toolIcon} />
-                <div>
-                  <p className={styles.toolName}>{tool.name}</p>
-                  <p className={styles.toolText}>{tool.text}</p>
-                </div>
-              </>
-            );
-
-            return tool.href ? (
+          if (tool.href) {
+            return (
               <Link key={tool.name} to={tool.href} className={cx(styles.tool, styles.toolLink)}>
                 {content}
               </Link>
-            ) : (
-              <div key={tool.name} className={styles.tool}>
-                {content}
-              </div>
             );
-          })}
-        </div>
+          }
+
+          return (
+            <div key={tool.name} className={styles.tool} aria-disabled="true">
+              {content}
+              <div className={styles.toolLock}>
+                <span className={styles.toolLockBadge}>
+                  <Icon name="clock" size={13} />
+                  Próximamente
+                </span>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </>
   );
