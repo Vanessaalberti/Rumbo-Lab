@@ -6,3 +6,4 @@ export { FeedbackSection } from './FeedbackSection';
 export { EvidencesSection } from './EvidencesSection';
 export { GoalsSection } from './GoalsSection';
 export { PreparationSection } from './PreparationSection';
+export { CvMatchSection } from './preparacion/CvMatchSection';

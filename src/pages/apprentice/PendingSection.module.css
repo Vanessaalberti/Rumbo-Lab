@@ -94,6 +94,18 @@
   border: 1px solid var(--border);
 }
 
+/* La única herramienta con algo construido detrás se ve tocable; las otras
+   dos, que siguen siendo la enunciación del alcance, no cambian. */
+.toolLink {
+  transition: var(--transition-colors);
+}
+
+.toolLink:hover,
+.toolLink:focus-visible {
+  border-color: var(--brand);
+  background-color: var(--brand-tint);
+}
+
 .toolIcon {
   flex-shrink: 0;
   margin-top: 2px;

@@ -22,15 +22,23 @@ async function request<T>(
     return { status: 'unauthenticated' };
   }
 
+  /*
+   * `FormData` viaja tal cual, sin `JSON.stringify` y sin fijar `Content-Type`
+   * a mano: el navegador arma el `multipart/form-data` con el boundary
+   * correcto solo si el header lo pone él. Es el único caso — hoy, adjuntar un
+   * CV suelto en Preparación sin guardarlo — donde el cuerpo no es JSON.
+   */
+  const isFormData = init?.body instanceof FormData;
+
   let response: Response;
   try {
     response = await fetch(`${environment.apiBaseUrl}${path}`, {
       method: init?.method ?? 'GET',
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        ...(init?.body ? { 'Content-Type': 'application/json' } : {}),
+        ...(init?.body && !isFormData ? { 'Content-Type': 'application/json' } : {}),
       },
-      body: init?.body ? JSON.stringify(init.body) : undefined,
+      body: isFormData ? (init.body as FormData) : init?.body ? JSON.stringify(init.body) : undefined,
     });
   } catch {
     return failure({
@@ -82,6 +90,8 @@ function toDataError(status: number, body: unknown): DataError {
 export const httpClient = {
   get: <T>(path: string) => request<T>(path),
   post: <T>(path: string, body?: unknown) => request<T>(path, { method: 'POST', body }),
+  /** Igual que `post`, pero para un `FormData` — hoy, subir un archivo suelto. */
+  postForm: <T>(path: string, body: FormData) => request<T>(path, { method: 'POST', body }),
   patch: <T>(path: string, body?: unknown) => request<T>(path, { method: 'PATCH', body }),
   delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
 };

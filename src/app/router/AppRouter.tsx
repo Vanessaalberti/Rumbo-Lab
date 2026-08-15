@@ -11,6 +11,7 @@ import { CreateSpacePage, SignInPage } from '@/pages/authentication';
 import { ChooseExperiencePage } from '@/pages/experience';
 import {
   ApplicationsSection,
+  CvMatchSection,
   CvsSection,
   EvidencesSection,
   GoalsSection,
@@ -65,6 +66,7 @@ export function AppRouter() {
                 <Route path="objetivos" element={<GoalsSection />} />
                 <Route path="espacios" element={<SpacesSection />} />
                 <Route path="preparacion" element={<PreparationSection />} />
+                <Route path="preparacion/comparar-cv" element={<CvMatchSection />} />
                 <Route path="feedback" element={<FeedbackSection />} />
                 <Route path="evidencias" element={<EvidencesSection />} />
               </Route>
