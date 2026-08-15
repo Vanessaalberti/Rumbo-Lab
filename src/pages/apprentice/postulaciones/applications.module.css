@@ -686,3 +686,96 @@
   color: var(--error-strong);
   font-size: var(--text-sm);
 }
+
+/* --- Alta en curso -------------------------------------------------------- */
+
+/*
+ * La fila provisoria se lee como "todavía no es del todo real": atenuada y sin
+ * los afectos de una fila normal (no se selecciona ni responde al puntero).
+ * Deliberadamente no se le pone un color de estado — no tiene estado hasta que
+ * el backend confirme.
+ */
+.rowPending {
+  cursor: default;
+  background-color: var(--surface-sunken);
+}
+
+.rowPending td {
+  color: var(--text-soft);
+}
+
+.savingCell {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--text-soft);
+  white-space: nowrap;
+}
+
+.spinner {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--border);
+  border-top-color: var(--brand);
+  animation: applications-spin 0.7s linear infinite;
+}
+
+@keyframes applications-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/*
+ * Sin giro para quien pidió menos movimiento: el indicador sigue existiendo
+ * —el texto "Guardando…" ya lo dice— pero deja de rotar.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+}
+
+/* --- Teléfono ------------------------------------------------------------- */
+
+/*
+ * La tabla se recompone en vez de encogerse.
+ *
+ * `.table` tiene `min-width: 560px`, así que en un teléfono la única salida era
+ * arrastrarla de costado: cinco columnas que no entran, y la persona teniendo
+ * que scrollear horizontalmente para ver en qué estado está cada postulación
+ * —justo el dato por el que abre esta pantalla—.
+ *
+ * Acá se decide qué sobrevive. Quedan **Nombre y Estado**, que son la pregunta
+ * y la respuesta de la vista. Puesto, CV enviado y Dónde no se pierden: viven
+ * en la ficha, que se abre tocando la fila y que en este ancho ya se muestra
+ * apilada debajo. Es un toque de distancia, contra un scroll lateral en todas
+ * las filas.
+ */
+@media (max-width: 620px) {
+  .table {
+    min-width: 0;
+  }
+
+  .tableWrap {
+    overflow-x: visible;
+  }
+
+  .table th:nth-child(2),
+  .table th:nth-child(3),
+  .table th:nth-child(4),
+  .table td:nth-child(2),
+  .table td:nth-child(3),
+  .table td:nth-child(4) {
+    display: none;
+  }
+
+  /* Con dos columnas, el estado se apoya contra el borde derecho. */
+  .table th:last-child,
+  .table td:last-child {
+    text-align: right;
+  }
+}

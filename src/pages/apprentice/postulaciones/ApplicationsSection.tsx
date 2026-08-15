@@ -3,8 +3,15 @@ import { useOutletContext } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { cx } from '@/utils/classNames';
 import type { ApprenticeShellContext } from '@/app/layouts/ApprenticeShell';
-import { updateApplication } from '@/services/data/dashboard/applications.service';
-import type { ApplicationStatus } from '@/services/data/dashboard/dashboard.types';
+import {
+  createApplication,
+  updateApplication,
+} from '@/services/data/dashboard/applications.service';
+import type {
+  ApplicationInput,
+  ApplicationStatus,
+  CvSummary,
+} from '@/services/data/dashboard/dashboard.types';
 import { ApplicationDetail } from './ApplicationDetail';
 import { NewApplicationModal } from './NewApplicationModal';
 import { StatusFilter } from './StatusFilter';
@@ -15,6 +22,20 @@ import styles from './applications.module.css';
 
 /** Cuántas postulaciones entran en una página de la tabla. */
 const APPLICATIONS_PER_PAGE = 10;
+
+/**
+ * Con qué CV se está registrando, mientras el alta viaja.
+ *
+ * Se resuelve desde lo que la persona eligió en el modal, no desde la respuesta
+ * del backend, que todavía no llegó. Mismos tres casos que `cvChoiceOf`: sin CV,
+ * uno hecho a medida, o uno de los guardados.
+ */
+function pendingCvLabel(input: ApplicationInput, cvs: CvSummary[]): string {
+  const choice = input.cvChoice;
+  if (!choice || choice === 'none') return 'No aplica';
+  if (choice === 'custom') return 'Personalizado';
+  return cvs.find((cv) => cv.id === choice)?.name ?? 'No aplica';
+}
 
 /**
  * Postulaciones — gestor personal del proceso de búsqueda.
@@ -54,6 +75,16 @@ export function ApplicationsSection() {
   const [rowError, setRowError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
 
+  /**
+   * El alta en curso, con lo que la persona acaba de escribir.
+   *
+   * Vive acá y no en el modal porque es la tabla la que tiene que mostrarla:
+   * mientras el backend responde, la fila ya está en pantalla en estado
+   * "Guardando…" y el resto de las postulaciones no se mueve. Cuando el alta
+   * confirma, `refresh()` trae la fila real y esta se descarta.
+   */
+  const [pending, setPending] = useState<ApplicationInput | null>(null);
+
   const visible =
     statusFilter.length === 0
       ? applications
@@ -89,6 +120,49 @@ export function ApplicationsSection() {
     }
 
     refresh();
+  };
+
+  /**
+   * Alta optimista.
+   *
+   * La fila aparece antes de que el backend conteste, con los datos que la
+   * persona cargó. No se inventa nada que no haya escrito: el nombre puede
+   * venir vacío —la base lo autogenera— y el estado no se muestra como
+   * `Pendiente` sino como "Guardando…", porque hasta que el alta no confirme no
+   * hay un estado real que mostrar.
+   *
+   * Si falla, la fila provisoria se va y el error se reporta por el mismo canal
+   * que el resto de las escrituras de esta pantalla (`rowError`). Las demás
+   * postulaciones no se tocan en ningún momento.
+   */
+  const handleCreate = async (input: ApplicationInput) => {
+    setRowError(null);
+    setModalOpen(false);
+    setPending(input);
+
+    const result = await createApplication(input);
+
+    if (result.status !== 'success') {
+      setPending(null);
+      setRowError(
+        result.status === 'error'
+          ? result.error.message
+          : 'No se pudo registrar la postulación. Intentá de nuevo en unos minutos.',
+      );
+      return;
+    }
+
+    /*
+     * Se espera a que la lista nueva esté en pantalla **antes** de sacar la
+     * fila provisoria. Descartarla apenas responde el alta abriría un hueco:
+     * la postulación desaparecería de la tabla hasta que llegue el refresco.
+     */
+    await refresh();
+    setPending(null);
+
+    /* Queda seleccionada: el panel muestra la recién creada para completarla
+       sin buscarla. */
+    setSelectedId(result.data.application.id);
   };
 
   return (
@@ -128,12 +202,15 @@ export function ApplicationsSection() {
 
       <div className={styles.split}>
         <div className={styles.tableColumn}>
-          {applications.length === 0 ? (
+          {/* Con un alta en curso siempre se muestra la tabla: la fila
+              provisoria tiene que tener dónde aparecer, incluso cuando es la
+              primera postulación de la cuenta. */}
+          {applications.length === 0 && !pending ? (
             <p className={screen.emptyState}>
               Acá van a aparecer las postulaciones que registres. Alcanza con saber dónde
               postularte: un enlace, un correo o un teléfono.
             </p>
-          ) : visible.length === 0 ? (
+          ) : visible.length === 0 && !pending ? (
             <p className={screen.emptyState}>
               Ninguna postulación tiene alguno de los estados que elegiste.
             </p>
@@ -150,6 +227,29 @@ export function ApplicationsSection() {
                   </tr>
                 </thead>
                 <tbody>
+                  {/*
+                   * La fila que se está guardando, arriba de todo y fuera del
+                   * paginado y del filtro: es lo último que hizo la persona y
+                   * tiene que verla, no buscarla. No se puede seleccionar
+                   * —todavía no tiene id— ni editar desde la fila.
+                   */}
+                  {pending && (
+                    <tr className={cx(styles.row, styles.rowPending)}>
+                      <td className={screen.cellStrong}>
+                        {pending.name?.trim() || 'Sin nombre todavía'}
+                      </td>
+                      <td className={screen.cellSoft}>{pending.position ?? '—'}</td>
+                      <td className={screen.cellSoft}>{pendingCvLabel(pending, cvs)}</td>
+                      <td className={screen.cellSoft}>{pending.url}</td>
+                      <td>
+                        <span className={styles.savingCell}>
+                          <span className={styles.spinner} aria-hidden="true" />
+                          Guardando…
+                        </span>
+                      </td>
+                    </tr>
+                  )}
+
                   {pageItems.map((application) => (
                     /*
                      * La fila entera abre el detalle: hacer puntería sobre el
@@ -261,13 +361,7 @@ export function ApplicationsSection() {
         open={modalOpen}
         cvs={cvs}
         onClose={() => setModalOpen(false)}
-        onCreated={(id) => {
-          setModalOpen(false);
-          refresh();
-          /* Queda seleccionada: el panel muestra la recién creada para
-             completarla sin buscarla. */
-          setSelectedId(id);
-        }}
+        onSubmit={(input) => void handleCreate(input)}
       />
     </div>
   );

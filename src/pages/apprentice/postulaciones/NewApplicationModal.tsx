@@ -4,15 +4,22 @@ import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { cx } from '@/utils/classNames';
 import { contactKindOf } from './contact';
-import { createApplication } from '@/services/data/dashboard/applications.service';
-import type { CvSummary } from '@/services/data/dashboard/dashboard.types';
+import type {
+  ApplicationInput,
+  CvSummary,
+} from '@/services/data/dashboard/dashboard.types';
 import styles from './applications.module.css';
 
 interface NewApplicationModalProps {
   open: boolean;
   cvs: CvSummary[];
   onClose: () => void;
-  onCreated: (id: string) => void;
+  /**
+   * Entrega lo que la persona cargó. **No espera al backend**: quien recibe
+   * esto pinta la fila en la tabla al instante y resuelve el alta por su
+   * cuenta, así la lista nunca desaparece mientras se guarda.
+   */
+  onSubmit: (input: ApplicationInput) => void;
 }
 
 /**
@@ -32,13 +39,12 @@ interface NewApplicationModalProps {
  * como `Postulación-N`) y el estado tampoco (toda postulación nace en
  * `Pendiente`, §19.3).
  */
-export function NewApplicationModal({ open, cvs, onClose, onCreated }: NewApplicationModalProps) {
+export function NewApplicationModal({ open, cvs, onClose, onSubmit }: NewApplicationModalProps) {
   const [detailed, setDetailed] = useState(false);
   const [url, setUrl] = useState('');
   const [name, setName] = useState('');
   const [position, setPosition] = useState('');
   const [cvChoice, setCvChoice] = useState('none');
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const reset = () => {
@@ -51,12 +57,11 @@ export function NewApplicationModal({ open, cvs, onClose, onCreated }: NewApplic
   };
 
   const handleClose = () => {
-    if (saving) return;
     reset();
     onClose();
   };
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
 
@@ -66,8 +71,12 @@ export function NewApplicationModal({ open, cvs, onClose, onCreated }: NewApplic
       return;
     }
 
-    setSaving(true);
-    const result = await createApplication({
+    /*
+     * El modal valida y se aparta. La petición la hace la pantalla, que es
+     * quien puede mostrar la fila provisoria mientras tanto: si esperáramos acá
+     * la persona se quedaría mirando un modal bloqueado sin ver su tabla.
+     */
+    onSubmit({
       url: trimmed,
       /* En modo rápido no se manda nada más: la base pone los valores por
          defecto que corresponden. */
@@ -79,20 +88,8 @@ export function NewApplicationModal({ open, cvs, onClose, onCreated }: NewApplic
           }
         : {}),
     });
-    setSaving(false);
 
-    if (result.status !== 'success') {
-      setError(
-        result.status === 'error'
-          ? result.error.message
-          : 'No se pudo registrar. Intentá de nuevo en unos minutos.',
-      );
-      return;
-    }
-
-    const created = result.data.application.id;
     reset();
-    onCreated(created);
   };
 
   return (
@@ -109,7 +106,6 @@ export function NewApplicationModal({ open, cvs, onClose, onCreated }: NewApplic
             className={cx(styles.mode, !detailed && styles.modeActive)}
             onClick={() => setDetailed(false)}
             aria-pressed={!detailed}
-            disabled={saving}
           >
             Solo eso
           </button>
@@ -118,7 +114,6 @@ export function NewApplicationModal({ open, cvs, onClose, onCreated }: NewApplic
             className={cx(styles.mode, detailed && styles.modeActive)}
             onClick={() => setDetailed(true)}
             aria-pressed={detailed}
-            disabled={saving}
           >
             Completar ahora
           </button>
@@ -132,7 +127,6 @@ export function NewApplicationModal({ open, cvs, onClose, onCreated }: NewApplic
             placeholder="https://empresa.com/empleo · rrhh@empresa.com · +54 9 341 555-1234"
             value={url}
             onChange={(event) => setUrl(event.target.value)}
-            disabled={saving}
             error={error ?? undefined}
             required
             autoFocus
@@ -146,7 +140,6 @@ export function NewApplicationModal({ open, cvs, onClose, onCreated }: NewApplic
                 hint="Si lo dejás vacío se genera solo, como Postulación-1."
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                disabled={saving}
               />
 
               <Input
@@ -155,7 +148,6 @@ export function NewApplicationModal({ open, cvs, onClose, onCreated }: NewApplic
                 hint="Puede quedar vacío. No se inventa ninguno."
                 value={position}
                 onChange={(event) => setPosition(event.target.value)}
-                disabled={saving}
               />
 
               <div className={styles.field}>
@@ -167,7 +159,6 @@ export function NewApplicationModal({ open, cvs, onClose, onCreated }: NewApplic
                   className={styles.select}
                   value={cvChoice}
                   onChange={(event) => setCvChoice(event.target.value)}
-                  disabled={saving}
                 >
                   <option value="none">No aplica</option>
                   <option value="custom">Personalizado</option>
@@ -188,10 +179,10 @@ export function NewApplicationModal({ open, cvs, onClose, onCreated }: NewApplic
         </p>
 
         <div className={styles.modalActions}>
-          <Button type="submit" size="sm" disabled={saving}>
-            {saving ? 'Registrando…' : 'Registrar'}
+          <Button type="submit" size="sm">
+            Registrar
           </Button>
-          <Button type="button" variant="quiet" size="sm" onClick={handleClose} disabled={saving}>
+          <Button type="button" variant="quiet" size="sm" onClick={handleClose}>
             Cancelar
           </Button>
         </div>

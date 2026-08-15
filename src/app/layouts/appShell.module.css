@@ -374,6 +374,36 @@
     overflow-x: auto;
     border-right: none;
     border-bottom: 1px solid var(--border);
+    /* Tira de navegación: se desplaza sola y no se lleva la página con ella. */
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  /*
+   * Los ítems conservan su ancho. Sin esto, flex los reparte para que entren
+   * los siete y las etiquetas se parten en dos líneas o se recortan.
+   */
+  .railItem {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  /*
+   * El filete cambia de eje con el rail. Estaba declarado solo como
+   * `height: 1px`, así que al pasar la lista a horizontal quedaba como una
+   * astilla de 1px de alto y ancho casi nulo entre dos ítems: el corte entre
+   * las secciones que registran y Preparación, que entrena, dejaba de leerse.
+   */
+  .railDivider {
+    width: 1px;
+    height: auto;
+    align-self: stretch;
+    flex-shrink: 0;
+    margin: var(--space-2) var(--space-2);
   }
 
   .railLabel {
@@ -382,5 +412,16 @@
 
   .main {
     padding: var(--space-5);
+  }
+}
+
+/*
+ * Teléfonos angostos: el aire lateral del contenido se recorta al mínimo. A
+ * 375px, `--space-5` a cada lado se come casi un 15% del ancho útil, y lo que
+ * hay adentro —tablas, fichas, listas— es lo que lo necesita.
+ */
+@media (max-width: 480px) {
+  .main {
+    padding: var(--space-4) var(--space-3);
   }
 }
