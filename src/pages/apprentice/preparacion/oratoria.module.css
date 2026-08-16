@@ -210,11 +210,10 @@ button.recordButton:disabled {
   background-color: var(--error);
 }
 
-/* Mientras graba, el botón deja de ser clickeable — se convierte en
-   indicador — así que es un `span`, no un `button`. */
+/* Mientras graba sigue siendo el mismo `button` clickeable: tocarlo de
+   nuevo corta la grabación y la manda a analizar. */
 .recordButtonActive {
   border-color: var(--error);
-  cursor: default;
 }
 
 .recordPulse {
@@ -276,15 +275,6 @@ button.recordButton:disabled {
 .controlButton:hover {
   border-color: var(--brand);
   color: var(--brand-strong);
-}
-
-/* Cuadrado simple: no hay un ícono de "detener" en el set, y no hace falta
-   uno — es una forma reconocible por sí sola. */
-.stopIcon {
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
-  background-color: currentColor;
 }
 
 /* --- Revisar antes de enviar ----------------------------------------------- */

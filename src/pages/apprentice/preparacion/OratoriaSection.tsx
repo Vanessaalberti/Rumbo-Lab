@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Icon, type IconName } from '@/components/ui/Icon';
@@ -53,6 +53,13 @@ export function OratoriaSection() {
   const [analysis, setAnalysis] = useState<AnalysisState>({ status: 'idle' });
   const recorder = useAudioRecorder();
 
+  /* Tocar de nuevo el botón central, mientras graba, corta la grabación y la
+     manda directo — no hace falta un segundo click en "Analizar respuesta".
+     `stop()` es asincrónico (el blob queda listo recién en el evento `onstop`
+     de MediaRecorder), así que esta marca se lee en el efecto de abajo apenas
+     el estado pasa a "stopped". */
+  const pendingAutoSubmitRef = useRef(false);
+
   const openCategory = (next: OratoriaCategory) => {
     setCategory(next);
     setQuestion(pickQuestion(next));
@@ -91,6 +98,23 @@ export function OratoriaSection() {
           ? result.error.message
           : 'No se pudo analizar la respuesta. Intentá de nuevo en unos minutos.',
     });
+  };
+
+  /* `useLayoutEffect`, no `useEffect`: dispara el envío antes del próximo
+     pintado, para que no se alcance a ver un parpadeo de los botones
+     manuales ("Grabar de nuevo" / "Analizar respuesta") entre que la
+     grabación corta y el análisis arranca. */
+  useLayoutEffect(() => {
+    if (recorder.status === 'stopped' && pendingAutoSubmitRef.current) {
+      pendingAutoSubmitRef.current = false;
+      void handleSubmit();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recorder.status]);
+
+  const handleStopAndSend = () => {
+    pendingAutoSubmitRef.current = true;
+    recorder.stop();
   };
 
   return (
@@ -158,6 +182,7 @@ export function OratoriaSection() {
                 recorder={recorder}
                 analyzing={analysis.status === 'loading'}
                 onSubmit={() => void handleSubmit()}
+                onStopAndSend={handleStopAndSend}
               />
 
               {recorder.status === 'stopped' && analysis.status !== 'loading' && (
@@ -207,15 +232,20 @@ interface RecordingControlsProps {
   recorder: ReturnType<typeof useAudioRecorder>;
   analyzing: boolean;
   onSubmit: () => void;
+  onStopAndSend: () => void;
 }
 
 /**
  * El botón para hablar, en sus cuatro momentos: listo para grabar, grabando,
- * grabado (para escuchar antes de mandarlo) y enviando. No incluye pausa
- * dentro de la grabación — grabar de nuevo cubre el mismo caso con menos
- * estados que mantener.
+ * grabado (para escuchar antes de mandarlo) y enviando.
+ *
+ * Es el mismo botón central el que arranca y el que corta+manda: un toque
+ * empieza a grabar, y volver a tocarlo mientras graba corta la grabación y
+ * la envía directo a analizar — no hace falta pasar por un botón aparte. El
+ * ícono de cancelar (✕) sigue disponible por separado para descartar sin
+ * mandar nada.
  */
-function RecordingControls({ recorder, analyzing, onSubmit }: RecordingControlsProps) {
+function RecordingControls({ recorder, analyzing, onSubmit, onStopAndSend }: RecordingControlsProps) {
   if (recorder.status === 'idle' || recorder.status === 'requesting' || recorder.status === 'error') {
     return (
       <div className={styles.recordArea}>
@@ -243,20 +273,18 @@ function RecordingControls({ recorder, analyzing, onSubmit }: RecordingControlsP
   if (recorder.status === 'recording') {
     return (
       <div className={styles.recordArea}>
-        <span className={cx(styles.recordButton, styles.recordButtonActive)}>
+        <button
+          type="button"
+          className={cx(styles.recordButton, styles.recordButtonActive)}
+          onClick={onStopAndSend}
+          aria-label="Terminar y enviar respuesta"
+        >
           <span className={styles.recordPulse} aria-hidden="true" />
-        </span>
+        </button>
         <span className={styles.recordTimer}>{formatSeconds(recorder.seconds)}</span>
+        <span className={styles.recordHint}>Tocá el botón para enviar tu respuesta</span>
 
         <div className={styles.recordControls}>
-          <button
-            type="button"
-            className={styles.controlButton}
-            onClick={() => recorder.stop()}
-            aria-label="Detener grabación"
-          >
-            <span className={styles.stopIcon} />
-          </button>
           <button
             type="button"
             className={styles.controlButton}
