@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { cx } from '@/utils/classNames';
 import type { ApprenticeShellContext } from '@/app/layouts/ApprenticeShell';
 import {
@@ -10,6 +11,7 @@ import {
 import type {
   ApplicationInput,
   ApplicationStatus,
+  ApplicationSummary,
   CvSummary,
 } from '@/services/data/dashboard/dashboard.types';
 import { ApplicationDetail } from './ApplicationDetail';
@@ -22,6 +24,30 @@ import styles from './applications.module.css';
 
 /** Cuántas postulaciones entran en una página de la tabla. */
 const APPLICATIONS_PER_PAGE = 10;
+
+/** Sin tildes ni mayúsculas: para que "gestion" encuentre "Gestión". */
+function normalize(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase();
+}
+
+/**
+ * ¿La postulación coincide con lo que se escribió en el buscador?
+ *
+ * Contra las tres columnas de texto libre de la tabla —nombre, puesto y
+ * "Dónde"—, nunca contra CV ni estado: esos dos ya tienen su propio control
+ * (el select de la fila y `StatusFilter`), buscarlos por texto sería una
+ * segunda forma de hacer lo mismo.
+ */
+function matchesSearch(application: ApplicationSummary, query: string): boolean {
+  if (query === '') return true;
+
+  return [application.name, application.position, application.url]
+    .filter((field): field is string => Boolean(field))
+    .some((field) => normalize(field).includes(query));
+}
 
 /**
  * Con qué CV se está registrando, mientras el alta viaja.
@@ -70,6 +96,7 @@ export function ApplicationsSection() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<ApplicationStatus[]>([]);
+  const [search, setSearch] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [rowError, setRowError] = useState<string | null>(null);
@@ -85,10 +112,16 @@ export function ApplicationsSection() {
    */
   const [pending, setPending] = useState<ApplicationInput | null>(null);
 
-  const visible =
-    statusFilter.length === 0
-      ? applications
-      : applications.filter((application) => statusFilter.includes(application.status));
+  /* Normalizada una sola vez por render, no en cada llamada de `matchesSearch`
+     dentro del `.filter` — evitar repetir el mismo trabajo por cada fila. */
+  const normalizedSearch = normalize(search.trim());
+  const isFiltered = statusFilter.length > 0 || normalizedSearch !== '';
+
+  const visible = applications
+    .filter(
+      (application) => statusFilter.length === 0 || statusFilter.includes(application.status),
+    )
+    .filter((application) => matchesSearch(application, normalizedSearch));
 
   const totalPages = Math.max(1, Math.ceil(visible.length / APPLICATIONS_PER_PAGE));
   /*
@@ -174,7 +207,7 @@ export function ApplicationsSection() {
             {applicationsTotal === 0
               ? 'Todavía no registraste ninguna'
               : `${applicationsTotal} registrada${applicationsTotal === 1 ? '' : 's'}`}
-            {statusFilter.length > 0 && ` · mostrando ${visible.length}`}
+            {isFiltered && ` · mostrando ${visible.length}`}
           </p>
         </div>
       </div>
@@ -191,6 +224,19 @@ export function ApplicationsSection() {
                resultado de 3 filas no tiene sentido. */
             setPage(1);
           }}
+        />
+
+        <Input
+          label="Buscar postulaciones"
+          hideLabel
+          iconLeading="search"
+          placeholder="Buscar por nombre, puesto o enlace…"
+          value={search}
+          onChange={(event) => {
+            setSearch(event.target.value);
+            setPage(1);
+          }}
+          className={styles.search}
         />
       </div>
 
@@ -212,7 +258,9 @@ export function ApplicationsSection() {
             </p>
           ) : visible.length === 0 && !pending ? (
             <p className={screen.emptyState}>
-              Ninguna postulación tiene alguno de los estados que elegiste.
+              {normalizedSearch !== ''
+                ? 'Ninguna postulación coincide con lo que buscaste.'
+                : 'Ninguna postulación tiene alguno de los estados que elegiste.'}
             </p>
           ) : (
             <div className={styles.tableWrap}>
