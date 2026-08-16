@@ -5,9 +5,6 @@
 }
 
 /* --- Volver ---------------------------------------------------------------- */
-/* Mismo patrón que cvMatch.module.css — cada pantalla de herramienta lo suma
-   por su cuenta, no hay un layout compartido que lo ponga una sola vez. */
-
 .backLink {
   display: inline-flex;
   align-items: center;
@@ -59,26 +56,114 @@
 
 /* --- Elegir categoría -------------------------------------------------------- */
 
+/* --- Selección: preguntas + tips ------------------------------------------ */
+
+.selectionLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .selectionLayout {
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 280px);
+  }
+}
+.tipsPanel {
+  display: none;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background-color: var(--teal-tint);
+  border-left: 3px solid var(--teal);
+  border-radius: var(--radius-md);
+  position: sticky;
+  top: var(--space-5);
+}
+
+@media (min-width: 900px) {
+  .tipsPanel {
+    display: flex;
+  }
+}
+
+.tipsHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.tipsIcon {
+  color: var(--teal);
+  flex-shrink: 0;
+}
+
+.tipsTitle {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text);
+}
+
+.tipsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.tipsItem {
+  position: relative;
+  padding-left: var(--space-4);
+  font-size: var(--text-xs);
+  line-height: var(--leading-relaxed);
+  color: var(--text-soft);
+}
+
+.tipsItem::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background-color: var(--teal);
+}
+
 .categories {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .categories {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .categories {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 .categoryCard {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
   gap: var(--space-3);
   width: 100%;
-  text-align: left;
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
+}
+
+.categoryHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .categoryIcon {
   color: var(--brand);
+  flex-shrink: 0;
 }
 
 .categoryLabel {
@@ -86,6 +171,29 @@
   font-weight: var(--weight-semibold);
   color: var(--text);
   line-height: 1.35;
+}
+
+.questionList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.questionButton {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  text-align: left;
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--text-soft);
+  transition: var(--transition-colors);
+}
+
+.questionButton:hover,
+.questionButton:focus-visible {
+  background-color: var(--bg-alt);
+  color: var(--text);
 }
 
 /* --- Practicar ---------------------------------------------------------------- */
@@ -157,13 +265,6 @@
   line-height: 1.4;
 }
 
-.newQuestionLink {
-  align-self: flex-start;
-  font-size: var(--text-xs);
-  color: var(--brand-strong);
-  text-decoration: underline;
-}
-
 .errorState {
   padding: var(--space-3) var(--space-4);
   background-color: var(--error-tint);
@@ -209,11 +310,12 @@ button.recordButton:disabled {
   border-radius: var(--radius-full);
   background-color: var(--error);
 }
-
-/* Mientras graba sigue siendo el mismo `button` clickeable: tocarlo de
-   nuevo corta la grabación y la manda a analizar. */
 .recordButtonActive {
   border-color: var(--error);
+}
+
+.recordButtonPaused {
+  border-color: var(--warning);
 }
 
 .recordPulse {
@@ -240,6 +342,24 @@ button.recordButton:disabled {
   .recordPulse {
     animation: none;
   }
+}
+
+.pauseIndicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 24px;
+  height: 24px;
+}
+
+.pauseIndicator::before,
+.pauseIndicator::after {
+  content: '';
+  width: 6px;
+  height: 20px;
+  border-radius: 2px;
+  background-color: var(--warning);
 }
 
 .recordHint {
@@ -275,6 +395,33 @@ button.recordButton:disabled {
 .controlButton:hover {
   border-color: var(--brand);
   color: var(--brand-strong);
+}
+
+.pauseIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 14px;
+  height: 14px;
+}
+
+.pauseIcon::before,
+.pauseIcon::after {
+  content: '';
+  width: 4px;
+  height: 14px;
+  border-radius: 1px;
+  background-color: currentColor;
+}
+
+.resumeIcon {
+  width: 0;
+  height: 0;
+  margin-left: 2px;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 9px solid currentColor;
 }
 
 /* --- Revisar antes de enviar ----------------------------------------------- */

@@ -1,16 +1,6 @@
 /**
  * Banco de preguntas de "Práctica de oratoria".
- *
- * Solo preguntas GENERALES de entrevista — presentación, motivación,
- * fortalezas, experiencias, trabajo en equipo, objetivos —, nunca técnicas ni
- * atadas a una oferta puntual. Eso es "Práctica de Entrevista", una
- * herramienta distinta que todavía no existe. Ninguna pregunta de acá debería
- * cambiar según a qué puesto se postule la persona.
- *
- * Vive en el frontend porque es contenido fijo del producto, no un dato de
- * usuario: no hace falta ida y vuelta al backend para elegir una pregunta al
- * azar.
- */
+*/
 
 export interface OratoriaCategory {
   id: string;
@@ -78,10 +68,3 @@ export const ORATORIA_CATEGORIES: readonly OratoriaCategory[] = [
     ],
   },
 ] as const;
-
-/** Una pregunta al azar de la categoría — nunca la misma dos veces seguidas. */
-export function pickQuestion(category: OratoriaCategory, previous?: string): string {
-  const pool = category.questions.filter((question) => question !== previous);
-  const candidates = pool.length > 0 ? pool : category.questions;
-  return candidates[Math.floor(Math.random() * candidates.length)];
-}

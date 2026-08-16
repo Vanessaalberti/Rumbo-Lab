@@ -1,20 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-export type RecorderStatus = 'idle' | 'requesting' | 'recording' | 'stopped' | 'error';
+export type RecorderStatus = 'idle' | 'requesting' | 'recording' | 'paused' | 'stopped' | 'error';
 
-/**
- * Corte de seguridad: nadie necesita grabar una respuesta de entrevista de
- * más de 3 minutos, y esto acota cuánto pesa lo que se sube y cuánto puede
- * llegar a costar cada análisis, sin depender de que la persona se acuerde de
- * frenar.
- */
 const MAX_RECORDING_SECONDS = 180;
 
-/**
- * En orden de preferencia. El navegador graba en el primero que soporte —
- * no hay forma de grabar directo a WAV o MP3 sin una librería de encoding
- * aparte, así que esto se apoya en lo que ya sabe hacer cada navegador.
- */
 const PREFERRED_MIME_TYPES = [
   'audio/webm;codecs=opus',
   'audio/webm',
@@ -29,25 +18,23 @@ function pickSupportedMimeType(): string | undefined {
 
 export interface UseAudioRecorder {
   status: RecorderStatus;
-  /** Segundos transcurridos de la grabación actual. */
+  /** Segundos transcurridos de grabación activa — no cuenta el tiempo en pausa. */
   seconds: number;
   audioBlob: Blob | null;
   /** Para reproducir lo grabado antes de mandarlo — `URL.createObjectURL` del blob. */
   audioUrl: string | null;
   errorMessage: string | null;
   start: () => void;
+  /** Pausa la captura sin terminar la grabación — se puede seguir con `resume()`. */
+  pause: () => void;
+  /** Retoma una grabación en pausa, agregando a la misma toma. */
+  resume: () => void;
+  /** Termina la grabación. No la manda — solo la deja lista para escuchar. */
   stop: () => void;
   /** Descarta la grabación actual y vuelve a `idle`, para grabar de nuevo. */
   reset: () => void;
 }
 
-/**
- * Graba audio del micrófono con `MediaRecorder`.
- *
- * Todo lo que produce vive en memoria del navegador (el `Blob`, nunca un
- * archivo en disco) hasta que quien use el hook decide mandarlo — y una vez
- * mandado, tampoco queda nada acá: `reset()` lo descarta.
- */
 export function useAudioRecorder(): UseAudioRecorder {
   const [status, setStatus] = useState<RecorderStatus>('idle');
   const [seconds, setSeconds] = useState(0);
@@ -59,6 +46,7 @@ export function useAudioRecorder(): UseAudioRecorder {
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const elapsedRef = useRef(0);
   const audioUrlRef = useRef<string | null>(null);
 
   const releaseStream = useCallback(() => {
@@ -73,19 +61,28 @@ export function useAudioRecorder(): UseAudioRecorder {
     }
   }, []);
 
+  const startTimer = useCallback(() => {
+    clearTimer();
+    timerRef.current = setInterval(() => {
+      elapsedRef.current += 1;
+      setSeconds(elapsedRef.current);
+      if (elapsedRef.current >= MAX_RECORDING_SECONDS) recorderRef.current?.stop();
+    }, 1000);
+  }, [clearTimer]);
+
   const setAudioUrlTracked = useCallback((url: string | null) => {
     if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
     audioUrlRef.current = url;
     setAudioUrl(url);
   }, []);
 
-  /* Si la persona navega afuera a mitad de una grabación, el micrófono no
-     puede seguir "prendido": se libera el stream y se corta el timer. */
   useEffect(() => {
     return () => {
       clearTimer();
       releaseStream();
-      if (recorderRef.current?.state === 'recording') recorderRef.current.stop();
+      if (recorderRef.current && recorderRef.current.state !== 'inactive') {
+        recorderRef.current.stop();
+      }
       if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
     };
   }, [clearTimer, releaseStream]);
@@ -94,6 +91,7 @@ export function useAudioRecorder(): UseAudioRecorder {
     setErrorMessage(null);
     setAudioBlob(null);
     setAudioUrlTracked(null);
+    elapsedRef.current = 0;
     setSeconds(0);
     setStatus('requesting');
 
@@ -121,13 +119,7 @@ export function useAudioRecorder(): UseAudioRecorder {
       recorderRef.current = recorder;
       recorder.start();
       setStatus('recording');
-
-      let elapsed = 0;
-      timerRef.current = setInterval(() => {
-        elapsed += 1;
-        setSeconds(elapsed);
-        if (elapsed >= MAX_RECORDING_SECONDS) recorder.stop();
-      }, 1000);
+      startTimer();
     } catch {
       setStatus('error');
       setErrorMessage(
@@ -135,10 +127,25 @@ export function useAudioRecorder(): UseAudioRecorder {
       );
       releaseStream();
     }
-  }, [clearTimer, releaseStream, setAudioUrlTracked]);
+  }, [clearTimer, releaseStream, setAudioUrlTracked, startTimer]);
+
+  const pause = useCallback(() => {
+    if (recorderRef.current?.state !== 'recording') return;
+    recorderRef.current.pause();
+    clearTimer();
+    setStatus('paused');
+  }, [clearTimer]);
+
+  const resume = useCallback(() => {
+    if (recorderRef.current?.state !== 'paused') return;
+    recorderRef.current.resume();
+    startTimer();
+    setStatus('recording');
+  }, [startTimer]);
 
   const stop = useCallback(() => {
-    if (recorderRef.current?.state === 'recording') recorderRef.current.stop();
+    const state = recorderRef.current?.state;
+    if (state === 'recording' || state === 'paused') recorderRef.current?.stop();
   }, []);
 
   const reset = useCallback(() => {
@@ -147,11 +154,12 @@ export function useAudioRecorder(): UseAudioRecorder {
     setAudioUrlTracked(null);
     chunksRef.current = [];
     recorderRef.current = null;
+    elapsedRef.current = 0;
     setAudioBlob(null);
     setSeconds(0);
     setErrorMessage(null);
     setStatus('idle');
   }, [clearTimer, releaseStream, setAudioUrlTracked]);
 
-  return { status, seconds, audioBlob, audioUrl, errorMessage, start, stop, reset };
+  return { status, seconds, audioBlob, audioUrl, errorMessage, start, pause, resume, stop, reset };
 }

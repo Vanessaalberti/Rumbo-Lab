@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Icon, type IconName } from '@/components/ui/Icon';
@@ -8,7 +8,7 @@ import {
   type OratoriaResult,
 } from '@/services/data/preparation/oratoria.service';
 import { cx } from '@/utils/classNames';
-import { ORATORIA_CATEGORIES, pickQuestion, type OratoriaCategory } from './oratoriaQuestions';
+import { ORATORIA_CATEGORIES, type OratoriaCategory } from './oratoriaQuestions';
 import { useAudioRecorder } from './useAudioRecorder';
 import { ToolBackLink } from './ToolBackLink';
 import screen from '@/app/layouts/appShell.module.css';
@@ -36,55 +36,37 @@ function formatSeconds(total: number): string {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
-/**
- * Preparación · Práctica de oratoria.
- *
- * Dos tiempos, calcados del wireframe: elegir una categoría de preguntas
- * generales de entrevista, y practicar una pregunta al azar de esa categoría
- * grabando la respuesta con el micrófono.
- *
- * El aviso de que esto no reemplaza una práctica presencial y no mide tono ni
- * emociones aparece en las dos pantallas — es la única parte de la
- * funcionalidad que no es negociable.
- */
+interface OratoriaSelection {
+  category: OratoriaCategory;
+  question: string;
+}
+
 export function OratoriaSection() {
-  const [category, setCategory] = useState<OratoriaCategory | null>(null);
-  const [question, setQuestion] = useState<string>('');
+  const [selection, setSelection] = useState<OratoriaSelection | null>(null);
   const [analysis, setAnalysis] = useState<AnalysisState>({ status: 'idle' });
   const recorder = useAudioRecorder();
 
-  /* Tocar de nuevo el botón central, mientras graba, corta la grabación y la
-     manda directo — no hace falta un segundo click en "Analizar respuesta".
-     `stop()` es asincrónico (el blob queda listo recién en el evento `onstop`
-     de MediaRecorder), así que esta marca se lee en el efecto de abajo apenas
-     el estado pasa a "stopped". */
-  const pendingAutoSubmitRef = useRef(false);
-
-  const openCategory = (next: OratoriaCategory) => {
-    setCategory(next);
-    setQuestion(pickQuestion(next));
+  const selectQuestion = (category: OratoriaCategory, question: string) => {
+    setSelection({ category, question });
     setAnalysis({ status: 'idle' });
     recorder.reset();
   };
 
-  const backToCategories = () => {
-    setCategory(null);
-    setAnalysis({ status: 'idle' });
-    recorder.reset();
-  };
-
-  const newQuestion = () => {
-    if (!category) return;
-    setQuestion(pickQuestion(category, question));
+  const backToQuestions = () => {
+    setSelection(null);
     setAnalysis({ status: 'idle' });
     recorder.reset();
   };
 
   const handleSubmit = async () => {
-    if (!recorder.audioBlob || !category) return;
+    if (!recorder.audioBlob || !selection) return;
 
     setAnalysis({ status: 'loading' });
-    const result = await analyzeOratoriaRecording(recorder.audioBlob, question, category.label);
+    const result = await analyzeOratoriaRecording(
+      recorder.audioBlob,
+      selection.question,
+      selection.category.label,
+    );
 
     if (result.status === 'success') {
       setAnalysis({ status: 'success', analysis: result.data.analysis });
@@ -98,23 +80,6 @@ export function OratoriaSection() {
           ? result.error.message
           : 'No se pudo analizar la respuesta. Intentá de nuevo en unos minutos.',
     });
-  };
-
-  /* `useLayoutEffect`, no `useEffect`: dispara el envío antes del próximo
-     pintado, para que no se alcance a ver un parpadeo de los botones
-     manuales ("Grabar de nuevo" / "Analizar respuesta") entre que la
-     grabación corta y el análisis arranca. */
-  useLayoutEffect(() => {
-    if (recorder.status === 'stopped' && pendingAutoSubmitRef.current) {
-      pendingAutoSubmitRef.current = false;
-      void handleSubmit();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recorder.status]);
-
-  const handleStopAndSend = () => {
-    pendingAutoSubmitRef.current = true;
-    recorder.stop();
   };
 
   return (
@@ -131,10 +96,7 @@ export function OratoriaSection() {
         </div>
       </div>
 
-      {/*
-        No negociable: tiene que verse al entrar, en las dos pantallas de esta
-        herramienta, no solo una vez en algún lado.
-      */}
+      {}
       <p className={styles.disclaimer}>
         <Icon name="alert" size={15} className={styles.disclaimerIcon} />
         Esta práctica es una ayuda para ensayar tus respuestas: no reemplaza una entrevista ni un
@@ -142,54 +104,60 @@ export function OratoriaSection() {
         ni tus emociones.
       </p>
 
-      {category === null ? (
+      {selection === null ? (
         <>
-          <p className={styles.sectionLabel}>Seleccioná un tipo de pregunta:</p>
+          <p className={styles.sectionLabel}>Elegí la pregunta que querés practicar:</p>
 
-          <div className={styles.categories}>
-            {ORATORIA_CATEGORIES.map((item) => (
-              <Card
-                key={item.id}
-                as="button"
-                padding="lg"
-                interactive
-                className={styles.categoryCard}
-                onClick={() => openCategory(item)}
-              >
-                <Icon
-                  name={CATEGORY_ICONS[item.id] ?? 'spark'}
-                  size={20}
-                  className={styles.categoryIcon}
-                />
-                <span className={styles.categoryLabel}>{item.label}</span>
-              </Card>
-            ))}
+          <div className={styles.selectionLayout}>
+            <div className={styles.categories}>
+              {ORATORIA_CATEGORIES.map((item) => (
+                <Card key={item.id} padding="lg" className={styles.categoryCard}>
+                  <div className={styles.categoryHeader}>
+                    <Icon
+                      name={CATEGORY_ICONS[item.id] ?? 'spark'}
+                      size={18}
+                      className={styles.categoryIcon}
+                    />
+                    <span className={styles.categoryLabel}>{item.label}</span>
+                  </div>
+
+                  <ul className={styles.questionList}>
+                    {item.questions.map((question) => (
+                      <li key={question}>
+                        <button
+                          type="button"
+                          className={styles.questionButton}
+                          onClick={() => selectQuestion(item, question)}
+                        >
+                          {question}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </Card>
+              ))}
+            </div>
+
+            <TipsPanel />
           </div>
         </>
       ) : (
         <div className={styles.practice}>
-          <button type="button" className={styles.categoryBack} onClick={backToCategories}>
+          <button type="button" className={styles.categoryBack} onClick={backToQuestions}>
             <Icon name="arrowRight" size={13} className={styles.categoryBackIcon} />
-            Cambiar de categoría
+            Elegir otra pregunta
           </button>
 
           <div className={styles.practiceLayout}>
             <div className={styles.recordingColumn}>
-              <span className={styles.categoryTag}>{category.label}</span>
-              <p className={styles.question}>{question}</p>
+              <span className={styles.categoryTag}>{selection.category.label}</span>
+              <p className={styles.question}>{selection.question}</p>
 
               <RecordingControls
                 recorder={recorder}
                 analyzing={analysis.status === 'loading'}
                 onSubmit={() => void handleSubmit()}
-                onStopAndSend={handleStopAndSend}
               />
-
-              {recorder.status === 'stopped' && analysis.status !== 'loading' && (
-                <button type="button" className={styles.newQuestionLink} onClick={newQuestion}>
-                  Probar con otra pregunta de esta categoría
-                </button>
-              )}
             </div>
 
             <div className={styles.resultColumn}>
@@ -218,7 +186,7 @@ export function OratoriaSection() {
           </div>
 
           {analysis.status === 'success' && (
-            <Button size="sm" variant="secondary" onClick={newQuestion}>
+            <Button size="sm" variant="secondary" onClick={backToQuestions}>
               Practicar otra pregunta
             </Button>
           )}
@@ -228,24 +196,42 @@ export function OratoriaSection() {
   );
 }
 
+/** Consejos generales, no atados a ninguna pregunta puntual. */
+const ORATORIA_TIPS: readonly string[] = [
+  'Usá ejemplos concretos: una situación real pesa más que una respuesta genérica.',
+  'Organizá tu respuesta en una estructura simple — qué pasó, qué hiciste, qué resultó.',
+  'No hace falta una respuesta larga: mejor pocas ideas bien desarrolladas.',
+  'Elegí un lugar tranquilo, sin ruido de fondo, antes de grabar.',
+  'Tomate unos segundos para pensar antes de arrancar a hablar.',
+  'Las muletillas ocasionales no son un problema — hablá con naturalidad.',
+];
+
+function TipsPanel() {
+  return (
+    <aside className={styles.tipsPanel}>
+      <div className={styles.tipsHeader}>
+        <Icon name="compass" size={18} className={styles.tipsIcon} />
+        <span className={styles.tipsTitle}>Tips para responder</span>
+      </div>
+
+      <ul className={styles.tipsList}>
+        {ORATORIA_TIPS.map((tip) => (
+          <li key={tip} className={styles.tipsItem}>
+            {tip}
+          </li>
+        ))}
+      </ul>
+    </aside>
+  );
+}
+
 interface RecordingControlsProps {
   recorder: ReturnType<typeof useAudioRecorder>;
   analyzing: boolean;
   onSubmit: () => void;
-  onStopAndSend: () => void;
 }
 
-/**
- * El botón para hablar, en sus cuatro momentos: listo para grabar, grabando,
- * grabado (para escuchar antes de mandarlo) y enviando.
- *
- * Es el mismo botón central el que arranca y el que corta+manda: un toque
- * empieza a grabar, y volver a tocarlo mientras graba corta la grabación y
- * la envía directo a analizar — no hace falta pasar por un botón aparte. El
- * ícono de cancelar (✕) sigue disponible por separado para descartar sin
- * mandar nada.
- */
-function RecordingControls({ recorder, analyzing, onSubmit, onStopAndSend }: RecordingControlsProps) {
+function RecordingControls({ recorder, analyzing, onSubmit }: RecordingControlsProps) {
   if (recorder.status === 'idle' || recorder.status === 'requesting' || recorder.status === 'error') {
     return (
       <div className={styles.recordArea}>
@@ -270,21 +256,40 @@ function RecordingControls({ recorder, analyzing, onSubmit, onStopAndSend }: Rec
     );
   }
 
-  if (recorder.status === 'recording') {
+  if (recorder.status === 'recording' || recorder.status === 'paused') {
+    const isPaused = recorder.status === 'paused';
+
     return (
       <div className={styles.recordArea}>
         <button
           type="button"
-          className={cx(styles.recordButton, styles.recordButtonActive)}
-          onClick={onStopAndSend}
-          aria-label="Terminar y enviar respuesta"
+          className={cx(
+            styles.recordButton,
+            isPaused ? styles.recordButtonPaused : styles.recordButtonActive,
+          )}
+          onClick={() => recorder.stop()}
+          aria-label="Terminar de grabar"
         >
-          <span className={styles.recordPulse} aria-hidden="true" />
+          {isPaused ? (
+            <span className={styles.pauseIndicator} aria-hidden="true" />
+          ) : (
+            <span className={styles.recordPulse} aria-hidden="true" />
+          )}
         </button>
         <span className={styles.recordTimer}>{formatSeconds(recorder.seconds)}</span>
-        <span className={styles.recordHint}>Tocá el botón para enviar tu respuesta</span>
+        <span className={styles.recordHint}>
+          {isPaused ? 'En pausa — tocá el botón para terminar' : 'Tocá el botón para terminar de grabar'}
+        </span>
 
         <div className={styles.recordControls}>
+          <button
+            type="button"
+            className={styles.controlButton}
+            onClick={() => (isPaused ? recorder.resume() : recorder.pause())}
+            aria-label={isPaused ? 'Continuar grabación' : 'Pausar grabación'}
+          >
+            <span className={isPaused ? styles.resumeIcon : styles.pauseIcon} aria-hidden="true" />
+          </button>
           <button
             type="button"
             className={styles.controlButton}
