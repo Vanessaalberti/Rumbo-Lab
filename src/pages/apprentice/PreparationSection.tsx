@@ -26,8 +26,9 @@ const TOOLS: Array<{
   {
     icon: 'feedback',
     name: 'Práctica de oratoria',
-    text: 'Ensayar cómo contás tu recorrido y recibir devoluciones sobre cómo sonaste.',
+    text: 'Responder una pregunta general de entrevista por micrófono y recibir feedback sobre cómo la contestaste.',
     tone: 'teal',
+    href: ROUTES.myRumboOratoria,
   },
   {
     icon: 'mentorship',

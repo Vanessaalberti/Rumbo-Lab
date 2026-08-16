@@ -7,3 +7,4 @@ export { EvidencesSection } from './EvidencesSection';
 export { GoalsSection } from './GoalsSection';
 export { PreparationSection } from './PreparationSection';
 export { CvMatchSection } from './preparacion/CvMatchSection';
+export { OratoriaSection } from './preparacion/OratoriaSection';

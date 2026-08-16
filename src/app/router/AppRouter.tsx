@@ -15,6 +15,7 @@ import {
   CvsSection,
   EvidencesSection,
   GoalsSection,
+  OratoriaSection,
   PreparationSection,
   FeedbackSection,
   PerfilSection,
@@ -67,6 +68,7 @@ export function AppRouter() {
                 <Route path="espacios" element={<SpacesSection />} />
                 <Route path="preparacion" element={<PreparationSection />} />
                 <Route path="preparacion/comparar-cv" element={<CvMatchSection />} />
+                <Route path="preparacion/oratoria" element={<OratoriaSection />} />
                 <Route path="feedback" element={<FeedbackSection />} />
                 <Route path="evidencias" element={<EvidencesSection />} />
               </Route>
