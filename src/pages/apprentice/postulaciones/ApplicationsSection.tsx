@@ -213,19 +213,6 @@ export function ApplicationsSection() {
       </div>
 
       <div className={styles.toolbar}>
-        <Button size="sm" iconLeading="plus" onClick={() => setModalOpen(true)}>
-          Nueva postulación
-        </Button>
-        <StatusFilter
-          selected={statusFilter}
-          onChange={(next) => {
-            setStatusFilter(next);
-            /* Filtrar cambia el conjunto: quedarse en la página 4 de un
-               resultado de 3 filas no tiene sentido. */
-            setPage(1);
-          }}
-        />
-
         <Input
           label="Buscar postulaciones"
           hideLabel
@@ -238,6 +225,23 @@ export function ApplicationsSection() {
           }}
           className={styles.search}
         />
+
+        {/* Crear y filtrar quedan juntos, empujados al extremo opuesto del
+            buscador — es el otro grupo de acciones de la barra. */}
+        <div className={styles.toolbarActions}>
+          <Button size="sm" iconLeading="plus" onClick={() => setModalOpen(true)}>
+            Nueva postulación
+          </Button>
+          <StatusFilter
+            selected={statusFilter}
+            onChange={(next) => {
+              setStatusFilter(next);
+              /* Filtrar cambia el conjunto: quedarse en la página 4 de un
+                 resultado de 3 filas no tiene sentido. */
+              setPage(1);
+            }}
+          />
+        </div>
       </div>
 
       {rowError && (

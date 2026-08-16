@@ -27,21 +27,33 @@
 }
 
 /*
- * A la derecha del todo en pantallas anchas (`margin-left: auto`), con un
- * ancho acotado para que no se estire a ocupar el resto de la barra —un
- * campo de búsqueda de medio metro de ancho no busca mejor que uno de 260px.
- * Por debajo de ese ancho cae a su propia línea y ocupa el 100%, como el
- * resto de los controles.
+ * Primero en la barra, con un ancho acotado para que no se estire a ocupar
+ * el resto — un campo de búsqueda de medio metro de ancho no busca mejor que
+ * uno de 260px. Por debajo de 480px cae a su propia línea y ocupa el 100%,
+ * como el resto de los controles.
  */
 .search {
-  margin-left: auto;
   width: 100%;
   max-width: 260px;
 }
 
+/* Crear + filtrar, juntos y empujados al extremo opuesto del buscador. */
+.toolbarActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-left: auto;
+}
+
 @media (max-width: 480px) {
+  /* El buscador pasa a ocupar toda la fila, y el grupo de acciones cae a la
+     suya propia sin el empuje a la derecha — ya no hay nada de qué alejarse. */
   .search {
     max-width: none;
+  }
+
+  .toolbarActions {
+    margin-left: 0;
   }
 }
 
