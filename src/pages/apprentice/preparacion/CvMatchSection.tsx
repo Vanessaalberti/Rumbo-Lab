@@ -12,16 +12,10 @@ import {
   type CvMatchResult,
 } from '@/services/data/preparation/cvMatch.service';
 import { cx } from '@/utils/classNames';
+import { ToolBackLink } from './ToolBackLink';
 import screen from '@/app/layouts/appShell.module.css';
 import styles from './cvMatch.module.css';
 
-/**
- * Mismos dos formatos que sabe leer `textExtraction.ts` del backend. Es un
- * filtro de cortesía, no la regla: pedir un CV en `.doc` o en JPG igual
- * respondería 422 con un mensaje claro, esto solo evita ofrecerlo como opción
- * —o dejarlo elegir como archivo suelto— cuando ya se sabe que no va a
- * funcionar.
- */
 const EXTRACTABLE_MIME_TYPES = new Set([
   'application/pdf',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -38,19 +32,6 @@ type ViewState =
   | { status: 'success'; match: CvMatchResult }
   | { status: 'error'; message: string };
 
-/**
- * Preparación · Comparar tu CV con una oferta.
- *
- * La única herramienta de Preparación con algo real detrás (ver
- * `PreparationSection`). El CV puede venir de dos lados:
- *
- *   - uno de los que ya tenés guardados en CVs, o
- *   - un archivo suelto que se sube acá mismo **solo para esta comparación**:
- *     no se agrega a CVs, no queda un registro nuevo en ningún lado. El
- *     backend lo lee, le saca el texto y descarta el archivo con la misma
- *     request — ver el comentario de `receiveOptionalFile` en
- *     `routes/preparation.ts` del backend.
- */
 export function CvMatchSection() {
   const { dashboard } = useOutletContext<ApprenticeShellContext>();
   const cvSelectId = useId();
@@ -60,10 +41,6 @@ export function CvMatchSection() {
   const eligibleCvs = dashboard.cvs.filter(
     (cv) => cv.storagePath && cv.mimeType && EXTRACTABLE_MIME_TYPES.has(cv.mimeType),
   );
-
-  /* Si no hay ningún CV guardado que se pueda leer, arranca directo en "subir
-     un archivo": obligar a pasar primero por un modo vacío sería fricción sin
-     motivo. */
   const [source, setSource] = useState<CvSource>(eligibleCvs.length > 0 ? 'saved' : 'upload');
   const [cvId, setCvId] = useState(eligibleCvs[0]?.id ?? '');
   const [file, setFile] = useState<File | null>(null);
@@ -101,6 +78,8 @@ export function CvMatchSection() {
 
   return (
     <div className={styles.body}>
+      <ToolBackLink />
+
       <div className={screen.header}>
         <div>
           <p className={screen.headerTitle}>Comparar tu CV con una oferta</p>

@@ -4,6 +4,29 @@
   gap: var(--space-6);
 }
 
+/* --- Volver -------------------------------------------------------------- */
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: calc(var(--space-6) * -1 + var(--space-2));
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-soft);
+  transition: var(--transition-colors);
+}
+
+.backLink:hover,
+.backLink:focus-visible {
+  color: var(--text);
+}
+
+.backLinkIcon {
+  transform: rotate(180deg);
+  flex-shrink: 0;
+}
+
 /* --- Formulario ------------------------------------------------------------ */
 
 .form {
@@ -13,11 +36,6 @@
   align-items: flex-start;
 }
 
-/*
- * CV a la izquierda, oferta a la derecha con más espacio: la oferta es
- * texto libre y necesita ancho para leerse mientras se pega; el selector de
- * CV es una sola línea.
- */
 .inputsRow {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
@@ -226,9 +244,6 @@
   flex-shrink: 0;
   margin-top: 3px;
 }
-
-/* Teléfonos: menos aire lateral, igual que el resto del área privada por
-   debajo de 480px (ver appShell.module.css). */
 @media (max-width: 480px) {
   .result {
     padding: var(--space-4) var(--space-3);
