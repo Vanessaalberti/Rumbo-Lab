@@ -8,17 +8,6 @@ import styles from './PendingSection.module.css';
 
 /**
  * Herramientas de Preparación.
- *
- * `href` solo en la que tiene algo real construido detrás. Las que todavía no
- * lo tienen no dejan de existir en la pantalla — se ven, con su nombre y su
- * descripción, pero bloqueadas: es la promesa de que van llegando una por una,
- * no una lista que aparece de golpe el día que estén las tres.
- *
- * `tone` solo diferencia visualmente las tarjetas — igual que el color de un
- * ícono de aplicación — y usa los tres acentos que ya existen en el sistema
- * (`ProgressBar` los llama `brand`/`progress`/`attention`); no es un dato del
- * producto, así que no importa si dos herramientas terminan compartiendo tono
- * el día que haya más de tres.
  */
 const TOOLS: Array<{
   icon: IconName;
@@ -46,25 +35,26 @@ const TOOLS: Array<{
     text: 'Responder preguntas típicas del puesto y revisar lo que contestaste.',
     tone: 'amber',
   },
+  {
+    icon: 'pencil',
+    name: 'Creador de publicaciones para LinkedIn',
+    text: 'Armar una publicación para contar un logro o un proyecto, lista para pegar en LinkedIn.',
+    tone: 'brand',
+  },
+  {
+    icon: 'shield',
+    name: 'Tester ATS',
+    text: 'Ver si tu CV pasa los filtros automáticos que usan las empresas antes de que lo lea una persona.',
+    tone: 'teal',
+  },
+  {
+    icon: 'portfolio',
+    name: 'Crear texto de presentación',
+    text: 'A partir de tu CV y la oferta, armar el mensaje que la acompaña, listo para copiar.',
+    tone: 'amber',
+  },
 ];
 
-/**
- * Preparación.
- *
- * Es la única sección que no **registra** el recorrido: lo **entrena**. Por eso
- * vive separada del resto en el rail.
- *
- * De las tres herramientas previstas, **una sola está construida** —Comparar
- * tu CV con una oferta, en `preparacion/CvMatchSection`—; las otras dos se
- * muestran con su nombre y su propósito, tapadas con "Próximamente" y sin
- * click: se van destapando a medida que cada una se construye de verdad. Una
- * simulación de entrevista falsa sería peor que no tenerla, porque quien la
- * use va a creer que se preparó.
- *
- * Las tarjetas no estiran para llenar el ancho disponible (`auto-fill` en vez
- * de columnas `1fr`): hoy son tres, pero la grilla ya está pensada para
- * cuando haya más sin tener que retocar el layout.
- */
 export function PreparationSection() {
   return (
     <>

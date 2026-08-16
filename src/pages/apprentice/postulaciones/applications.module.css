@@ -1,23 +1,8 @@
-/**
- * Postulaciones — gestor personal, no portal de empleo.
- *
- * Composición de Notion `04 · Postulaciones` §18bis: barra de acciones arriba,
- * tabla a la izquierda y panel de detalle a la derecha, conviviendo. El panel
- * no se superpone a la tabla ni la tapa: ocupa un espacio reservado.
- *
- * Las primitivas compartidas (`table`, `tag`, `row`, `panelTitle`) vienen de
- * `appShell.module.css`; acá vive solo lo propio de esta pantalla.
- */
-
 .body {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
 }
-
-/* --- Barra de acciones ---------------------------------------------------- */
-/* Tres controles: crear, filtrar por estado y buscar por texto. La
-   configuración de columnas se retiró del producto (§18bis.7). */
 
 .toolbar {
   display: flex;
@@ -26,15 +11,14 @@
   flex-wrap: wrap;
 }
 
-/*
- * Primero en la barra, con un ancho acotado para que no se estire a ocupar
- * el resto — un campo de búsqueda de medio metro de ancho no busca mejor que
- * uno de 260px. Por debajo de 480px cae a su propia línea y ocupa el 100%,
- * como el resto de los controles.
- */
 .search {
   width: 100%;
   max-width: 260px;
+}
+
+.search input {
+  height: 34px;
+  font-size: var(--text-sm);
 }
 
 /* Crear + filtrar, juntos y empujados al extremo opuesto del buscador. */
@@ -46,8 +30,6 @@
 }
 
 @media (max-width: 480px) {
-  /* El buscador pasa a ocupar toda la fila, y el grupo de acciones cae a la
-     suya propia sin el empuje a la derecha — ya no hay nada de qué alejarse. */
   .search {
     max-width: none;
   }
@@ -156,32 +138,11 @@
   align-items: start;
 }
 
-/* El panel entra al lado recién cuando hay ancho para sostener las dos zonas
-   sin apretar la tabla. Debajo de eso se apila, que es la degradación
-   correcta: el panel sigue existiendo, solo cambia de lugar. */
 @media (min-width: 1100px) {
   .split {
     grid-template-columns: minmax(0, 1.7fr) minmax(320px, 1fr);
-    /*
-     * `stretch` en lugar de `start`: la columna del panel toma el alto de la
-     * fila, que lo define la tabla. Es lo que ata una medida a la otra.
-     */
     align-items: stretch;
   }
-
-  /*
-   * El panel no puede pasar el alto de la tabla que tiene al lado.
-   *
-   * Antes se limitaba a lo que quedaba de ventana
-   * (`100vh - navbar - space-10`), una medida que no tiene nada que ver con lo
-   * que hay en pantalla: en un monitor alto el panel se estiraba muy por debajo
-   * del final de la tabla y las dos columnas terminaban en lugares distintos.
-   *
-   * El truco es sacar al panel del flujo (`absolute`): así no puede empujar el
-   * alto de la fila —si pudiera, se agrandaría a sí mismo y la restricción no
-   * cerraría nunca— y la fila queda definida solo por la tabla. `max-height`
-   * y no `height`: una ficha corta ocupa lo que necesita, no se estira.
-   */
   .detailColumn {
     position: relative;
     min-height: 0;
@@ -202,6 +163,9 @@
 
 .tableColumn {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
 }
 
 .detailColumn {
@@ -244,8 +208,6 @@
   color: var(--text-soft);
 }
 
-/* Valor que no se reconoce como enlace, correo ni teléfono: se muestra tal
-   cual, sin fingir que lleva a algún lado. */
 .contactPlain {
   color: var(--text-soft);
   overflow-wrap: anywhere;
@@ -255,14 +217,6 @@
   color: var(--brand-strong);
   text-decoration: underline;
 }
-
-/* --- Celdas editables en línea -------------------------------------------- */
-/*
- * Menú propio en vez de `<select>` nativo: cada opción tiene que mostrarse con
- * el color de su estado y el navegador no permite estilar las `<option>`. Lo
- * que el control nativo daba gratis —rol, selección, Escape— se repone en el
- * componente.
- */
 
 .cellRoot {
   position: relative;
@@ -345,11 +299,6 @@
   pointer-events: none;
 }
 
-/* --- Menú de opciones ----------------------------------------------------- */
-/*
- * El panel lo posiciona y estiliza el componente Popover, que lo saca a un
- * portal para que la tabla no lo recorte. Acá quedan solo las filas.
- */
 
 .option {
   display: flex;
@@ -652,7 +601,6 @@
 }
 
 /* --- Historial ------------------------------------------------------------ */
-/* Lo escribe un trigger en cada cambio de estado; acá es de solo lectura. */
 
 .history {
   border-top: 1px solid var(--border-soft);
@@ -740,12 +688,6 @@
 
 /* --- Alta en curso -------------------------------------------------------- */
 
-/*
- * La fila provisoria se lee como "todavía no es del todo real": atenuada y sin
- * los afectos de una fila normal (no se selecciona ni responde al puntero).
- * Deliberadamente no se le pone un color de estado — no tiene estado hasta que
- * el backend confirme.
- */
 .rowPending {
   cursor: default;
   background-color: var(--surface-sunken);
@@ -780,10 +722,6 @@
   }
 }
 
-/*
- * Sin giro para quien pidió menos movimiento: el indicador sigue existiendo
- * —el texto "Guardando…" ya lo dice— pero deja de rotar.
- */
 @media (prefers-reduced-motion: reduce) {
   .spinner {
     animation: none;
@@ -792,20 +730,6 @@
 
 /* --- Teléfono ------------------------------------------------------------- */
 
-/*
- * La tabla se recompone en vez de encogerse.
- *
- * `.table` tiene `min-width: 560px`, así que en un teléfono la única salida era
- * arrastrarla de costado: cinco columnas que no entran, y la persona teniendo
- * que scrollear horizontalmente para ver en qué estado está cada postulación
- * —justo el dato por el que abre esta pantalla—.
- *
- * Acá se decide qué sobrevive. Quedan **Nombre y Estado**, que son la pregunta
- * y la respuesta de la vista. Puesto, CV enviado y Dónde no se pierden: viven
- * en la ficha, que se abre tocando la fila y que en este ancho ya se muestra
- * apilada debajo. Es un toque de distancia, contra un scroll lateral en todas
- * las filas.
- */
 @media (max-width: 620px) {
   .table {
     min-width: 0;
@@ -833,16 +757,6 @@
 
 /* --- Aire lateral de las celdas ------------------------------------------- */
 
-/*
- * `.table td` del shell solo declara `padding-block`, así que el contenido
- * quedaba pegado al borde de la celda. No se nota en una fila común —no hay
- * borde que lo delate— pero sí en la seleccionada, que tiene fondo propio y un
- * filete de 2px: el texto arrancaba encima del filete.
- *
- * El aire va acá y no en el shell porque esta es la única tabla con filas
- * seleccionables; tocar la primitiva movería también las tablas de las otras
- * secciones sin motivo.
- */
 .table th,
 .table td {
   padding-inline: var(--space-3);
@@ -862,11 +776,6 @@
 
 /* --- Notas ---------------------------------------------------------------- */
 
-/*
- * `pre-wrap` preserva los saltos de línea que la persona escribió en el
- * textarea. Sin esto el navegador los colapsaba a un espacio y una nota con
- * varios párrafos se leía como un bloque corrido.
- */
 .notes {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
