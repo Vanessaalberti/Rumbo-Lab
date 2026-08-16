@@ -4,10 +4,14 @@ dist-ssr
 *.local
 .env
 .env.*
-!.env.example
-NOTION-PENDIENTE
+NOTION-PENDIENTE.md
+SECURITY.md
 .DS_Store
 Thumbs.db
+
+# Config local de Claude Code (p. ej. launch.json del dev server para el
+# preview del asistente): es de la herramienta, no del proyecto.
+.claude/
 
 .vscode/*
 !.vscode/extensions.json
