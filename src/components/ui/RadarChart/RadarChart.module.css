@@ -1,0 +1,169 @@
+/**
+ * Gráfico de radar. Todo el color sale de los tokens, así que el modo oscuro
+ * funciona sin una segunda paleta.
+ */
+
+/*
+ * Las etiquetas de los ejes se dibujan por fuera del `viewBox` (de ahí el
+ * `overflow: visible`), así que el contenedor reserva aire a los costados
+ * para que "Relevancia" o "Estructura" no se corten contra el borde.
+ */
+.root {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: var(--space-2) var(--space-8);
+}
+
+.svg {
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  overflow: visible;
+}
+
+/* --- Grilla ---------------------------------------------------------------- */
+
+/*
+ * Sirve para las dos formas de la grilla: los círculos mientras busca y los
+ * polígonos cuando hay resultado. Como React reemplaza unos por otros, la
+ * aparición se dispara justo en ese cambio y suaviza el salto de una forma
+ * a la otra.
+ */
+.gridPolygon {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 1;
+  animation: rumbo-radar-grid var(--duration-normal) var(--ease-out) both;
+}
+
+@keyframes rumbo-radar-grid {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gridPolygon {
+    animation: none;
+  }
+}
+
+.axisLine {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.axisLabel {
+  font-size: 11px;
+  font-weight: var(--weight-medium);
+  fill: var(--text-soft);
+  transition: fill var(--duration-slow) var(--ease-out);
+}
+
+/* Mientras escanea las etiquetas bajan de intensidad: todavía no hay dato
+   que leer en ellas, sólo el nombre del eje. */
+.axisLabelDim {
+  fill: var(--text-faint);
+}
+
+/* --- Barrido de escaneo ---------------------------------------------------- */
+
+.sweep {
+  transform-origin: 50% 50%;
+  animation: rumbo-radar-sweep 2.4s linear infinite;
+}
+
+.sweepEdge {
+  stroke: var(--brand);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.sweepTrailNear {
+  fill: var(--brand);
+  fill-opacity: 0.26;
+}
+
+.sweepTrailMid {
+  fill: var(--brand);
+  fill-opacity: 0.14;
+}
+
+.sweepTrailFar {
+  fill: var(--brand);
+  fill-opacity: 0.06;
+}
+
+@keyframes rumbo-radar-sweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/*
+ * Sin movimiento el barrido no gira: queda una cuña fija sobre la grilla.
+ * Se pierde la metáfora del radar buscando, pero la figura sigue estando —
+ * y quien pidió no ver animaciones no debería igual verlas.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .sweep {
+    animation: none;
+  }
+}
+
+/* --- Series ---------------------------------------------------------------- */
+
+/* El promedio: es lo que hay que leer primero. */
+.primaryShape {
+  fill: var(--brand);
+  fill-opacity: 0.22;
+  stroke: var(--brand);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  animation: rumbo-radar-appear var(--duration-slow) var(--ease-out) both;
+}
+
+.primaryDot {
+  fill: var(--brand);
+  animation: rumbo-radar-appear var(--duration-slow) var(--ease-out) both;
+}
+
+/*
+ * Cada respuesta individual, apenas visible. No están para leerse una por
+ * una: juntas muestran si el desempeño fue parejo (contornos apretados) o
+ * irregular (contornos dispersos).
+ */
+.ghostShape {
+  fill: none;
+  stroke: var(--text-faint);
+  stroke-width: 1;
+  stroke-opacity: 0.4;
+  stroke-linejoin: round;
+}
+
+@keyframes rumbo-radar-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+    transform-origin: center;
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    transform-origin: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .primaryShape,
+  .primaryDot {
+    animation: none;
+  }
+}

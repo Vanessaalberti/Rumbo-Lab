@@ -1,0 +1,72 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 420px;
+}
+
+.track {
+  position: relative;
+  height: 4px;
+  width: 100%;
+  background-color: var(--bg-alt);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+/* Barra indeterminada: recorre la pista de punta a punta sin prometer un
+   porcentaje que nadie puede calcular. */
+.sweep {
+  position: absolute;
+  inset-block: 0;
+  width: 40%;
+  border-radius: var(--radius-full);
+  background: linear-gradient(90deg, transparent, var(--brand), transparent);
+  animation: rumbo-loading-sweep 1.6s var(--ease-in-out) infinite;
+}
+
+@keyframes rumbo-loading-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(350%);
+  }
+}
+
+.message {
+  font-size: var(--text-sm);
+  color: var(--text-soft);
+  animation: rumbo-loading-message var(--duration-slow) var(--ease-out) both;
+}
+
+@keyframes rumbo-loading-message {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/*
+ * Sin movimiento: la barra queda como una presencia estática y el mensaje
+ * aparece sin desplazarse. El indicador sigue estando — lo que se saca es la
+ * animación, no la información.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .sweep {
+    position: static;
+    width: 100%;
+    animation: none;
+    background: var(--brand);
+    opacity: 0.5;
+  }
+
+  .message {
+    animation: none;
+  }
+}

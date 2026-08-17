@@ -500,6 +500,38 @@ button.recordButton:disabled {
   border-bottom: 1px solid var(--border-soft);
 }
 
+/* Espera del cierre: el radar escaneando con el mensaje debajo, centrados. */
+.closingWait {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* --- Radar del conjunto ------------------------------------------------------ */
+
+.radarBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.radarTitle {
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
+.radarLegend {
+  font-size: var(--text-xs);
+  line-height: var(--leading-relaxed);
+  color: var(--text-faint);
+}
+
 /* --- Listas de feedback ------------------------------------------------------ */
 
 .list {

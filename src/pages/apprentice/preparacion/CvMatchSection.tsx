@@ -4,6 +4,8 @@ import type { ApprenticeShellContext } from '@/app/layouts/ApprenticeShell';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { ProgressBar } from '@/components/ui/ProgressBar';
+import { RadarChart, type RadarAxis } from '@/components/ui/RadarChart';
+import { LoadingState } from '@/components/ui/LoadingState';
 import { TextLink } from '@/components/ui/TextLink';
 import { ROUTES } from '@/constants/routes';
 import {
@@ -199,11 +201,17 @@ export function CvMatchSection() {
         </Button>
       </form>
 
+      {/* El mismo radar que después muestra el resultado, escaneando: en vez
+          de un cartel de "cargando", la figura que ya va a estar ahí. */}
       {state.status === 'loading' && (
-        <div className={styles.result} aria-live="polite">
-          <p className={screen.emptyState}>
-            Comparando tu CV con la oferta. Puede tardar unos segundos…
-          </p>
+        <div className={styles.result}>
+          <RadarChart
+            axes={CV_MATCH_AXES}
+            series={[]}
+            state="scanning"
+            ariaLabel="Comparando tu CV con la oferta."
+          />
+          <LoadingState messages={CV_MATCH_LOADING_STEPS} className={styles.centeredLoading} />
         </div>
       )}
 
@@ -218,8 +226,40 @@ export function CvMatchSection() {
   );
 }
 
+/**
+ * Los seis ejes del radar de esta herramienta. Oratoria y entrevista tienen
+ * cuatro cada una: la cantidad sale de cuántas dimensiones evalúa realmente
+ * cada análisis, no de una decisión estética.
+ */
+const CV_MATCH_AXES: RadarAxis[] = [
+  { id: 'experiencia', label: 'Experiencia' },
+  { id: 'habilidadesTecnicas', label: 'Técnicas' },
+  { id: 'responsabilidades', label: 'Tareas' },
+  { id: 'formacion', label: 'Formación' },
+  { id: 'idiomas', label: 'Idiomas' },
+  { id: 'habilidadesBlandas', label: 'Blandas' },
+];
+
+/** Los pasos reales del workflow, en orden. */
+const CV_MATCH_LOADING_STEPS = [
+  'Leyendo tu CV…',
+  'Extrayendo los requisitos de la oferta…',
+  'Comparando uno por uno…',
+  'Armando el análisis…',
+];
+
 function MatchResult({ match }: { match: CvMatchResult }) {
   const tone = match.matchScore >= 70 ? 'brand' : match.matchScore >= 40 ? 'attention' : 'progress';
+
+  /* Mismo orden que `CV_MATCH_AXES`. */
+  const dimensionValues = [
+    match.dimensions.experiencia,
+    match.dimensions.habilidadesTecnicas,
+    match.dimensions.responsabilidades,
+    match.dimensions.formacion,
+    match.dimensions.idiomas,
+    match.dimensions.habilidadesBlandas,
+  ];
 
   return (
     <div className={styles.result}>
@@ -228,6 +268,12 @@ function MatchResult({ match }: { match: CvMatchResult }) {
         label="Compatibilidad con esta oferta"
         tone={tone}
         size="md"
+      />
+
+      <RadarChart
+        axes={CV_MATCH_AXES}
+        series={[{ id: 'match', label: 'Tu CV', values: dimensionValues }]}
+        ariaLabel={CV_MATCH_AXES.map((axis, index) => `${axis.label} ${dimensionValues[index]} de 100`).join(', ')}
       />
 
       <p className={styles.summary}>{match.summary}</p>

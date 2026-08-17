@@ -3,6 +3,8 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Icon, type IconName } from '@/components/ui/Icon';
 import { ProgressBar } from '@/components/ui/ProgressBar';
+import { RadarChart, type RadarAxis } from '@/components/ui/RadarChart';
+import { LoadingState } from '@/components/ui/LoadingState';
 import {
   analyzeOratoriaRecording,
   type OratoriaResult,
@@ -23,6 +25,17 @@ const CATEGORY_ICONS: Record<string, IconName> = {
   'trabajo-en-equipo': 'mentorship',
   objetivos: 'goal',
 };
+
+/**
+ * Los pasos reales del workflow de n8n, en orden: primero transcribe el
+ * audio, después analiza el texto y al final arma la devolución. No es una
+ * secuencia decorativa — es lo que está pasando mientras se espera.
+ */
+const ORATORIA_LOADING_STEPS = [
+  'Transcribiendo lo que grabaste…',
+  'Analizando cómo armaste la respuesta…',
+  'Preparando la devolución…',
+];
 
 type AnalysisState =
   | { status: 'idle' }
@@ -170,9 +183,15 @@ export function OratoriaSection() {
               )}
 
               {analysis.status === 'loading' && (
-                <p className={screen.emptyState} aria-live="polite">
-                  Transcribiendo y analizando tu respuesta. Puede tardar unos segundos…
-                </p>
+                <>
+                  <RadarChart
+                    axes={ORATORIA_AXES}
+                    series={[]}
+                    state="scanning"
+                    ariaLabel="Analizando tu respuesta."
+                  />
+                  <LoadingState messages={ORATORIA_LOADING_STEPS} />
+                </>
               )}
 
               {analysis.status === 'error' && (
@@ -328,6 +347,14 @@ function scoreTone(value: number): 'brand' | 'attention' | 'progress' {
   return 'progress';
 }
 
+/** Mismo orden que los valores que se le pasan al radar. */
+const ORATORIA_AXES: RadarAxis[] = [
+  { id: 'answerQuality', label: 'Respuesta' },
+  { id: 'clarity', label: 'Claridad' },
+  { id: 'structure', label: 'Estructura' },
+  { id: 'fillerWords', label: 'Muletillas' },
+];
+
 function AnalysisResult({ result }: { result: OratoriaResult }) {
   const [showTranscript, setShowTranscript] = useState(false);
 
@@ -340,6 +367,25 @@ function AnalysisResult({ result }: { result: OratoriaResult }) {
           de abajo.
         </p>
       )}
+
+      {/* El radar muestra la forma del resultado de un vistazo; las barras de
+          abajo siguen siendo las que dan el número exacto de cada dimensión. */}
+      <RadarChart
+        axes={ORATORIA_AXES}
+        series={[
+          {
+            id: 'resultado',
+            label: 'Esta respuesta',
+            values: [
+              result.scores.answerQuality,
+              result.scores.clarity,
+              result.scores.structure,
+              result.scores.fillerWordsScore,
+            ],
+          },
+        ]}
+        ariaLabel={`Resultado de la respuesta: responde la pregunta ${result.scores.answerQuality} de 100, claridad ${result.scores.clarity}, estructura ${result.scores.structure}, uso de muletillas ${result.scores.fillerWordsScore}.`}
+      />
 
       <div className={styles.scores}>
         <ProgressBar

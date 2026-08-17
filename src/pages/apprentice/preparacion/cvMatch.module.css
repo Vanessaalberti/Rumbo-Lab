@@ -172,6 +172,12 @@
   border-radius: var(--radius-lg);
 }
 
+/* Durante el escaneo el mensaje va centrado bajo el radar, no pegado a la
+   izquierda: el bloque entero es una sola figura mientras se espera. */
+.centeredLoading {
+  align-self: center;
+}
+
 .summary {
   font-size: var(--text-sm);
   line-height: var(--leading-relaxed);

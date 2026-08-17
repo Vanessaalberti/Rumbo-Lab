@@ -17,8 +17,23 @@ import type { AsyncState } from '@/services/data/types';
  *     momento.
  */
 
+/**
+ * Desglose del match en seis dimensiones. Cada una se evalúa por separado —
+ * no son un promedio del `matchScore` — y es lo que alimenta el radar de la
+ * pantalla: la diferencia entre ellas es lo informativo.
+ */
+export interface CvMatchDimensions {
+  experiencia: number;
+  habilidadesTecnicas: number;
+  formacion: number;
+  habilidadesBlandas: number;
+  idiomas: number;
+  responsabilidades: number;
+}
+
 export interface CvMatchResult {
   matchScore: number;
+  dimensions: CvMatchDimensions;
   strengths: string[];
   gaps: string[];
   suggestions: string[];

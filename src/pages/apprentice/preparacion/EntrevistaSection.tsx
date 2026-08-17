@@ -4,6 +4,8 @@ import type { ApprenticeShellContext } from '@/app/layouts/ApprenticeShell';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { ProgressBar } from '@/components/ui/ProgressBar';
+import { RadarChart, type RadarAxis, type RadarSeries } from '@/components/ui/RadarChart';
+import { LoadingState } from '@/components/ui/LoadingState';
 import { TextLink } from '@/components/ui/TextLink';
 import { ROUTES } from '@/constants/routes';
 import {
@@ -37,6 +39,19 @@ interface AnsweredQuestion {
   evaluation: AnswerEvaluation | null;
   failed: boolean;
 }
+
+/** Los pasos reales de cada espera, no una secuencia decorativa. */
+const PREPARING_STEPS = [
+  'Leyendo tu CV…',
+  'Cruzándolo con lo que pide la oferta…',
+  'Armando las preguntas de la entrevista…',
+];
+
+const CLOSING_STEPS = [
+  'Terminando de evaluar las últimas respuestas…',
+  'Buscando qué se repite a lo largo de la entrevista…',
+  'Escribiendo la devolución final…',
+];
 
 type Phase =
   | { name: 'setup' }
@@ -249,11 +264,7 @@ export function EntrevistaSection() {
         />
       )}
 
-      {phase.name === 'preparing' && (
-        <p className={screen.emptyState} aria-live="polite">
-          Leyendo tu CV y la oferta para armar las preguntas. Puede tardar unos segundos…
-        </p>
-      )}
+      {phase.name === 'preparing' && <LoadingState messages={PREPARING_STEPS} />}
 
       {phase.name === 'interview' && answers[current] && (
         <InterviewStep
@@ -267,9 +278,15 @@ export function EntrevistaSection() {
       )}
 
       {phase.name === 'closing' && (
-        <p className={screen.emptyState} aria-live="polite">
-          Terminaste la entrevista. Estamos revisando cada respuesta y armando la devolución…
-        </p>
+        <div className={styles.closingWait}>
+          <RadarChart
+            axes={INTERVIEW_AXES}
+            series={[]}
+            state="scanning"
+            ariaLabel="Revisando las respuestas de la entrevista."
+          />
+          <LoadingState messages={CLOSING_STEPS} />
+        </div>
       )}
 
       {phase.name === 'results' && (
@@ -555,6 +572,62 @@ function scoreTone(value: number): 'brand' | 'attention' | 'progress' {
   return 'progress';
 }
 
+/** Mismo orden que los valores que se le pasan al radar. */
+const INTERVIEW_AXES: RadarAxis[] = [
+  { id: 'answerQuality', label: 'Responde' },
+  { id: 'structure', label: 'Estructura' },
+  { id: 'specificity', label: 'Detalle' },
+  { id: 'relevance', label: 'Relevancia' },
+];
+
+function axisValues(scores: AnswerEvaluation['scores']): number[] {
+  return [scores.answerQuality, scores.structure, scores.specificity, scores.relevance];
+}
+
+/**
+ * El radar del conjunto: el promedio relleno, y cada respuesta como contorno
+ * tenue detrás.
+ *
+ * Es lo que las barras por respuesta no muestran — si el bajón en "detalle"
+ * fue de una respuesta puntual o si viene pasando en todas. Contornos
+ * apretados significan un desempeño parejo; dispersos, irregular.
+ */
+function InterviewRadar({ evaluations }: { evaluations: readonly AnswerEvaluation[] }) {
+  if (evaluations.length === 0) return null;
+
+  const average = INTERVIEW_AXES.map((_, axis) => {
+    const total = evaluations.reduce((sum, evaluation) => sum + axisValues(evaluation.scores)[axis], 0);
+    return Math.round(total / evaluations.length);
+  });
+
+  const series: RadarSeries[] = [
+    ...evaluations.map((evaluation, index) => ({
+      id: `respuesta-${index}`,
+      label: `Respuesta ${index + 1}`,
+      values: axisValues(evaluation.scores),
+      emphasis: 'ghost' as const,
+    })),
+    { id: 'promedio', label: 'Promedio', values: average, emphasis: 'primary' as const },
+  ];
+
+  const summary = INTERVIEW_AXES.map((axis, index) => `${axis.label} ${average[index]} de 100`).join(', ');
+
+  return (
+    <div className={styles.radarBlock}>
+      <p className={styles.radarTitle}>Cómo te fue en cada dimensión</p>
+      <RadarChart
+        axes={INTERVIEW_AXES}
+        series={series}
+        ariaLabel={`Promedio de las ${evaluations.length} respuestas: ${summary}.`}
+      />
+      <p className={styles.radarLegend}>
+        La figura llena es tu promedio. Las líneas finas son cada respuesta: si están juntas,
+        respondiste parejo; si están dispersas, hubo respuestas mucho mejores que otras.
+      </p>
+    </div>
+  );
+}
+
 function InterviewResults({
   closing,
   answers,
@@ -564,6 +637,10 @@ function InterviewResults({
   answers: readonly AnsweredQuestion[];
   onRestart: () => void;
 }) {
+  const evaluations = answers
+    .map((entry) => entry.evaluation)
+    .filter((evaluation): evaluation is AnswerEvaluation => evaluation !== null);
+
   return (
     <div className={styles.results}>
       {closing ? (
@@ -575,6 +652,8 @@ function InterviewResults({
             <span className={styles.scoreOutOf}>/100</span>
           </div>
           <p className={styles.closingSummary}>{closing.summary}</p>
+
+          <InterviewRadar evaluations={evaluations} />
 
           <FeedbackList icon="check" iconClass={styles.strengthIcon} title="Lo que sostuviste bien" items={closing.strengths} empty="No encontramos un patrón positivo que se repita a lo largo de la entrevista." />
           <FeedbackList icon="alert" iconClass={styles.improvementIcon} title="Lo que se repite y conviene corregir" items={closing.improvements} empty="No hay problemas de fondo que se repitan." />
