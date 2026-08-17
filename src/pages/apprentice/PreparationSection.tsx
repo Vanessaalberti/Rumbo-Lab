@@ -6,16 +6,24 @@ import { cx } from '@/utils/classNames';
 import screen from '@/app/layouts/appShell.module.css';
 import styles from './PendingSection.module.css';
 
-/**
- * Herramientas de Preparación.
- */
-const TOOLS: Array<{
+interface Tool {
   icon: IconName;
   name: string;
   text: string;
   tone: 'brand' | 'teal' | 'amber';
+  /** Sin ruta, la herramienta todavía no existe: se muestra como "Próximamente". */
   href?: string;
-}> = [
+}
+
+/**
+ * Herramientas de Preparación, en su orden temático.
+ *
+ * El orden de la pantalla no es este: las disponibles van primero (ver
+ * `sortByAvailability`). Esta lista mantiene el agrupamiento por tema para
+ * que se lea bien al editarla, y desbloquear una herramienta es sólo
+ * agregarle su `href` — sube sola.
+ */
+const TOOLS: Tool[] = [
   {
     icon: 'document',
     name: 'Comparar tu CV con una oferta',
@@ -47,6 +55,7 @@ const TOOLS: Array<{
     name: 'Tester ATS',
     text: 'Ver si tu CV pasa los filtros automáticos que usan las empresas antes de que lo lea una persona.',
     tone: 'teal',
+    href: ROUTES.myRumboAtsTester,
   },
   {
     icon: 'portfolio',
@@ -56,7 +65,20 @@ const TOOLS: Array<{
   },
 ];
 
+/**
+ * Lo que ya se puede usar, primero; lo que falta, después.
+ *
+ * `sort` es estable en JavaScript, así que dentro de cada grupo se conserva
+ * el orden temático en que están declaradas — no hay una segunda lista que
+ * mantener sincronizada.
+ */
+function sortByAvailability(tools: readonly Tool[]): Tool[] {
+  return [...tools].sort((a, b) => Number(Boolean(b.href)) - Number(Boolean(a.href)));
+}
+
 export function PreparationSection() {
+  const tools = sortByAvailability(TOOLS);
+
   return (
     <>
       <div className={screen.header}>
@@ -67,7 +89,7 @@ export function PreparationSection() {
       </div>
 
       <div className={styles.tools}>
-        {TOOLS.map((tool) => {
+        {tools.map((tool) => {
           const card = (
             <Card
               padding="lg"

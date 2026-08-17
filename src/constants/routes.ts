@@ -38,6 +38,7 @@ export const ROUTES = {
   /** Herramientas de Preparación con algo construido detrás; ver `PreparationSection`. */
   myRumboCvMatch: '/mi-rumbo/preparacion/comparar-cv',
   myRumboOratoria: '/mi-rumbo/preparacion/oratoria',
+  myRumboAtsTester: '/mi-rumbo/preparacion/tester-ats',
   mentorPanel: '/panel-mentor',
   /** Ajustes de la cuenta — no del perfil de Aprendiz, que vive en Mi Rumbo. */
   settings: '/configuracion',

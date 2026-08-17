@@ -11,6 +11,7 @@ import { CreateSpacePage, SignInPage } from '@/pages/authentication';
 import { ChooseExperiencePage } from '@/pages/experience';
 import {
   ApplicationsSection,
+  AtsTesterSection,
   CvMatchSection,
   CvsSection,
   EvidencesSection,
@@ -69,6 +70,7 @@ export function AppRouter() {
                 <Route path="preparacion" element={<PreparationSection />} />
                 <Route path="preparacion/comparar-cv" element={<CvMatchSection />} />
                 <Route path="preparacion/oratoria" element={<OratoriaSection />} />
+                <Route path="preparacion/tester-ats" element={<AtsTesterSection />} />
                 <Route path="feedback" element={<FeedbackSection />} />
                 <Route path="evidencias" element={<EvidencesSection />} />
               </Route>
