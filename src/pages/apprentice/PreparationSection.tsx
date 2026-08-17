@@ -40,9 +40,10 @@ const TOOLS: Tool[] = [
   },
   {
     icon: 'mentorship',
-    name: 'Practicar respuestas de entrevista',
-    text: 'Responder preguntas típicas del puesto y revisar lo que contestaste.',
+    name: 'Práctica de entrevista',
+    text: 'Una entrevista simulada con preguntas armadas desde tu CV y una oferta concreta, con devolución al final.',
     tone: 'amber',
+    href: ROUTES.myRumboEntrevista,
   },
   {
     icon: 'pencil',

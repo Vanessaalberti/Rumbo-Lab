@@ -9,3 +9,4 @@ export { PreparationSection } from './PreparationSection';
 export { CvMatchSection } from './preparacion/CvMatchSection';
 export { OratoriaSection } from './preparacion/OratoriaSection';
 export { AtsTesterSection } from './preparacion/AtsTesterSection';
+export { EntrevistaSection } from './preparacion/EntrevistaSection';

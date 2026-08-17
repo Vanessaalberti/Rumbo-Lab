@@ -14,6 +14,7 @@ import {
   AtsTesterSection,
   CvMatchSection,
   CvsSection,
+  EntrevistaSection,
   EvidencesSection,
   GoalsSection,
   OratoriaSection,
@@ -71,6 +72,7 @@ export function AppRouter() {
                 <Route path="preparacion/comparar-cv" element={<CvMatchSection />} />
                 <Route path="preparacion/oratoria" element={<OratoriaSection />} />
                 <Route path="preparacion/tester-ats" element={<AtsTesterSection />} />
+                <Route path="preparacion/entrevista" element={<EntrevistaSection />} />
                 <Route path="feedback" element={<FeedbackSection />} />
                 <Route path="evidencias" element={<EvidencesSection />} />
               </Route>
