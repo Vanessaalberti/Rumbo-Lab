@@ -5,11 +5,34 @@ export type RecorderStatus = 'idle' | 'requesting' | 'recording' | 'paused' | 's
 /**
  * Tope de una grabación cuando quien la usa no dice otra cosa.
  *
- * Es un límite de costo tanto como de forma: Gemini cobra el audio por
- * duración, así que cada segundo grabado se paga. "Práctica de entrevista"
- * pide un tope más corto — ver `ENTREVISTA_MAX_ANSWER_SECONDS`.
+ * Es un límite de costo tanto como de forma: cada segundo grabado se transcribe
+ * y se analiza. "Práctica de entrevista" pide un tope más corto.
  */
 const DEFAULT_MAX_RECORDING_SECONDS = 180;
+
+/**
+ * Cuántas barras tiene el medidor de voz. Es historia, no el instante: si sólo
+ * se mostrara el nivel actual, un micrófono que se corta un segundo pasaría
+ * desapercibido.
+ */
+const LEVEL_BARS = 32;
+
+/** Cada cuánto se agrega una barra. 70 ms ≈ 14 por segundo: se ve fluido sin
+    hacer que React vuelva a dibujar en cada cuadro de animación. */
+const LEVEL_STEP_MS = 70;
+
+/**
+ * Desde qué nivel se considera que entró voz, y cuánto tiene que sostenerse.
+ *
+ * El umbral es deliberadamente bajo. No está para juzgar si se habló fuerte:
+ * está para distinguir "hay señal" de "silencio digital", que es lo que llega
+ * cuando el micrófono está desconectado o el navegador tomó el dispositivo
+ * equivocado. Cualquier voz real lo supera de sobra; ponerlo más alto haría que
+ * una grabación buena pero de voz baja quedara marcada como vacía, y ese error
+ * es mucho peor que el contrario.
+ */
+const VOICE_RMS_THRESHOLD = 0.012;
+const VOICE_SUSTAIN_MS = 500;
 
 const PREFERRED_MIME_TYPES = [
   'audio/webm;codecs=opus',
@@ -23,12 +46,29 @@ function pickSupportedMimeType(): string | undefined {
   return PREFERRED_MIME_TYPES.find((type) => MediaRecorder.isTypeSupported(type));
 }
 
+function emptyLevels(): number[] {
+  return new Array(LEVEL_BARS).fill(0);
+}
+
 export interface UseAudioRecorder {
   status: RecorderStatus;
   /** El tope vigente, para poder mostrarlo sin duplicar el número en la vista. */
   maxSeconds: number;
   /** Segundos transcurridos de grabación activa — no cuenta el tiempo en pausa. */
   seconds: number;
+  /**
+   * Nivel del micrófono en los últimos segundos, de 0 a 1, del más viejo al más
+   * nuevo. Se dibuja como barras para que se vea que la voz está entrando.
+   */
+  levels: number[];
+  /**
+   * Si en algún momento de esta grabación entró voz de verdad.
+   *
+   * Existe para un problema concreto: terminar toda una práctica y recién
+   * después descubrir que el micrófono no estaba tomando nada, con la
+   * evaluación hecha sobre un audio vacío y un uso ya gastado.
+   */
+  voiceDetected: boolean;
   audioBlob: Blob | null;
   /** Para reproducir lo grabado antes de mandarlo — `URL.createObjectURL` del blob. */
   audioUrl: string | null;
@@ -53,6 +93,8 @@ export function useAudioRecorder(options: AudioRecorderOptions = {}): UseAudioRe
   const maxSeconds = options.maxSeconds ?? DEFAULT_MAX_RECORDING_SECONDS;
   const [status, setStatus] = useState<RecorderStatus>('idle');
   const [seconds, setSeconds] = useState(0);
+  const [levels, setLevels] = useState<number[]>(emptyLevels);
+  const [voiceDetected, setVoiceDetected] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -64,9 +106,31 @@ export function useAudioRecorder(options: AudioRecorderOptions = {}): UseAudioRe
   const elapsedRef = useRef(0);
   const audioUrlRef = useRef<string | null>(null);
 
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const frameRef = useRef<number | null>(null);
+  const levelsRef = useRef<number[]>(emptyLevels());
+  /* Mientras está en pausa el micrófono sigue abierto: sin esta bandera el
+     medidor seguiría moviéndose y diría que se está grabando algo que no. */
+  const capturingRef = useRef(false);
+  const voiceDetectedRef = useRef(false);
+
   const releaseStream = useCallback(() => {
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
+  }, []);
+
+  const stopMetering = useCallback(() => {
+    capturingRef.current = false;
+    if (frameRef.current !== null) {
+      cancelAnimationFrame(frameRef.current);
+      frameRef.current = null;
+    }
+    void audioContextRef.current?.close().catch(() => {
+      /* Cerrar un contexto ya cerrado no es un problema que valga reportar. */
+    });
+    audioContextRef.current = null;
+    levelsRef.current = emptyLevels();
+    setLevels(levelsRef.current);
   }, []);
 
   const clearTimer = useCallback(() => {
@@ -91,16 +155,77 @@ export function useAudioRecorder(options: AudioRecorderOptions = {}): UseAudioRe
     setAudioUrl(url);
   }, []);
 
+  /**
+   * Lee el micrófono cuadro a cuadro y saca el valor eficaz (RMS) de la onda.
+   *
+   * El analizador se cuelga del mismo `MediaStream` que graba, así que mide
+   * exactamente lo que se está por mandar. No se lo conecta a la salida de
+   * audio a propósito: eso devolvería el micrófono por los parlantes y armaría
+   * un acople.
+   */
+  const startMetering = useCallback((stream: MediaStream) => {
+    const context = new AudioContext();
+    audioContextRef.current = context;
+
+    const analyser = context.createAnalyser();
+    analyser.fftSize = 1024;
+    context.createMediaStreamSource(stream).connect(analyser);
+
+    const muestras = new Uint8Array(analyser.fftSize);
+    let ultimaBarra = 0;
+    let ultimoCuadro = performance.now();
+    let vozSostenidaMs = 0;
+
+    const leer = () => {
+      frameRef.current = requestAnimationFrame(leer);
+
+      const ahora = performance.now();
+      const transcurrido = ahora - ultimoCuadro;
+      ultimoCuadro = ahora;
+      if (!capturingRef.current) return;
+
+      analyser.getByteTimeDomainData(muestras);
+
+      let suma = 0;
+      for (let i = 0; i < muestras.length; i += 1) {
+        const desvio = (muestras[i] - 128) / 128;
+        suma += desvio * desvio;
+      }
+      const rms = Math.sqrt(suma / muestras.length);
+
+      if (rms >= VOICE_RMS_THRESHOLD) {
+        vozSostenidaMs += transcurrido;
+        if (vozSostenidaMs >= VOICE_SUSTAIN_MS && !voiceDetectedRef.current) {
+          voiceDetectedRef.current = true;
+          setVoiceDetected(true);
+        }
+      }
+
+      if (ahora - ultimaBarra >= LEVEL_STEP_MS) {
+        ultimaBarra = ahora;
+        /* La raíz cuadrada abre la parte baja de la escala: sin ella una voz
+           normal apenas movería las barras y el medidor no serviría para nada. */
+        const nivel = Math.min(1, Math.sqrt(rms) * 2.2);
+        levelsRef.current = [...levelsRef.current.slice(1), nivel];
+        setLevels(levelsRef.current);
+      }
+    };
+
+    capturingRef.current = true;
+    frameRef.current = requestAnimationFrame(leer);
+  }, []);
+
   useEffect(() => {
     return () => {
       clearTimer();
+      stopMetering();
       releaseStream();
       if (recorderRef.current && recorderRef.current.state !== 'inactive') {
         recorderRef.current.stop();
       }
       if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
     };
-  }, [clearTimer, releaseStream]);
+  }, [clearTimer, releaseStream, stopMetering]);
 
   const start = useCallback(async () => {
     setErrorMessage(null);
@@ -108,6 +233,8 @@ export function useAudioRecorder(options: AudioRecorderOptions = {}): UseAudioRe
     setAudioUrlTracked(null);
     elapsedRef.current = 0;
     setSeconds(0);
+    voiceDetectedRef.current = false;
+    setVoiceDetected(false);
     setStatus('requesting');
 
     try {
@@ -128,6 +255,7 @@ export function useAudioRecorder(options: AudioRecorderOptions = {}): UseAudioRe
         setAudioUrlTracked(URL.createObjectURL(blob));
         setStatus('stopped');
         clearTimer();
+        stopMetering();
         releaseStream();
       };
 
@@ -135,18 +263,21 @@ export function useAudioRecorder(options: AudioRecorderOptions = {}): UseAudioRe
       recorder.start();
       setStatus('recording');
       startTimer();
+      startMetering(stream);
     } catch {
       setStatus('error');
       setErrorMessage(
         'No pudimos acceder al micrófono. Revisá los permisos del navegador e intentá de nuevo.',
       );
+      stopMetering();
       releaseStream();
     }
-  }, [clearTimer, releaseStream, setAudioUrlTracked, startTimer]);
+  }, [clearTimer, releaseStream, setAudioUrlTracked, startMetering, startTimer, stopMetering]);
 
   const pause = useCallback(() => {
     if (recorderRef.current?.state !== 'recording') return;
     recorderRef.current.pause();
+    capturingRef.current = false;
     clearTimer();
     setStatus('paused');
   }, [clearTimer]);
@@ -154,6 +285,7 @@ export function useAudioRecorder(options: AudioRecorderOptions = {}): UseAudioRe
   const resume = useCallback(() => {
     if (recorderRef.current?.state !== 'paused') return;
     recorderRef.current.resume();
+    capturingRef.current = true;
     startTimer();
     setStatus('recording');
   }, [startTimer]);
@@ -165,16 +297,33 @@ export function useAudioRecorder(options: AudioRecorderOptions = {}): UseAudioRe
 
   const reset = useCallback(() => {
     clearTimer();
+    stopMetering();
     releaseStream();
     setAudioUrlTracked(null);
     chunksRef.current = [];
     recorderRef.current = null;
     elapsedRef.current = 0;
+    voiceDetectedRef.current = false;
+    setVoiceDetected(false);
     setAudioBlob(null);
     setSeconds(0);
     setErrorMessage(null);
     setStatus('idle');
-  }, [clearTimer, releaseStream, setAudioUrlTracked]);
+  }, [clearTimer, releaseStream, setAudioUrlTracked, stopMetering]);
 
-  return { status, maxSeconds, seconds, audioBlob, audioUrl, errorMessage, start, pause, resume, stop, reset };
+  return {
+    status,
+    maxSeconds,
+    seconds,
+    levels,
+    voiceDetected,
+    audioBlob,
+    audioUrl,
+    errorMessage,
+    start,
+    pause,
+    resume,
+    stop,
+    reset,
+  };
 }

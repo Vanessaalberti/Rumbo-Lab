@@ -15,6 +15,7 @@ import {
 } from '@/services/data/preparation/oratoria.service';
 import { cx } from '@/utils/classNames';
 import { ORATORIA_CATEGORIES, type OratoriaCategory } from './oratoriaQuestions';
+import { MicLevelMeter, SilentRecordingNotice } from './MicLevelMeter';
 import { useAudioRecorder } from './useAudioRecorder';
 import { ToolBackLink } from './ToolBackLink';
 import screen from '@/app/layouts/appShell.module.css';
@@ -317,6 +318,13 @@ function RecordingControls({ recorder, analyzing, onSubmit }: RecordingControlsP
           {isPaused ? 'En pausa — tocá el botón para terminar' : 'Tocá el botón para terminar de grabar'}
         </span>
 
+        <MicLevelMeter
+          levels={recorder.levels}
+          paused={isPaused}
+          voiceDetected={recorder.voiceDetected}
+          seconds={recorder.seconds}
+        />
+
         <div className={styles.recordControls}>
           <button
             type="button"
@@ -346,11 +354,17 @@ function RecordingControls({ recorder, analyzing, onSubmit }: RecordingControlsP
         <audio className={styles.audioPreview} controls src={recorder.audioUrl} />
       )}
 
+      {!recorder.voiceDetected && <SilentRecordingNotice />}
+
       <div className={styles.reviewActions}>
         <Button size="sm" variant="ghost" onClick={() => recorder.start()} disabled={analyzing}>
           Grabar de nuevo
         </Button>
-        <Button size="sm" onClick={onSubmit} disabled={analyzing}>
+        <Button
+          size="sm"
+          onClick={onSubmit}
+          disabled={analyzing || !recorder.voiceDetected}
+        >
           {analyzing ? 'Analizando…' : 'Analizar respuesta'}
         </Button>
       </div>

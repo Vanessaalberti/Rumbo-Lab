@@ -19,6 +19,7 @@ import {
 } from '@/services/data/preparation/entrevista.service';
 import { cx } from '@/utils/classNames';
 import { composeInterview, QUESTION_KIND_LABEL } from './interviewQuestions';
+import { MicLevelMeter, SilentRecordingNotice } from './MicLevelMeter';
 import { useAudioRecorder } from './useAudioRecorder';
 import { ToolBackLink } from './ToolBackLink';
 import screen from '@/app/layouts/appShell.module.css';
@@ -532,11 +533,12 @@ function InterviewStep({ index, total, question, recorder, onNext, onSkip }: Int
         {recorder.status === 'stopped' ? (
           <>
             {recorder.audioUrl && <audio className={styles.audioPreview} controls src={recorder.audioUrl} />}
+            {!recorder.voiceDetected && <SilentRecordingNotice />}
             <div className={styles.reviewActions}>
               <Button size="sm" variant="ghost" onClick={() => recorder.start()}>
                 Grabar de nuevo
               </Button>
-              <Button size="sm" onClick={onNext}>
+              <Button size="sm" onClick={onNext} disabled={!recorder.voiceDetected}>
                 {index + 1 < total ? 'Enviar y seguir' : 'Enviar y terminar'}
               </Button>
             </div>
@@ -571,6 +573,12 @@ function InterviewStep({ index, total, question, recorder, onNext, onSkip }: Int
                 <span className={styles.recordHint}>
                   {isPaused ? 'En pausa — tocá el botón para terminar' : 'Tocá el botón cuando termines'}
                 </span>
+                <MicLevelMeter
+                  levels={recorder.levels}
+                  paused={isPaused}
+                  voiceDetected={recorder.voiceDetected}
+                  seconds={recorder.seconds}
+                />
                 <div className={styles.recordControls}>
                   <button
                     type="button"
@@ -599,7 +607,11 @@ function InterviewStep({ index, total, question, recorder, onNext, onSkip }: Int
         )}
       </div>
 
-      {recorder.status !== 'stopped' && !isRecording && (
+      {/* También cuando la grabación quedó muda: ahí no se puede enviar, y sin
+          esta salida la única opción sería volver a grabar con el mismo
+          micrófono que no anda. */}
+      {((recorder.status !== 'stopped' && !isRecording) ||
+        (recorder.status === 'stopped' && !recorder.voiceDetected)) && (
         <button type="button" className={styles.skipLink} onClick={onSkip}>
           No sé qué responder, saltear esta pregunta
         </button>

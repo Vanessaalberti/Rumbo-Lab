@@ -1,0 +1,66 @@
+/* Medidor de voz — ver MicLevelMeter.tsx */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.meter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 44px;
+  width: 100%;
+  max-width: 280px;
+}
+
+.bar {
+  flex: 1;
+  min-width: 3px;
+  max-width: 6px;
+  border-radius: var(--radius-full);
+  background-color: var(--brand);
+  /* Igual de rápido que el paso con que llegan los datos: más lento arrastra
+     el nivel y deja de reflejar lo que está entrando ahora. */
+  transition: height 70ms linear, background-color var(--duration-fast) var(--ease-standard);
+}
+
+/* En pausa el micrófono sigue abierto pero no se está grabando. Las barras
+   quedan quietas y apagadas para que no parezca que sí. */
+.meterPaused .bar {
+  background-color: var(--text-soft);
+  opacity: 0.35;
+}
+
+.meterSilent .bar {
+  background-color: var(--amber-strong);
+  opacity: 0.55;
+}
+
+.silentHint {
+  max-width: 44ch;
+  text-align: center;
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--amber-strong);
+}
+
+.silentNotice {
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--amber-tint);
+  border: 1px solid var(--amber-strong);
+  border-radius: var(--radius-md);
+  color: var(--amber-strong);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar {
+    transition: none;
+  }
+}
