@@ -40,6 +40,9 @@ export const ROUTES = {
   myRumboOratoria: '/mi-rumbo/preparacion/oratoria',
   myRumboAtsTester: '/mi-rumbo/preparacion/tester-ats',
   myRumboEntrevista: '/mi-rumbo/preparacion/entrevista',
+  myRumboLinkedin: '/mi-rumbo/preparacion/linkedin',
+  /** Planes y cupos de las herramientas de IA. Se llega desde Preparación. */
+  myRumboPlans: '/mi-rumbo/planes',
   mentorPanel: '/panel-mentor',
   /** Ajustes de la cuenta — no del perfil de Aprendiz, que vive en Mi Rumbo. */
   settings: '/configuracion',

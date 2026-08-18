@@ -379,6 +379,16 @@ button.recordButton:disabled {
   color: var(--text);
 }
 
+/*
+ * El tope, al lado del reloj y en menor jerarquía: informa sin competir con
+ * el número que de verdad importa mientras se habla.
+ */
+.recordLimit {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-faint);
+}
+
 .recordControls {
   display: flex;
   gap: var(--space-3);
@@ -506,6 +516,24 @@ button.recordButton:disabled {
   flex-direction: column;
   align-items: center;
   gap: var(--space-4);
+}
+
+/*
+ * Fallo del envío final. Las seis respuestas viajan juntas, así que un error
+ * acá se llevaría la entrevista entera — por eso lo primero que se dice es
+ * que las grabaciones siguen estando.
+ */
+.retryHint {
+  font-size: var(--text-sm);
+  color: var(--text-soft);
+  text-align: center;
+}
+
+.retryActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
 }
 
 /* --- Radar del conjunto ------------------------------------------------------ */

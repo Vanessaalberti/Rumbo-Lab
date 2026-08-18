@@ -7,6 +7,7 @@ import { RadarChart, type RadarAxis } from '@/components/ui/RadarChart';
 import { LoadingState } from '@/components/ui/LoadingState';
 import {
   analyzeOratoriaRecording,
+  ORATORIA_CRITERIA,
   type OratoriaResult,
 } from '@/services/data/preparation/oratoria.service';
 import { cx } from '@/utils/classNames';
@@ -216,12 +217,17 @@ export function OratoriaSection() {
 }
 
 /** Consejos generales, no atados a ninguna pregunta puntual. */
+/*
+ * Los consejos apuntan a lo mismo que ahora mide la evaluación: no alcanza
+ * con hablar bien, hay que sostener lo que se afirma. El primero es el que
+ * más importa y por eso va primero.
+ */
 const ORATORIA_TIPS: readonly string[] = [
-  'Usá ejemplos concretos: una situación real pesa más que una respuesta genérica.',
-  'Organizá tu respuesta en una estructura simple — qué pasó, qué hiciste, qué resultó.',
-  'No hace falta una respuesta larga: mejor pocas ideas bien desarrolladas.',
+  'No alcanza con decir "soy responsable": explicá cómo se nota eso en lo que hacés.',
+  'Mejor una sola característica bien explicada que cuatro enumeradas.',
+  'Cuando la pregunta pide una situación, contá el caso: qué pasó, qué hiciste, cómo terminó.',
+  'No hace falta una respuesta larga. Una respuesta corta y desarrollada vale más que una extensa y vacía.',
   'Elegí un lugar tranquilo, sin ruido de fondo, antes de grabar.',
-  'Tomate unos segundos para pensar antes de arrancar a hablar.',
   'Las muletillas ocasionales no son un problema — hablá con naturalidad.',
 ];
 
@@ -347,16 +353,16 @@ function scoreTone(value: number): 'brand' | 'attention' | 'progress' {
   return 'progress';
 }
 
-/** Mismo orden que los valores que se le pasan al radar. */
-const ORATORIA_AXES: RadarAxis[] = [
-  { id: 'answerQuality', label: 'Respuesta' },
-  { id: 'clarity', label: 'Claridad' },
-  { id: 'structure', label: 'Estructura' },
-  { id: 'fillerWords', label: 'Muletillas' },
-];
+/** Mismo orden que `ORATORIA_CRITERIA`: de mayor a menor peso. */
+const ORATORIA_AXES: RadarAxis[] = ORATORIA_CRITERIA.map((criterion) => ({
+  id: criterion.id,
+  label: criterion.short,
+}));
 
 function AnalysisResult({ result }: { result: OratoriaResult }) {
   const [showTranscript, setShowTranscript] = useState(false);
+
+  const values = ORATORIA_CRITERIA.map((criterion) => result.scores[criterion.id]);
 
   return (
     <div className={styles.analysis}>
@@ -368,58 +374,61 @@ function AnalysisResult({ result }: { result: OratoriaResult }) {
         </p>
       )}
 
-      {/* El radar muestra la forma del resultado de un vistazo; las barras de
-          abajo siguen siendo las que dan el número exacto de cada dimensión. */}
+      {/* El puntaje global va primero y es un promedio ponderado: desarrollo,
+          pertinencia y coherencia pesan más que la forma de hablar. */}
+      <ProgressBar
+        value={result.overallScore}
+        label="Calidad de la respuesta"
+        tone={scoreTone(result.overallScore)}
+        size="md"
+      />
+
+      {result.summary && <p className={styles.summary}>{result.summary}</p>}
+
+      {/* El radar muestra la forma del resultado de un vistazo. Lo que hay que
+          poder leer ahí es el desbalance típico: alto en cómo hablás, bajo en
+          qué dijiste. */}
       <RadarChart
         axes={ORATORIA_AXES}
-        series={[
-          {
-            id: 'resultado',
-            label: 'Esta respuesta',
-            values: [
-              result.scores.answerQuality,
-              result.scores.clarity,
-              result.scores.structure,
-              result.scores.fillerWordsScore,
-            ],
-          },
-        ]}
-        ariaLabel={`Resultado de la respuesta: responde la pregunta ${result.scores.answerQuality} de 100, claridad ${result.scores.clarity}, estructura ${result.scores.structure}, uso de muletillas ${result.scores.fillerWordsScore}.`}
+        series={[{ id: 'resultado', label: 'Esta respuesta', values }]}
+        ariaLabel={ORATORIA_CRITERIA.map(
+          (criterion, index) => `${criterion.label} ${values[index]} de 100`,
+        ).join(', ')}
       />
 
       <div className={styles.scores}>
-        <ProgressBar
-          value={result.scores.answerQuality}
-          label="Respuesta a la pregunta"
-          size="sm"
-          tone={scoreTone(result.scores.answerQuality)}
-        />
-        <ProgressBar
-          value={result.scores.clarity}
-          label="Claridad"
-          size="sm"
-          tone={scoreTone(result.scores.clarity)}
-        />
-        <ProgressBar
-          value={result.scores.structure}
-          label="Estructura"
-          size="sm"
-          tone={scoreTone(result.scores.structure)}
-        />
-        <ProgressBar
-          value={result.scores.fillerWordsScore}
-          label="Uso de muletillas"
-          size="sm"
-          tone={scoreTone(result.scores.fillerWordsScore)}
-        />
+        {ORATORIA_CRITERIA.map((criterion) => (
+          <div key={criterion.id} className={styles.criterion}>
+            <ProgressBar
+              value={result.scores[criterion.id]}
+              label={criterion.label}
+              size="sm"
+              tone={scoreTone(result.scores[criterion.id])}
+            />
+            <p className={styles.criterionHint}>
+              {criterion.hint}
+              {criterion.major && <span className={styles.criterionWeight}> · pesa más</span>}
+            </p>
+          </div>
+        ))}
       </div>
+
+      {/* Qué se le exigió a esta respuesta. Sin esto, alguien con una pregunta
+          breve no entiende por qué le piden desarrollo, y alguien con una de
+          situación no entiende por qué le piden tanto. */}
+      <p className={styles.demand}>
+        <Icon name="compass" size={14} className={styles.demandIcon} />
+        {result.demand === 'desarrollada'
+          ? 'Esta pregunta pide una situación concreta, así que se evaluó esperando contexto, qué hiciste y cómo terminó.'
+          : 'Esta pregunta admite una respuesta breve, pero igual se espera que expliques lo que afirmás.'}
+      </p>
 
       <ResultList
         icon="check"
         iconClassName={styles.strengthIcon}
         title="Lo que hiciste bien"
         items={result.strengths}
-        empty="No encontramos puntos destacables en esta respuesta."
+        empty="No encontramos nada puntual para destacar en esta respuesta."
       />
 
       <ResultList
@@ -430,13 +439,25 @@ function AnalysisResult({ result }: { result: OratoriaResult }) {
         empty="No hay sugerencias puntuales para esta respuesta."
       />
 
-      {result.fillerWords.length > 0 && (
+      {result.speechNotes.length > 0 && (
+        <ResultList
+          icon="feedback"
+          iconClassName={styles.speechIcon}
+          title="Cómo sonó al hablar"
+          items={result.speechNotes}
+          empty=""
+        />
+      )}
+
+      {/* Sólo aparecen las muletillas de verdad. Un "bueno" al empezar es
+          habla normal y no se muestra como problema. */}
+      {result.fillers.length > 0 && (
         <div className={styles.fillerWords}>
-          <p className={styles.listTitle}>Muletillas detectadas</p>
+          <p className={styles.listTitle}>Muletillas que se repitieron</p>
           <ul className={styles.fillerWordsList}>
-            {result.fillerWords.map((item) => (
-              <li key={item.word} className={styles.fillerWordItem}>
-                <span className={styles.fillerWordText}>"{item.word}"</span>
+            {result.fillers.map((item) => (
+              <li key={item.text} className={styles.fillerWordItem}>
+                <span className={styles.fillerWordText}>"{item.text}"</span>
                 <span className={styles.fillerWordCount}>
                   {item.count} {item.count === 1 ? 'vez' : 'veces'}
                 </span>

@@ -1,0 +1,165 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* Mismo tratamiento que el "volver" de las herramientas de Preparación, que
+   es de donde se llega. */
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: var(--space-2);
+  margin-bottom: calc(var(--space-6) * -1 + var(--space-2));
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-soft);
+  transition: var(--transition-colors);
+}
+
+.backLink:hover,
+.backLink:focus-visible {
+  color: var(--text);
+}
+
+.backLinkIcon {
+  transform: rotate(180deg);
+  flex-shrink: 0;
+}
+
+/*
+ * Dos tarjetas de igual ancho, que no se estiran a lo ancho de la pantalla:
+ * una comparación se lee mejor cuando las dos columnas están cerca.
+ */
+.plans {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 380px));
+  gap: var(--space-5);
+  align-items: stretch;
+}
+
+@media (max-width: 680px) {
+  .plans {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.plan {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  height: 100%;
+}
+
+/* El plan pago se destaca con el color de marca, no con tamaño: agrandarlo
+   descoloca la comparación, que es para lo que está la pantalla. */
+.planHighlighted {
+  border-color: var(--brand);
+}
+
+.planHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.planTitle {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--text);
+}
+
+.planBadge {
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background-color: var(--bg-alt);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-medium);
+  color: var(--text-faint);
+}
+
+.planPrice {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.planPriceNote {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-faint);
+}
+
+.planDescription {
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--text-soft);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.planTools {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.planTool {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--text-soft);
+}
+
+.planToolIcon {
+  color: var(--success);
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+/* El número es el dato que se compara entre los dos planes: va destacado. */
+.planToolCount {
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.planToolWindow {
+  color: var(--text-faint);
+}
+
+/* Empuja la acción al pie aunque las dos tarjetas tengan distinto contenido. */
+.planAction {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: auto;
+  padding-top: var(--space-4);
+}
+
+.planActionNote {
+  font-size: var(--text-2xs);
+  line-height: var(--leading-relaxed);
+  color: var(--text-faint);
+}
+
+.note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  line-height: var(--leading-relaxed);
+  color: var(--text-soft);
+}
+
+.noteIcon {
+  color: var(--text-faint);
+  flex-shrink: 0;
+  margin-top: 2px;
+}

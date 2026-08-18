@@ -2,7 +2,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 export type RecorderStatus = 'idle' | 'requesting' | 'recording' | 'paused' | 'stopped' | 'error';
 
-const MAX_RECORDING_SECONDS = 180;
+/**
+ * Tope de una grabación cuando quien la usa no dice otra cosa.
+ *
+ * Es un límite de costo tanto como de forma: Gemini cobra el audio por
+ * duración, así que cada segundo grabado se paga. "Práctica de entrevista"
+ * pide un tope más corto — ver `ENTREVISTA_MAX_ANSWER_SECONDS`.
+ */
+const DEFAULT_MAX_RECORDING_SECONDS = 180;
 
 const PREFERRED_MIME_TYPES = [
   'audio/webm;codecs=opus',
@@ -18,6 +25,8 @@ function pickSupportedMimeType(): string | undefined {
 
 export interface UseAudioRecorder {
   status: RecorderStatus;
+  /** El tope vigente, para poder mostrarlo sin duplicar el número en la vista. */
+  maxSeconds: number;
   /** Segundos transcurridos de grabación activa — no cuenta el tiempo en pausa. */
   seconds: number;
   audioBlob: Blob | null;
@@ -35,7 +44,13 @@ export interface UseAudioRecorder {
   reset: () => void;
 }
 
-export function useAudioRecorder(): UseAudioRecorder {
+export interface AudioRecorderOptions {
+  /** Cuánto puede durar la grabación antes de cortarse sola. */
+  maxSeconds?: number;
+}
+
+export function useAudioRecorder(options: AudioRecorderOptions = {}): UseAudioRecorder {
+  const maxSeconds = options.maxSeconds ?? DEFAULT_MAX_RECORDING_SECONDS;
   const [status, setStatus] = useState<RecorderStatus>('idle');
   const [seconds, setSeconds] = useState(0);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
@@ -66,9 +81,9 @@ export function useAudioRecorder(): UseAudioRecorder {
     timerRef.current = setInterval(() => {
       elapsedRef.current += 1;
       setSeconds(elapsedRef.current);
-      if (elapsedRef.current >= MAX_RECORDING_SECONDS) recorderRef.current?.stop();
+      if (elapsedRef.current >= maxSeconds) recorderRef.current?.stop();
     }, 1000);
-  }, [clearTimer]);
+  }, [clearTimer, maxSeconds]);
 
   const setAudioUrlTracked = useCallback((url: string | null) => {
     if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
@@ -161,5 +176,5 @@ export function useAudioRecorder(): UseAudioRecorder {
     setStatus('idle');
   }, [clearTimer, releaseStream, setAudioUrlTracked]);
 
-  return { status, seconds, audioBlob, audioUrl, errorMessage, start, pause, resume, stop, reset };
+  return { status, maxSeconds, seconds, audioBlob, audioUrl, errorMessage, start, pause, resume, stop, reset };
 }

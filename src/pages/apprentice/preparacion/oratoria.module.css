@@ -470,6 +470,71 @@ button.recordButton:disabled {
   color: var(--amber-strong);
 }
 
+/*
+ * El resumen honesto, justo debajo del puntaje global. Va antes del radar
+ * porque una frase se lee más rápido que un gráfico, y es lo que le da
+ * sentido al número de arriba.
+ */
+.summary {
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--text-soft);
+}
+
+/*
+ * Cada criterio con su barra y su explicación.
+ *
+ * La línea de abajo no es decorativa: "coherencia" y "cohesión" suenan casi
+ * igual, y sin una frase que las distinga dos barras con nombres parecidos no
+ * le dicen nada a nadie.
+ */
+.criterion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.criterionHint {
+  font-size: var(--text-2xs);
+  line-height: var(--leading-relaxed);
+  color: var(--text-faint);
+}
+
+/* Marca los tres que más deciden el puntaje global. */
+.criterionWeight {
+  font-weight: var(--weight-semibold);
+  color: var(--text-soft);
+}
+
+/*
+ * Qué se le exigió a esta respuesta según el tipo de pregunta. Sin esto,
+ * alguien con una pregunta breve no entiende por qué igual le piden
+ * desarrollo.
+ */
+.demand {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-alt);
+  font-size: var(--text-xs);
+  line-height: var(--leading-relaxed);
+  color: var(--text-soft);
+}
+
+.demandIcon {
+  color: var(--text-faint);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.speechIcon {
+  color: var(--amber-strong);
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
 .scores {
   display: flex;
   flex-direction: column;

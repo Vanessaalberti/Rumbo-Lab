@@ -85,6 +85,23 @@
   width: 100%;
 }
 
+/*
+ * En mobile la grilla baja a una sola columna, y como la pista tiene tope de
+ * 300px la tarjeta queda pegada a la izquierda con un vacío a la derecha. Ese
+ * espacio sobrante es deliberado en pantallas anchas —la grilla está pensada
+ * para seis u ocho herramientas— pero con una sola columna no anticipa nada:
+ * es un margen desparejo.
+ *
+ * 560px es donde deja de entrar la segunda columna (2 × 240px + el gap). Por
+ * encima de ese ancho las pistas llenan la fila y `center` no cambia nada, así
+ * que el corte no tiene que ser exacto.
+ */
+@media (max-width: 560px) {
+  .tools {
+    justify-content: center;
+  }
+}
+
 /* El link no puede llevar el estilo de tarjeta —`Card` ya se lo pone al hijo
    directo— pero sí necesita anular el subrayado y el color propios de un
    enlace, para que la tarjeta de adentro se vea igual sea `<a>` o `<div>`. */
@@ -180,4 +197,99 @@
   font-size: var(--text-xs);
   font-weight: var(--weight-semibold);
   box-shadow: var(--shadow-md);
+}
+
+/* --- Preparación: cuántos usos de IA quedan ------------------------------ */
+
+/*
+ * Va arriba de las tarjetas y no dentro de cada herramienta: el saldo es uno
+ * solo y compartido, y verlo antes de elegir es justamente el punto — que
+ * nadie escriba seis mil caracteres para enterarse recién al final.
+ */
+/*
+ * El aviso y el botón, uno al lado del otro. `flex-start` en vez de estirar:
+ * un aviso del ancho de la pantalla dejaba la etiqueta del plan en la otra
+ * punta, tan lejos del texto que no se leía como parte de lo mismo.
+ */
+.quotaRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.credits {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background-color: var(--surface);
+}
+
+.creditsIcon {
+  color: var(--text-soft);
+  flex-shrink: 0;
+}
+
+.creditsText {
+  min-width: 0;
+  font-size: var(--text-sm);
+  color: var(--text-soft);
+}
+
+.creditsCount {
+  font-weight: var(--weight-semibold);
+  color: var(--text);
+}
+
+.creditsRefill {
+  color: var(--text-soft);
+}
+
+/* La regla del cupo, en segunda línea: se lee una vez y después ya se sabe. */
+.creditsNote {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--text-2xs);
+  color: var(--text-faint);
+}
+
+.creditsPlan {
+  flex-shrink: 0;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background-color: var(--bg-alt);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-medium);
+  color: var(--text-faint);
+}
+
+/*
+ * El cupo, dentro de la tarjeta: verlo antes de entrar evita el peor momento
+ * posible para enterarse, que es con el trabajo ya hecho.
+ *
+ * Es sólo un número ("3/5"), así que se compone como un dato y no como una
+ * frase: tabular para que no baile entre tarjetas, y con algo más de cuerpo
+ * que el resto de la letra chica porque es lo único que dice.
+ */
+.toolCost {
+  margin-top: auto;
+  padding-top: var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-soft);
+}
+
+.toolCostFree {
+  color: var(--success);
+}
+
+/* Agotado no es un error: se renueva en la próxima hora en punto. */
+.toolCostEmpty {
+  color: var(--warning-strong);
+  font-weight: var(--weight-semibold);
 }

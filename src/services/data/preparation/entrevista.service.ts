@@ -33,8 +33,12 @@ export interface AnswerScores {
   relevance: number;
 }
 
+/**
+ * La evaluación de una respuesta. **Sin la transcripción**: esa llega en el
+ * paso anterior y la pantalla ya la tiene, así que el backend no la devuelve
+ * de nuevo.
+ */
 export interface AnswerEvaluation {
-  transcript: string;
   answeredQuestion: boolean;
   usedStar: boolean;
   starFeedback: string;
@@ -49,6 +53,19 @@ export interface InterviewClosing {
   strengths: string[];
   improvements: string[];
   nextSteps: string[];
+}
+
+export interface InterviewReview {
+  /** Una por pregunta enviada, en el mismo orden. */
+  answers: AnswerEvaluation[];
+  closing: InterviewClosing;
+}
+
+/** Una respuesta ya transcripta, lista para que la evalúen. */
+export interface TranscribedAnswer {
+  question: string;
+  kind: string;
+  transcript: string;
 }
 
 /** Paso 1 — genera las preguntas atadas al CV y a la oferta. */
@@ -69,25 +86,30 @@ export function prepareInterviewWithUpload(
   return httpClient.postForm('/preparation/entrevista/preguntas', form);
 }
 
-/** Paso 2 — una llamada por respuesta grabada. */
-export function evaluateInterviewAnswer(params: {
-  audio: Blob;
-  question: string;
-  kind: string;
-  roleSummary: string;
-}): Promise<AsyncState<{ evaluation: AnswerEvaluation }>> {
+/**
+ * Paso 2 — todas las grabaciones juntas, en una sola llamada.
+ *
+ * El orden es el contrato: la transcripción número tres corresponde a la
+ * grabación número tres. Las preguntas viajan sólo como contexto.
+ *
+ * Una pregunta salteada entra igual, con un blob vacío, para no correr un
+ * lugar a todas las que siguen.
+ */
+export function transcribeInterviewAnswers(
+  recordings: ReadonlyArray<{ audio: Blob; question: string }>,
+): Promise<AsyncState<{ transcripts: string[] }>> {
   const form = new FormData();
-  form.append('audio', params.audio, 'respuesta');
-  form.append('question', params.question);
-  form.append('kind', params.kind);
-  form.append('roleSummary', params.roleSummary);
-  return httpClient.postForm('/preparation/entrevista/respuesta', form);
+  recordings.forEach((recording, index) => {
+    form.append('audio', recording.audio, `respuesta-${index + 1}`);
+    form.append('questions', recording.question);
+  });
+  return httpClient.postForm('/preparation/entrevista/transcripciones', form);
 }
 
-/** Paso 3 — la devolución final, a partir de lo ya evaluado. */
-export function closeInterview(
+/** Paso 3 — evaluación de cada respuesta más la devolución final, de una. */
+export function reviewInterview(
   roleSummary: string,
-  answers: string,
-): Promise<AsyncState<{ closing: InterviewClosing }>> {
-  return httpClient.post('/preparation/entrevista/cierre', { roleSummary, answers });
+  answers: readonly TranscribedAnswer[],
+): Promise<AsyncState<{ review: InterviewReview }>> {
+  return httpClient.post('/preparation/entrevista/revision', { roleSummary, answers });
 }

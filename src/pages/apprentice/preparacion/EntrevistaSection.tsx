@@ -9,10 +9,10 @@ import { LoadingState } from '@/components/ui/LoadingState';
 import { TextLink } from '@/components/ui/TextLink';
 import { ROUTES } from '@/constants/routes';
 import {
-  closeInterview,
-  evaluateInterviewAnswer,
   prepareInterviewWithCv,
   prepareInterviewWithUpload,
+  reviewInterview,
+  transcribeInterviewAnswers,
   type AnswerEvaluation,
   type InterviewClosing,
   type InterviewQuestion,
@@ -33,12 +33,24 @@ const MIN_JOB_TEXT_LENGTH = 100;
 
 type CvSource = 'saved' | 'upload';
 
-/** Una pregunta de la entrevista, con la evaluación que llega en segundo plano. */
+/**
+ * Una pregunta de la entrevista y todo lo que se le va acumulando.
+ *
+ * `audio` se conserva hasta que la devolución llega bien. Es lo que permite
+ * reintentar sin volver a grabar cuando el envío falla: las seis respuestas
+ * viajan juntas en una sola llamada, así que un error se llevaría la
+ * entrevista entera si el navegador ya hubiese soltado las grabaciones.
+ */
 interface AnsweredQuestion {
   question: InterviewQuestion;
+  /** `null` si se salteó la pregunta. */
+  audio: Blob | null;
+  transcript: string;
   evaluation: AnswerEvaluation | null;
-  failed: boolean;
 }
+
+/** Cuánto puede durar una respuesta. Ver `ENTREVISTA_MAX_ANSWER_SECONDS`. */
+const MAX_ANSWER_SECONDS = 90;
 
 /** Los pasos reales de cada espera, no una secuencia decorativa. */
 const PREPARING_STEPS = [
@@ -48,7 +60,9 @@ const PREPARING_STEPS = [
 ];
 
 const CLOSING_STEPS = [
-  'Terminando de evaluar las últimas respuestas…',
+  'Escuchando tus respuestas…',
+  'Pasándolas a texto…',
+  'Evaluando una por una…',
   'Buscando qué se repite a lo largo de la entrevista…',
   'Escribiendo la devolución final…',
 ];
@@ -58,12 +72,15 @@ type Phase =
   | { name: 'preparing' }
   | { name: 'interview' }
   | { name: 'closing' }
+  /* La entrevista terminó pero el envío falló. Las grabaciones siguen en
+     memoria, así que se puede reintentar sin volver a grabar nada. */
+  | { name: 'closingFailed'; message: string }
   | { name: 'results'; closing: InterviewClosing | null };
 
 export function EntrevistaSection() {
   const { dashboard } = useOutletContext<ApprenticeShellContext>();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const recorder = useAudioRecorder();
+  const recorder = useAudioRecorder({ maxSeconds: MAX_ANSWER_SECONDS });
 
   const eligibleCvs = dashboard.cvs.filter(
     (cv) => cv.storagePath && cv.mimeType && EXTRACTABLE_MIME_TYPES.has(cv.mimeType),
@@ -80,16 +97,6 @@ export function EntrevistaSection() {
   const [answers, setAnswers] = useState<AnsweredQuestion[]>([]);
   const [current, setCurrent] = useState(0);
 
-  /*
-   * Las evaluaciones se disparan al pasar de pregunta y se resuelven mientras
-   * la persona contesta la siguiente: cuando termina de responder todo, la
-   * mayoría ya están listas y el cierre sale casi de inmediato.
-   *
-   * Cada promesa resuelve **su propio resultado**, no `void`: así el cierre
-   * arma la lista final esperándolas y no leyendo el estado, que en ese
-   * momento todavía podría estar desactualizado.
-   */
-  const pendingEvaluations = useRef<Array<Promise<{ index: number; evaluation: AnswerEvaluation | null }>>>([]);
 
   const canStart =
     (source === 'saved' ? cvId !== '' : file !== null) && jobText.trim().length >= MIN_JOB_TEXT_LENGTH;
@@ -119,101 +126,111 @@ export function EntrevistaSection() {
 
     const composed = composeInterview(result.data.preparation.questions);
     setRoleSummary(result.data.preparation.roleSummary);
-    setAnswers(composed.map((question) => ({ question, evaluation: null, failed: false })));
+    setAnswers(composed.map((question) => ({ question, audio: null, transcript: '', evaluation: null })));
     setCurrent(0);
-    pendingEvaluations.current = [];
     recorder.reset();
     setPhase({ name: 'interview' });
   };
 
-  /** Manda la grabación a evaluar sin bloquear el avance a la próxima pregunta. */
-  const submitAnswer = (index: number, audio: Blob, question: InterviewQuestion) => {
-    const task = evaluateInterviewAnswer({
-      audio,
-      question: question.question,
-      kind: question.kind,
-      roleSummary,
-    }).then((result) => {
-      const evaluation = result.status === 'success' ? result.data.evaluation : null;
+  /**
+   * Guarda la grabación y pasa a la siguiente.
+   *
+   * No manda nada todavía: las respuestas viajan todas juntas al final. Eso
+   * baja la entrevista de catorce llamadas a Gemini a tres, a costa de una
+   * espera real al terminar en vez de una imperceptible.
+   */
+  const advance = (recorded: Blob | null) => {
+    const next = answers.map((entry, position) =>
+      position === current ? { ...entry, audio: recorded } : entry,
+    );
+    setAnswers(next);
+    recorder.reset();
 
-      setAnswers((previous) =>
-        previous.map((entry, position) =>
-          position !== index ? entry : { ...entry, evaluation, failed: evaluation === null },
-        ),
-      );
-
-      return { index, evaluation };
-    });
-
-    pendingEvaluations.current.push(task);
+    if (current + 1 < next.length) {
+      setCurrent(current + 1);
+      return;
+    }
+    void finishInterview(next);
   };
 
   const handleNext = () => {
-    const audio = recorder.audioBlob;
-    const entry = answers[current];
-    if (!audio || !entry) return;
-
-    submitAnswer(current, audio, entry.question);
-    recorder.reset();
-
-    if (current + 1 < answers.length) {
-      setCurrent(current + 1);
-      return;
-    }
-    void finishInterview();
+    if (recorder.audioBlob) advance(recorder.audioBlob);
   };
 
-  const handleSkip = () => {
-    recorder.reset();
-    setAnswers((previous) =>
-      previous.map((entry, position) => (position === current ? { ...entry, failed: true } : entry)),
-    );
-
-    if (current + 1 < answers.length) {
-      setCurrent(current + 1);
-      return;
-    }
-    void finishInterview();
-  };
+  const handleSkip = () => advance(null);
 
   /**
-   * Espera las evaluaciones que quedaron en vuelo y pide la devolución final.
+   * Los dos pasos finales: pasar todo a texto y después evaluarlo.
    *
-   * La lista se arma desde lo que resuelven las promesas, no desde el estado:
-   * la última evaluación puede estar llegando justo ahora y `answers` todavía
-   * no reflejarla.
+   * Recibe la lista por parámetro y no la lee del estado: `advance` acaba de
+   * guardar la última grabación y `answers` todavía no la refleja.
+   *
+   * Ante un fallo no se pierde nada — las grabaciones siguen en `answers` y
+   * `closingFailed` ofrece reintentar. Es la contrapartida obligatoria de
+   * mandar las seis juntas.
    */
-  const finishInterview = async () => {
+  const finishInterview = async (finished: AnsweredQuestion[]) => {
     setPhase({ name: 'closing' });
 
-    const questions = answers.map((entry) => entry.question);
-    const resolved = await Promise.all(pendingEvaluations.current);
+    /* Sólo las contestadas viajan; se guarda su posición para devolver cada
+       transcripción a su pregunta. Las salteadas se evalúan igual, más
+       abajo, con la transcripción vacía. */
+    const recorded = finished
+      .map((entry, index) => ({ index, audio: entry.audio, question: entry.question.question }))
+      .filter((item): item is { index: number; audio: Blob; question: string } => item.audio !== null);
 
-    const evaluated = resolved
-      .filter((item): item is { index: number; evaluation: AnswerEvaluation } => item.evaluation !== null)
-      .sort((a, b) => a.index - b.index);
-
-    if (evaluated.length === 0) {
+    if (recorded.length === 0) {
       setPhase({ name: 'results', closing: null });
       return;
     }
 
-    const transcriptText = evaluated
-      .map(({ index, evaluation }, position) => {
-        const question = questions[index];
-        return [
-          `PREGUNTA ${position + 1} (${question?.kind ?? 'personal'}): ${question?.question ?? ''}`,
-          `RESPUESTA: ${evaluation.transcript}`,
-          `EVALUACIÓN: respondió=${evaluation.answeredQuestion}, STAR=${evaluation.usedStar}, puntajes: calidad ${evaluation.scores.answerQuality}, estructura ${evaluation.scores.structure}, especificidad ${evaluation.scores.specificity}, relevancia ${evaluation.scores.relevance}`,
-        ].join('\n');
-      })
-      .join('\n\n');
+    const transcribed = await transcribeInterviewAnswers(recorded);
+    if (transcribed.status !== 'success') {
+      setPhase({
+        name: 'closingFailed',
+        message:
+          transcribed.status === 'error'
+            ? transcribed.error.message
+            : 'No se pudieron procesar las respuestas. Intentá de nuevo en unos minutos.',
+      });
+      return;
+    }
 
-    const result = await closeInterview(roleSummary, transcriptText);
-    setPhase({
-      name: 'results',
-      closing: result.status === 'success' ? result.data.closing : null,
+    const withTranscripts = finished.map((entry) => ({ ...entry }));
+    recorded.forEach((item, position) => {
+      const transcript = transcribed.data.transcripts[position] ?? '';
+      const target = withTranscripts[item.index];
+      if (target) target.transcript = transcript;
     });
+    setAnswers(withTranscripts);
+
+    const reviewed = await reviewInterview(
+      roleSummary,
+      withTranscripts.map((entry) => ({
+        question: entry.question.question,
+        kind: entry.question.kind,
+        transcript: entry.transcript,
+      })),
+    );
+
+    if (reviewed.status !== 'success') {
+      setPhase({
+        name: 'closingFailed',
+        message:
+          reviewed.status === 'error'
+            ? reviewed.error.message
+            : 'No se pudo generar la devolución. Intentá de nuevo en unos minutos.',
+      });
+      return;
+    }
+
+    setAnswers(
+      withTranscripts.map((entry, index) => ({
+        ...entry,
+        evaluation: reviewed.data.review.answers[index] ?? null,
+      })),
+    );
+    setPhase({ name: 'results', closing: reviewed.data.review.closing });
   };
 
   const restart = () => {
@@ -222,7 +239,6 @@ export function EntrevistaSection() {
     setCurrent(0);
     setRoleSummary('');
     setErrorMessage(null);
-    pendingEvaluations.current = [];
     setPhase({ name: 'setup' });
   };
 
@@ -286,6 +302,23 @@ export function EntrevistaSection() {
             ariaLabel="Revisando las respuestas de la entrevista."
           />
           <LoadingState messages={CLOSING_STEPS} />
+        </div>
+      )}
+
+      {phase.name === 'closingFailed' && (
+        <div className={styles.closingWait}>
+          <p className={styles.errorState} role="alert">
+            {phase.message}
+          </p>
+          <p className={styles.retryHint}>
+            Tus grabaciones siguen acá — no hace falta que vuelvas a responder.
+          </p>
+          <div className={styles.retryActions}>
+            <Button onClick={() => void finishInterview(answers)}>Reintentar</Button>
+            <Button variant="secondary" onClick={restart}>
+              Empezar de nuevo
+            </Button>
+          </div>
         </div>
       )}
 
@@ -525,7 +558,12 @@ function InterviewStep({ index, total, question, recorder, onNext, onSkip }: Int
 
             {isRecording ? (
               <>
-                <span className={styles.recordTimer}>{formatSeconds(recorder.seconds)}</span>
+                {/* El tope va junto al reloj y no en una nota aparte: mientras
+                    se habla, lo único que se mira es este número. */}
+                <span className={styles.recordTimer}>
+                  {formatSeconds(recorder.seconds)}
+                  <span className={styles.recordLimit}> / {formatSeconds(recorder.maxSeconds)}</span>
+                </span>
                 <span className={styles.recordHint}>
                   {isPaused ? 'En pausa — tocá el botón para terminar' : 'Tocá el botón cuando termines'}
                 </span>
@@ -542,7 +580,9 @@ function InterviewStep({ index, total, question, recorder, onNext, onSkip }: Int
               </>
             ) : (
               <span className={styles.recordHint}>
-                {recorder.status === 'requesting' ? 'Pidiendo acceso al micrófono…' : 'Grabar respuesta'}
+                {recorder.status === 'requesting'
+                  ? 'Pidiendo acceso al micrófono…'
+                  : `Grabar respuesta · hasta ${formatSeconds(recorder.maxSeconds)}`}
               </span>
             )}
 
@@ -689,7 +729,7 @@ function AnswerCard({ entry, index }: { entry: AnsweredQuestion; index: number }
         <span className={styles.answerNumber}>{index + 1}</span>
         <span className={styles.answerQuestion}>{entry.question.question}</span>
         <span className={styles.answerScore}>
-          {evaluation ? `${evaluation.scores.answerQuality}/100` : entry.failed ? 'Sin evaluar' : '…'}
+          {evaluation ? `${evaluation.scores.answerQuality}/100` : 'Sin evaluar'}
         </span>
       </button>
 
@@ -697,9 +737,12 @@ function AnswerCard({ entry, index }: { entry: AnsweredQuestion; index: number }
         <div className={styles.answerBody}>
           {!evaluation ? (
             <p className={styles.answerEmpty}>
-              {entry.failed
-                ? 'Esta pregunta quedó sin responder o no se pudo evaluar.'
-                : 'Todavía estamos evaluando esta respuesta.'}
+              {/* Ya no existe el estado "todavía evaluando": las evaluaciones
+                  llegan todas juntas con la devolución final. Si falta una, es
+                  porque la pregunta quedó sin responder. */}
+              {entry.audio === null
+                ? 'Salteaste esta pregunta, así que no hay nada para evaluar.'
+                : 'No se pudo evaluar esta respuesta.'}
             </p>
           ) : (
             <>
@@ -721,7 +764,7 @@ function AnswerCard({ entry, index }: { entry: AnsweredQuestion; index: number }
 
               <details className={styles.transcriptBlock}>
                 <summary className={styles.transcriptToggle}>Ver lo que dijiste</summary>
-                <p className={styles.transcript}>{evaluation.transcript || 'No se detectó texto.'}</p>
+                <p className={styles.transcript}>{entry.transcript || 'No se detectó texto.'}</p>
               </details>
             </>
           )}

@@ -1,7 +1,14 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/Card';
+import { LinkButton } from '@/components/ui/Button';
 import { Icon, type IconName } from '@/components/ui/Icon';
 import { ROUTES } from '@/constants/routes';
+import {
+  readAiQuota,
+  timeUntilReset,
+  type AiQuota,
+} from '@/services/data/preparation/aiQuota.service';
 import { cx } from '@/utils/classNames';
 import screen from '@/app/layouts/appShell.module.css';
 import styles from './PendingSection.module.css';
@@ -13,6 +20,14 @@ interface Tool {
   tone: 'brand' | 'teal' | 'amber';
   /** Sin ruta, la herramienta todavía no existe: se muestra como "Próximamente". */
   href?: string;
+  /**
+   * Con qué cupo se cuenta esta herramienta. Tiene que coincidir con las
+   * claves de `AI_TOOLS` del backend, que es quien lleva la cuenta.
+   *
+   * Sin `quotaId` la herramienta no tiene límite — hoy, sólo el Tester ATS,
+   * que no usa IA.
+   */
+  quotaId?: 'cvMatch' | 'oratoria' | 'linkedin' | 'entrevista';
 }
 
 /**
@@ -30,6 +45,7 @@ const TOOLS: Tool[] = [
     text: 'Ver qué pide la búsqueda, qué de eso ya está en tu CV y qué te falta nombrar.',
     tone: 'brand',
     href: ROUTES.myRumboCvMatch,
+    quotaId: 'cvMatch',
   },
   {
     icon: 'feedback',
@@ -37,6 +53,7 @@ const TOOLS: Tool[] = [
     text: 'Responder una pregunta general de entrevista por micrófono y recibir feedback sobre cómo la contestaste.',
     tone: 'teal',
     href: ROUTES.myRumboOratoria,
+    quotaId: 'oratoria',
   },
   {
     icon: 'mentorship',
@@ -44,12 +61,15 @@ const TOOLS: Tool[] = [
     text: 'Una entrevista simulada con preguntas armadas desde tu CV y una oferta concreta, con devolución al final.',
     tone: 'amber',
     href: ROUTES.myRumboEntrevista,
+    quotaId: 'entrevista',
   },
   {
     icon: 'pencil',
     name: 'Creador de publicaciones para LinkedIn',
     text: 'Armar una publicación para contar un logro o un proyecto, lista para pegar en LinkedIn.',
     tone: 'brand',
+    href: ROUTES.myRumboLinkedin,
+    quotaId: 'linkedin',
   },
   {
     icon: 'shield',
@@ -79,6 +99,23 @@ function sortByAvailability(tools: readonly Tool[]): Tool[] {
 
 export function PreparationSection() {
   const tools = sortByAvailability(TOOLS);
+  const [quota, setQuota] = useState<AiQuota | null>(null);
+
+  /*
+   * El saldo se pide al entrar, que es el único momento en que sirve: la idea
+   * es que se vea antes de elegir herramienta y antes de escribir nada. Si la
+   * consulta falla no se muestra nada — quedarse sin el número no puede
+   * impedir usar la sección.
+   */
+  useEffect(() => {
+    let active = true;
+    void readAiQuota().then((result) => {
+      if (active && result.status === 'success') setQuota(result.data);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <>
@@ -88,6 +125,8 @@ export function PreparationSection() {
           <p className={screen.headerMeta}>Practicar para lo que viene, no registrar lo que pasó</p>
         </div>
       </div>
+
+      {quota && <QuotaBanner quota={quota} />}
 
       <div className={styles.tools}>
         {tools.map((tool) => {
@@ -103,6 +142,8 @@ export function PreparationSection() {
 
               <p className={styles.toolName}>{tool.name}</p>
               <p className={styles.toolText}>{tool.text}</p>
+
+              {tool.href && <ToolQuotaLabel tool={tool} quota={quota} />}
 
               {!tool.href && (
                 <div className={styles.toolLock}>
@@ -127,5 +168,77 @@ export function PreparationSection() {
         })}
       </div>
     </>
+  );
+}
+
+/**
+ * Cuántos usos le quedan a la persona en este bloque.
+ *
+ * Dice las dos cosas que hacen falta para no quedarse esperando de gusto:
+ * **cada cuánto** se renueva el cupo y **cuánto falta** para la próxima
+ * renovación. Sin la segunda, "sin usos" se lee como "volvé mañana", cuando
+ * en realidad puede faltar un rato corto.
+ *
+ * El bloque ocupa sólo lo que necesita, no el ancho de la pantalla: estirado,
+ * la etiqueta del plan quedaba en la otra punta y pasaba desapercibida. Al
+ * lado va el botón para mejorar, que es la acción que sigue naturalmente a
+ * leer cuánto te queda.
+ */
+function QuotaBanner({ quota }: { quota: AiQuota }) {
+  const remaining = timeUntilReset(quota.resetAt);
+  const hours = quota.windowHours;
+
+  return (
+    <div className={styles.quotaRow}>
+      <div className={styles.credits}>
+        <Icon name="clock" size={16} className={styles.creditsIcon} />
+
+        <p className={styles.creditsText}>
+          <strong className={styles.creditsCount}>
+            Los usos se renuevan cada {hours === 1 ? 'hora' : `${hours} horas`}
+          </strong>
+          {remaining && <span className={styles.creditsRefill}> · faltan {remaining}</span>}
+          <span className={styles.creditsNote}>
+            Cada herramienta tiene su propio cupo y no se acumula de un bloque al siguiente.
+          </span>
+        </p>
+
+        {quota.plan === 'free' && <span className={styles.creditsPlan}>Plan gratuito</span>}
+      </div>
+
+      {quota.plan === 'free' && (
+        <LinkButton href={ROUTES.myRumboPlans} variant="secondary" size="sm">
+          Mejorar plan
+        </LinkButton>
+      )}
+    </div>
+  );
+}
+
+/**
+ * El cupo de una herramienta, dentro de su tarjeta.
+ *
+ * Sólo el número: "3/5". El aviso de arriba ya explicó que son usos y cada
+ * cuánto se renuevan, así que repetirlo en cada tarjeta es ruido. Mientras el
+ * dato no llegó no se muestra nada — mejor vacío que un cero que después va a
+ * cambiar solo.
+ */
+function ToolQuotaLabel({ tool, quota }: { tool: Tool; quota: AiQuota | null }) {
+  if (!tool.quotaId) {
+    return <span className={cx(styles.toolCost, styles.toolCostFree)}>Sin límite de usos</span>;
+  }
+
+  const toolQuota = quota?.tools[tool.quotaId];
+  if (!toolQuota) return null;
+
+  const empty = toolQuota.remaining === 0;
+
+  return (
+    <span
+      className={cx(styles.toolCost, empty && styles.toolCostEmpty)}
+      title={`Te quedan ${toolQuota.remaining} de ${toolQuota.limit} usos en este bloque`}
+    >
+      {toolQuota.remaining}/{toolQuota.limit}
+    </span>
   );
 }
