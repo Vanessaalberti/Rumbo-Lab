@@ -10,6 +10,7 @@ import { LoadingState } from '@/components/ui/LoadingState';
 import {
   analyzeOratoriaRecording,
   ORATORIA_CRITERIA,
+  paceLabel,
   type OratoriaResult,
 } from '@/services/data/preparation/oratoria.service';
 import { cx } from '@/utils/classNames';
@@ -79,11 +80,14 @@ export function OratoriaSection() {
     if (!recorder.audioBlob || !selection) return;
 
     setAnalysis({ status: 'loading' });
-    const result = await analyzeOratoriaRecording(
-      recorder.audioBlob,
-      selection.question,
-      selection.category.label,
-    );
+    const result = await analyzeOratoriaRecording({
+      audio: recorder.audioBlob,
+      question: selection.question,
+      category: selection.category.label,
+      /* Lo que midió el grabador: el servidor no puede sacar la duración del
+         blob sin decodificarlo, y acá ya está contada. */
+      durationSeconds: recorder.seconds,
+    });
 
     if (result.status === 'success') {
       setAnalysis({ status: 'success', analysis: result.data.analysis });
@@ -120,8 +124,9 @@ export function OratoriaSection() {
       <p className={styles.disclaimer}>
         <Icon name="alert" size={15} className={styles.disclaimerIcon} />
         Esta práctica es una ayuda para ensayar tus respuestas: no reemplaza una entrevista ni un
-        ensayo presencial. Analiza únicamente el contenido de lo que decís — no mide tu tono de voz
-        ni tus emociones.
+        ensayo presencial. Escucha tu grabación para señalar cosas concretas —pausas, repeticiones,
+        frases cortadas— pero <strong>no juzga tu tono de voz ni cómo te sentías</strong>: eso no se
+        puede saber desde un audio y no te serviría para mejorar.
       </p>
 
       {selection === null ? (
@@ -445,15 +450,7 @@ function AnalysisResult({ result }: { result: OratoriaResult }) {
         empty="No hay sugerencias puntuales para esta respuesta."
       />
 
-      {result.speechNotes.length > 0 && (
-        <ResultList
-          icon="feedback"
-          iconClassName={styles.speechIcon}
-          title="Cómo sonó al hablar"
-          items={result.speechNotes}
-          empty=""
-        />
-      )}
+      <SpeechBlock speech={result.speech} />
 
       {/* Sólo aparecen las muletillas de verdad. Un "bueno" al empezar es
           habla normal y no se muestra como problema. */}
@@ -486,6 +483,55 @@ function AnalysisResult({ result }: { result: OratoriaResult }) {
         )}
       </div>
     </div>
+  );
+}
+
+/**
+ * La mecánica del habla.
+ *
+ * Los dos números van arriba porque son medibles y comparables entre
+ * prácticas: cuántos silencios largos hubo y a qué ritmo hablaste. Debajo, las
+ * observaciones — que son conductas ("cortaste dos frases a la mitad"), nunca
+ * juicios sobre cómo sonaste.
+ *
+ * El ritmo se muestra sin color ni puntaje: no está bien ni mal hablar
+ * pausado, y teñirlo lo convertiría en una nota que nadie pidió.
+ */
+function SpeechBlock({ speech }: { speech: OratoriaResult['speech'] }) {
+  const pace = paceLabel(speech.wordsPerMinute);
+  const hasNothing = speech.notes.length === 0 && speech.longPauses === 0 && pace === null;
+  if (hasNothing) return null;
+
+  return (
+    <section className={styles.list}>
+      <p className={styles.listTitle}>Cómo sonó al hablar</p>
+
+      <div className={styles.speechStats}>
+        {pace && speech.wordsPerMinute !== null && (
+          <span className={styles.speechStat}>
+            <strong className={styles.speechStatValue}>{speech.wordsPerMinute}</strong> palabras por
+            minuto · {pace}
+          </span>
+        )}
+        {speech.longPauses > 0 && (
+          <span className={styles.speechStat}>
+            <strong className={styles.speechStatValue}>{speech.longPauses}</strong>{' '}
+            {speech.longPauses === 1 ? 'pausa larga' : 'pausas largas'}
+          </span>
+        )}
+      </div>
+
+      {speech.notes.length > 0 && (
+        <ul className={styles.listItems}>
+          {speech.notes.map((note) => (
+            <li key={note} className={styles.listItem}>
+              <Icon name="feedback" size={15} className={styles.speechIcon} />
+              <span>{note}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 

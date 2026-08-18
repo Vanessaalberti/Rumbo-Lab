@@ -529,6 +529,28 @@ button.recordButton:disabled {
   margin-top: 2px;
 }
 
+/*
+ * Los dos datos medibles del habla, en fila. Sin color ni tono de puntaje: no
+ * está bien ni mal hablar pausado, y teñirlos los convertiría en una nota.
+ */
+.speechStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+}
+
+.speechStat {
+  font-size: var(--text-xs);
+  color: var(--text-soft);
+}
+
+.speechStatValue {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
 .speechIcon {
   color: var(--amber-strong);
   flex-shrink: 0;

@@ -13,6 +13,10 @@ import type { AsyncState } from '@/services/data/types';
  * estructura y si usaba muletillas— y con eso una respuesta de puros
  * adjetivos sin explicar sacaba buena nota. Ahora son siete criterios y los
  * que más pesan son los que miran el contenido.
+ *
+ * La transcripción la hace Whisper y **la IA escucha el audio**, no lee el
+ * texto. Por eso la fluidez y la mecánica del habla dejaron de ser una
+ * inferencia sobre una transcripción y pasaron a medir algo real.
  */
 
 /** Una muletilla real: relleno repetido, no un conector natural del habla. */
@@ -37,6 +41,21 @@ export interface OratoriaScores {
 
 export type OratoriaCriterion = keyof OratoriaScores;
 
+/**
+ * La mecánica del habla.
+ *
+ * Son conductas observables, nunca juicios sobre la persona: la herramienta
+ * no dice si sonaste seguro o nervioso, porque no lo puede saber y porque
+ * saberlo no te daría nada para corregir.
+ */
+export interface OratoriaSpeech {
+  /** Silencios de tres segundos o más dentro de la respuesta. */
+  longPauses: number;
+  /** Palabras por minuto. `null` en grabaciones muy cortas, donde es ruido. */
+  wordsPerMinute: number | null;
+  notes: string[];
+}
+
 export interface OratoriaResult {
   transcript: string;
   answeredQuestion: boolean;
@@ -49,8 +68,7 @@ export interface OratoriaResult {
   strengths: string[];
   improvements: string[];
   fillers: OratoriaFiller[];
-  /** Repeticiones, palabras truncadas, frases abandonadas. Nunca tono ni emoción. */
-  speechNotes: string[];
+  speech: OratoriaSpeech;
 }
 
 /**
@@ -125,14 +143,31 @@ export const ORATORIA_CRITERIA: CriterionMeta[] = [
   },
 ];
 
-export function analyzeOratoriaRecording(
-  audio: Blob,
-  question: string,
-  category: string,
-): Promise<AsyncState<{ analysis: OratoriaResult }>> {
+export function analyzeOratoriaRecording(params: {
+  audio: Blob;
+  question: string;
+  category: string;
+  /** Lo que midió el grabador. Sirve para el ritmo y para las pausas. */
+  durationSeconds: number;
+}): Promise<AsyncState<{ analysis: OratoriaResult }>> {
   const form = new FormData();
-  form.append('audio', audio, 'respuesta');
-  form.append('question', question);
-  form.append('category', category);
+  form.append('audio', params.audio, 'respuesta');
+  form.append('question', params.question);
+  form.append('category', params.category);
+  form.append('durationSeconds', String(params.durationSeconds));
   return httpClient.postForm('/preparation/oratoria', form);
+}
+
+/**
+ * Cómo se lee un ritmo de habla.
+ *
+ * Los rangos salen de lo que se recomienda para hablar en público: por debajo
+ * de 110 se percibe lento, por encima de 170 cuesta seguirlo. No es un
+ * puntaje ni entra en la evaluación — es un dato para que la persona lo mire.
+ */
+export function paceLabel(wordsPerMinute: number | null): string | null {
+  if (wordsPerMinute === null) return null;
+  if (wordsPerMinute < 110) return 'pausado';
+  if (wordsPerMinute > 170) return 'rápido';
+  return 'cómodo de seguir';
 }
