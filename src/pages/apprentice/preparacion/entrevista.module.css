@@ -726,6 +726,46 @@ button.recordButton:disabled {
   gap: var(--space-3);
 }
 
+.criterion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.criterionHint {
+  font-size: var(--text-2xs);
+  line-height: var(--leading-relaxed);
+  color: var(--text-faint);
+}
+
+/* Marca los tres criterios que más deciden el puntaje global. */
+.criterionWeight {
+  font-weight: var(--weight-semibold);
+  color: var(--text-soft);
+}
+
+/*
+ * Qué se esperaba de esta respuesta según el tipo de pregunta. Mismo patrón
+ * que `.demand` en oratoria.module.css.
+ */
+.demand {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-alt);
+  font-size: var(--text-xs);
+  line-height: var(--leading-relaxed);
+  color: var(--text-soft);
+}
+
+.demandIcon {
+  color: var(--text-faint);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
 .transcriptBlock {
   padding-top: var(--space-3);
   border-top: 1px solid var(--border-soft);

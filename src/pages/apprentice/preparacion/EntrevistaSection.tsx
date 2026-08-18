@@ -9,6 +9,8 @@ import { LoadingState } from '@/components/ui/LoadingState';
 import { TextLink } from '@/components/ui/TextLink';
 import { ROUTES } from '@/constants/routes';
 import {
+  ENTREVISTA_CRITERIA,
+  ENTREVISTA_QUESTION_TYPE_HINT,
   prepareInterviewWithCv,
   prepareInterviewWithUpload,
   reviewInterview,
@@ -622,22 +624,27 @@ function InterviewStep({ index, total, question, recorder, onNext, onSkip }: Int
 
 /* ─── Devolución final ───────────────────────────────────────────────────── */
 
+/**
+ * Los cortes quedaron alineados con la escala de referencia del rediseño:
+ * 70+ es "buena" para arriba, 50-69 cubre "aceptable" y "débil", por debajo
+ * de 50 es "deficiente" para abajo. Antes 40-50 era el resultado más común
+ * para cualquier respuesta con problemas de comunicación — con los ocho
+ * criterios separados, un 45 real es ahora una respuesta floja de verdad.
+ */
 function scoreTone(value: number): 'brand' | 'attention' | 'progress' {
-  if (value >= 75) return 'brand';
+  if (value >= 70) return 'brand';
   if (value >= 50) return 'attention';
   return 'progress';
 }
 
-/** Mismo orden que los valores que se le pasan al radar. */
-const INTERVIEW_AXES: RadarAxis[] = [
-  { id: 'answerQuality', label: 'Responde' },
-  { id: 'structure', label: 'Estructura' },
-  { id: 'specificity', label: 'Detalle' },
-  { id: 'relevance', label: 'Relevancia' },
-];
+/** Mismo orden que `ENTREVISTA_CRITERIA`: de mayor a menor peso. */
+const INTERVIEW_AXES: RadarAxis[] = ENTREVISTA_CRITERIA.map((criterion) => ({
+  id: criterion.id,
+  label: criterion.short,
+}));
 
 function axisValues(scores: AnswerEvaluation['scores']): number[] {
-  return [scores.answerQuality, scores.structure, scores.specificity, scores.relevance];
+  return ENTREVISTA_CRITERIA.map((criterion) => scores[criterion.id]);
 }
 
 /**
@@ -745,7 +752,7 @@ function AnswerCard({ entry, index }: { entry: AnsweredQuestion; index: number }
         <span className={styles.answerNumber}>{index + 1}</span>
         <span className={styles.answerQuestion}>{entry.question.question}</span>
         <span className={styles.answerScore}>
-          {evaluation ? `${evaluation.scores.answerQuality}/100` : 'Sin evaluar'}
+          {evaluation ? `${evaluation.overallScore}/100` : 'Sin evaluar'}
         </span>
       </button>
 
@@ -762,17 +769,48 @@ function AnswerCard({ entry, index }: { entry: AnsweredQuestion; index: number }
             </p>
           ) : (
             <>
-              <div className={cx(styles.starBadge, evaluation.usedStar ? styles.starBadgeOk : styles.starBadgeMissing)}>
-                <Icon name={evaluation.usedStar ? 'check' : 'alert'} size={14} />
-                {evaluation.usedStar ? 'Usaste la estructura STAR' : 'No completaste la estructura STAR'}
+              {/* Qué se esperaba de esta respuesta según el tipo de pregunta.
+                  Sin esto, "no completaste la estructura STAR" en una
+                  pregunta general se leía como un error de la herramienta. */}
+              <p className={styles.demand}>
+                <Icon name="compass" size={14} className={styles.demandIcon} />
+                {ENTREVISTA_QUESTION_TYPE_HINT[evaluation.questionType]}
+              </p>
+
+              {evaluation.questionType === 'conductual' && (
+                <>
+                  <div className={cx(styles.starBadge, evaluation.usedStar ? styles.starBadgeOk : styles.starBadgeMissing)}>
+                    <Icon name={evaluation.usedStar ? 'check' : 'alert'} size={14} />
+                    {evaluation.usedStar ? 'Usaste la estructura STAR' : 'No completaste la estructura STAR'}
+                  </div>
+                  {evaluation.starFeedback && <p className={styles.starFeedback}>{evaluation.starFeedback}</p>}
+                </>
+              )}
+
+              {/* Los dos números que separan qué tan buena era la respuesta de
+                  qué tan bien la comunicaste. Es la distinción central del
+                  rediseño: antes se mezclaban en un solo puntaje. */}
+              <div className={styles.scores}>
+                <ProgressBar value={evaluation.contentScore} label="Calidad del contenido" size="md" tone={scoreTone(evaluation.contentScore)} />
+                <ProgressBar value={evaluation.communicationScore} label="Comunicación oral" size="md" tone={scoreTone(evaluation.communicationScore)} />
               </div>
-              {evaluation.starFeedback && <p className={styles.starFeedback}>{evaluation.starFeedback}</p>}
 
               <div className={styles.scores}>
-                <ProgressBar value={evaluation.scores.answerQuality} label="Responde la pregunta" size="sm" tone={scoreTone(evaluation.scores.answerQuality)} />
-                <ProgressBar value={evaluation.scores.structure} label="Estructura" size="sm" tone={scoreTone(evaluation.scores.structure)} />
-                <ProgressBar value={evaluation.scores.specificity} label="Nivel de detalle" size="sm" tone={scoreTone(evaluation.scores.specificity)} />
-                <ProgressBar value={evaluation.scores.relevance} label="Relevancia para el puesto" size="sm" tone={scoreTone(evaluation.scores.relevance)} />
+                <p className={styles.radarTitle}>Detalle por criterio</p>
+                {ENTREVISTA_CRITERIA.map((criterion) => (
+                  <div key={criterion.id} className={styles.criterion}>
+                    <ProgressBar
+                      value={evaluation.scores[criterion.id]}
+                      label={criterion.label}
+                      size="sm"
+                      tone={scoreTone(evaluation.scores[criterion.id])}
+                    />
+                    <p className={styles.criterionHint}>
+                      {criterion.hint}
+                      {criterion.major && <span className={styles.criterionWeight}> · pesa más</span>}
+                    </p>
+                  </div>
+                ))}
               </div>
 
               <FeedbackList icon="check" iconClass={styles.strengthIcon} title="Lo que hiciste bien" items={evaluation.strengths} empty="No encontramos algo puntual para destacar en esta respuesta." />
