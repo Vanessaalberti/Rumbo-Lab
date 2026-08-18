@@ -20,6 +20,7 @@ import { cvChoiceOf } from '@/services/data/dashboard/dashboard.types';
 import { APPLICATION_STATUS_LABELS } from '../applicationStatus';
 import { cvChoiceLabel } from './cvChoice';
 import { StatusPill } from './TableCells';
+import { ListSkeleton } from '@/components/ui/Skeleton';
 import { formatLongDate } from '../perfil/formatters';
 import screen from '@/app/layouts/appShell.module.css';
 import styles from './applications.module.css';
@@ -306,7 +307,7 @@ export function ApplicationDetail({
         {historyFailed ? (
           <p className={screen.emptyState}>No pudimos cargar el historial.</p>
         ) : history === null ? (
-          <p className={screen.emptyState}>Cargando historial…</p>
+          <ListSkeleton rows={3} label="Cargando historial…" />
         ) : history.length === 0 ? (
           <p className={screen.emptyState}>Todavía no hay cambios registrados.</p>
         ) : (

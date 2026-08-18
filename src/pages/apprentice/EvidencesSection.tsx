@@ -9,6 +9,7 @@ import {
   type EvidencePage,
   type EvidenceRange,
 } from '@/services/data/dashboard/evidences.service';
+import { ListSkeleton } from '@/components/ui/Skeleton';
 import { formatLongDate, formatShortDate } from './perfil/formatters';
 import screen from '@/app/layouts/appShell.module.css';
 import styles from './EvidencesSection.module.css';
@@ -145,7 +146,7 @@ export function EvidencesSection() {
         </Popover>
       </div>
 
-      {state.status === 'loading' && <p className={screen.emptyState}>Cargando tu recorrido…</p>}
+      {state.status === 'loading' && <ListSkeleton rows={4} label="Cargando tu recorrido…" />}
 
       {state.status === 'error' && (
         <p className={styles.errorState} role="alert">

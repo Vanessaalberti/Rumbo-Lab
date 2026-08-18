@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { getMyRumboDashboard } from '@/services/data/dashboard/dashboard.service';
 import type { MyRumboDashboard } from '@/services/data/dashboard/dashboard.types';
+import { PageSkeleton, type SkeletonVariant } from '@/components/ui/Skeleton';
 import { AppRail } from './AppRail';
 import styles from './appShell.module.css';
 
@@ -24,6 +25,31 @@ type ShellState =
   | { status: 'error' };
 
 /**
+ * Qué esqueleto mostrar mientras cargan los datos.
+ *
+ * La ruta es lo único que el layout sabe antes de tener nada: alcanza para
+ * anticipar la forma de la pantalla a la que se está entrando, que es lo que
+ * hace útil a un esqueleto. Una sección sin entrada acá cae en la lista, que
+ * es la forma más común entre las que quedan.
+ */
+function skeletonFor(pathname: string): SkeletonVariant {
+  const section = pathname.replace(/^\/mi-rumbo\/?/, '').split('/')[0];
+
+  switch (section) {
+    case '':
+      return 'perfil';
+    case 'postulaciones':
+      return 'postulaciones';
+    case 'preparacion':
+    case 'espacios':
+    case 'objetivos':
+      return 'tarjetas';
+    default:
+      return 'lista';
+  }
+}
+
+/**
  * Layout del área de Aprendiz: rail lateral + contenido.
  *
  * Carga `GET /api/me` una sola vez acá arriba y lo comparte con todas las
@@ -32,6 +58,7 @@ type ShellState =
  */
 export function ApprenticeShell() {
   const [state, setState] = useState<ShellState>({ status: 'loading' });
+  const location = useLocation();
 
   /**
    * `initial` distingue la **primera** carga de las revalidaciones posteriores.
@@ -69,7 +96,7 @@ export function ApprenticeShell() {
       <div className={styles.screen}>
         <AppRail />
         <div className={styles.main}>
-          <p className={styles.emptyState}>Cargando tu Mi Rumbo…</p>
+          <PageSkeleton variant={skeletonFor(location.pathname)} />
         </div>
       </div>
     );

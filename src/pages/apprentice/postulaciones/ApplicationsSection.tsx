@@ -12,7 +12,6 @@ import type {
   ApplicationInput,
   ApplicationStatus,
   ApplicationSummary,
-  CvSummary,
 } from '@/services/data/dashboard/dashboard.types';
 import { ApplicationDetail } from './ApplicationDetail';
 import { NewApplicationModal } from './NewApplicationModal';
@@ -40,11 +39,34 @@ function matchesSearch(application: ApplicationSummary, query: string): boolean 
     .some((field) => normalize(field).includes(query));
 }
 
-function pendingCvLabel(input: ApplicationInput, cvs: CvSummary[]): string {
-  const choice = input.cvChoice;
-  if (!choice || choice === 'none') return 'No aplica';
-  if (choice === 'custom') return 'Personalizado';
-  return cvs.find((cv) => cv.id === choice)?.name ?? 'No aplica';
+/** Cuánto dura el repliegue cuando la postulación no se pudo guardar. */
+const RETIRE_MS = 220;
+
+/** Anchos de las barras del esqueleto, por columna. Fijos: si variaran en
+    cada render, la fila parpadearía de ancho mientras se guarda. */
+const SKELETON_WIDTHS = ['72%', '58%', '46%', '64%', '38%'];
+
+/**
+ * La fila que ocupa el lugar de la postulación mientras se guarda.
+ *
+ * Crece desde altura cero, y por eso las filas de abajo se desplazan solas:
+ * el empujón no está animado aparte, es la consecuencia natural de que esta
+ * fila ocupe lugar. Cuando el guardado falla, `retiring` reproduce la misma
+ * animación al revés antes de desmontarla, para que la fila se repliegue en
+ * lugar de desaparecer de golpe.
+ */
+function PendingRow({ retiring }: { retiring: boolean }) {
+  return (
+    <tr className={cx(styles.row, styles.rowPending)} aria-hidden="true">
+      {SKELETON_WIDTHS.map((width, index) => (
+        <td key={index} className={styles.skeletonTd}>
+          <div className={cx(styles.skeletonCell, retiring && styles.skeletonCellRetiring)}>
+            <span className={styles.skeletonBar} style={{ width }} />
+          </div>
+        </td>
+      ))}
+    </tr>
+  );
 }
 
 export function ApplicationsSection() {
@@ -60,6 +82,8 @@ export function ApplicationsSection() {
   const [page, setPage] = useState(1);
 
   const [pending, setPending] = useState<ApplicationInput | null>(null);
+  /** Marca el repliegue de la fila cuando el guardado falló. */
+  const [pendingRetiring, setPendingRetiring] = useState(false);
 
   const normalizedSearch = normalize(search.trim());
   const isFiltered = statusFilter.length > 0 || normalizedSearch !== '';
@@ -70,12 +94,25 @@ export function ApplicationsSection() {
     )
     .filter((application) => matchesSearch(application, normalizedSearch));
 
-  const totalPages = Math.max(1, Math.ceil(visible.length / APPLICATIONS_PER_PAGE));
-  
+  /*
+   * La fila que se está guardando ocupa un lugar real en la tabla: cuenta
+   * para el total de páginas y desplaza a las demás. Con la página llena,
+   * eso empuja la última postulación a la página siguiente — que es lo que
+   * va a pasar igual apenas el servidor confirme el alta.
+   */
+  const pendingCount = pending ? 1 : 0;
+  const totalPages = Math.max(
+    1,
+    Math.ceil((visible.length + pendingCount) / APPLICATIONS_PER_PAGE),
+  );
+
   const currentPage = Math.min(page, totalPages);
+  /* El esqueleto vive al tope de la primera página, así que sólo ahí le
+     saca un lugar a las postulaciones ya guardadas. */
+  const skeletonTakesSlot = pending !== null && currentPage === 1;
   const pageItems = visible.slice(
-    (currentPage - 1) * APPLICATIONS_PER_PAGE,
-    currentPage * APPLICATIONS_PER_PAGE,
+    Math.max(0, (currentPage - 1) * APPLICATIONS_PER_PAGE - pendingCount),
+    currentPage * APPLICATIONS_PER_PAGE - (skeletonTakesSlot ? 1 : 0),
   );
 
   const selected = applications.find((application) => application.id === selectedId) ?? null;
@@ -100,19 +137,31 @@ export function ApplicationsSection() {
   const handleCreate = async (input: ApplicationInput) => {
     setRowError(null);
     setModalOpen(false);
+    setPendingRetiring(false);
     setPending(input);
+    /* El esqueleto aparece al tope de la primera página: si estaba viendo
+       otra, no vería nada de lo que acaba de hacer. */
+    setPage(1);
 
     const result = await createApplication(input);
 
     if (result.status !== 'success') {
-      setPending(null);
       setRowError(
         result.status === 'error'
           ? result.error.message
           : 'No se pudo registrar la postulación. Intentá de nuevo en unos minutos.',
       );
+
+      /* La fila se repliega antes de desaparecer y las de abajo vuelven a
+         subir solas — el mismo movimiento de la aparición, al revés. */
+      setPendingRetiring(true);
+      setTimeout(() => {
+        setPending(null);
+        setPendingRetiring(false);
+      }, RETIRE_MS);
       return;
     }
+
     await refresh();
     setPending(null);
     setSelectedId(result.data.application.id);
@@ -197,23 +246,7 @@ export function ApplicationsSection() {
                   </tr>
                 </thead>
                 <tbody>
-                  {}
-                  {pending && (
-                    <tr className={cx(styles.row, styles.rowPending)}>
-                      <td className={screen.cellStrong}>
-                        {pending.name?.trim() || 'Sin nombre todavía'}
-                      </td>
-                      <td className={screen.cellSoft}>{pending.position ?? '—'}</td>
-                      <td className={screen.cellSoft}>{pendingCvLabel(pending, cvs)}</td>
-                      <td className={screen.cellSoft}>{pending.url}</td>
-                      <td>
-                        <span className={styles.savingCell}>
-                          <span className={styles.spinner} aria-hidden="true" />
-                          Guardando…
-                        </span>
-                      </td>
-                    </tr>
-                  )}
+                  {pending && <PendingRow retiring={pendingRetiring} />}
 
                   {pageItems.map((application) => (
                     <tr

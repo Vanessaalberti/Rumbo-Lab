@@ -697,33 +697,91 @@
   color: var(--text-soft);
 }
 
-.savingCell {
-  display: inline-flex;
+/* --- Esqueleto de la postulación que se está guardando --------------------- */
+
+/*
+ * El padding vertical se le saca a la celda y se lo lleva el div de adentro:
+ * una fila de tabla no anima bien su propia altura, pero el contenedor de la
+ * celda sí. Al crecer de cero a su alto natural, las filas de abajo se
+ * corren solas — el empujón no está programado, es la consecuencia.
+ */
+.skeletonTd {
+  padding-block: 0 !important;
+}
+
+.skeletonCell {
+  display: flex;
   align-items: center;
-  gap: var(--space-2);
-  font-size: var(--text-sm);
-  color: var(--text-soft);
-  white-space: nowrap;
+  height: 0;
+  overflow: hidden;
+  animation: applications-skeleton-grow var(--duration-normal) var(--ease-out) forwards;
 }
 
-.spinner {
-  width: 12px;
-  height: 12px;
-  flex-shrink: 0;
-  border-radius: var(--radius-full);
-  border: 2px solid var(--border);
-  border-top-color: var(--brand);
-  animation: applications-spin 0.7s linear infinite;
+/* Mismo recorrido, al revés: la fila se repliega y las de abajo suben. */
+.skeletonCellRetiring {
+  animation: applications-skeleton-collapse var(--duration-normal) var(--ease-standard) forwards;
 }
 
-@keyframes applications-spin {
+@keyframes applications-skeleton-grow {
+  from {
+    height: 0;
+    opacity: 0;
+  }
   to {
-    transform: rotate(360deg);
+    /* El alto de una fila normal: padding vertical + línea de texto. */
+    height: calc(var(--space-3) * 2 + 1.35em);
+    opacity: 1;
   }
 }
 
+@keyframes applications-skeleton-collapse {
+  from {
+    height: calc(var(--space-3) * 2 + 1.35em);
+    opacity: 1;
+  }
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+.skeletonBar {
+  height: 9px;
+  border-radius: var(--radius-full);
+  background-color: var(--border-soft);
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--surface) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: applications-skeleton-shimmer 1.4s var(--ease-in-out) infinite;
+}
+
+@keyframes applications-skeleton-shimmer {
+  from {
+    background-position: -120% 0;
+  }
+  to {
+    background-position: 220% 0;
+  }
+}
+
+/*
+ * Sin movimiento la fila aparece y desaparece ya con su alto final: se
+ * pierde el desplazamiento, no la información de que algo se está guardando.
+ */
 @media (prefers-reduced-motion: reduce) {
-  .spinner {
+  .skeletonCell,
+  .skeletonCellRetiring {
+    height: calc(var(--space-3) * 2 + 1.35em);
+    animation: none;
+    opacity: 1;
+  }
+
+  .skeletonBar {
     animation: none;
   }
 }
