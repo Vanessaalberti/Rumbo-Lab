@@ -31,10 +31,15 @@
 /*
  * Dos tarjetas de igual ancho, que no se estiran a lo ancho de la pantalla:
  * una comparación se lee mejor cuando las dos columnas están cerca.
+ *
+ * Centradas, porque son el contenido entero de la pantalla: pegadas a la
+ * izquierda dejaban un vacío a la derecha que no anticipaba nada — no va a
+ * haber un tercer plan.
  */
 .plans {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 380px));
+  justify-content: center;
   gap: var(--space-5);
   align-items: stretch;
 }

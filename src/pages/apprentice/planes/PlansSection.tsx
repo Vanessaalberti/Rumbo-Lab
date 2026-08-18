@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Icon } from '@/components/ui/Icon';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { ROUTES } from '@/constants/routes';
 import {
   readPlans,
@@ -25,6 +26,11 @@ import styles from './planes.module.css';
  * arma con la misma configuración que aplica el cobro. Escribirlos a mano
  * garantizaría que en algún momento la pantalla prometa algo distinto de lo
  * que el backend permite.
+ *
+ * Ese viaje cuesta una llamada, y por eso hay esqueleto: lo único que se
+ * espera son los números, así que el resto de la tarjeta —título, precio,
+ * descripción— se dibuja de entrada y sólo la lista aparece después. Lo que
+ * se ve moverse es una lista completándose, no la pantalla entera apareciendo.
  */
 
 const PRICE_ARS = 5000;
@@ -39,6 +45,16 @@ const TOOL_LABELS: Record<string, string> = {
 
 /** El orden en que se leen. El mismo en los dos planes, para poder comparar. */
 const TOOL_ORDER = ['cvMatch', 'oratoria', 'entrevista', 'linkedin'];
+
+/**
+ * Cuánto mide, más o menos, cada fila de la lista mientras carga.
+ *
+ * Salen de los largos reales de `TOOL_LABELS`, en el mismo orden: la fila más
+ * larga es "Comparaciones de CV con una oferta" y la más corta "Prácticas de
+ * oratoria". Un esqueleto que no se parece a lo que viene después no anticipa
+ * nada.
+ */
+const SKELETON_WIDTHS = ['88%', '62%', '78%', '70%'];
 
 export function PlansSection() {
   const [info, setInfo] = useState<PlansInfo | null>(null);
@@ -138,9 +154,25 @@ function PlanCard({
 
       <p className={styles.planDescription}>{description}</p>
 
-      {/* Mientras los límites no llegaron no se muestra una lista con ceros:
-          un plan que dice "0 comparaciones" por un instante es peor que un
-          plan que todavía no dice nada. */}
+      {/* Mientras los límites no llegaron va el esqueleto y no una lista con
+          ceros: un plan que dice "0 comparaciones" por un instante promete
+          algo falso, aunque sea por medio segundo. */}
+      {!plan && (
+        <ul className={styles.planTools} aria-hidden="true">
+          {/* Cada fila ocupa lo mismo que va a ocupar el texto real: el
+              cuadradito del ícono y una barra del largo de la etiqueta. Los
+              anchos son distintos entre filas porque los nombres lo son —
+              cuatro barras idénticas se leen como una tabla vacía, no como
+              contenido cargando. */}
+          {SKELETON_WIDTHS.map((width, index) => (
+            <li key={index} className={styles.planTool}>
+              <Skeleton width="15px" height="15px" shape="block" className={styles.planToolIcon} />
+              <Skeleton width={width} height="1.05rem" />
+            </li>
+          ))}
+        </ul>
+      )}
+
       {plan && (
         <ul className={styles.planTools}>
           {TOOL_ORDER.filter((tool) => plan.tools[tool] !== undefined).map((tool) => (

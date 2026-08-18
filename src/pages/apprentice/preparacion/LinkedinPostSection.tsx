@@ -1,4 +1,6 @@
 import { useId, useState, type FormEvent } from 'react';
+import { useOutletContext } from 'react-router-dom';
+import type { ApprenticeShellContext } from '@/app/layouts/ApprenticeShell';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { LoadingState } from '@/components/ui/LoadingState';
@@ -62,6 +64,7 @@ const LOADING_STEPS = [
 ];
 
 export function LinkedinPostSection() {
+  const { refreshQuota } = useOutletContext<ApprenticeShellContext>();
   const rawTextId = useId();
 
   const [rawText, setRawText] = useState('');
@@ -100,6 +103,9 @@ export function LinkedinPostSection() {
     if (result.status === 'success') {
       setState({ status: 'success', result: result.data.generated });
       setDraft(result.data.generated.post);
+      /* Generar es lo único que consume cupo, incluido "generar otra
+         versión": cada una cuenta por separado. */
+      void refreshQuota();
       return;
     }
 

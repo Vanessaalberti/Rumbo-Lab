@@ -55,6 +55,11 @@ export const ICON_PATHS = {
   layers: 'M12 2 2 7l10 5 10-5zM2 17l10 5 10-5M2 12l10 5 10-5',
   shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10M9 12l2 2 4-4',
   trending: 'M3 17l6-6 4 4 8-8M15 7h6v6',
+  /* Espejo vertical de `trending`: la misma línea quebrada, bajando, con la
+     punta de flecha abajo a la derecha. Se dibuja aparte y no se rota por CSS
+     para que el grosor del trazo y los remates queden idénticos al resto. */
+  trendingDown: 'M3 7l6 6 4-4 8 8M15 17h6v-6',
+  star: 'M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z',
   spark: 'M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.4z',
   compass: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18M15.5 8.5l-2 5-5 2 2-5z',
 } as const;

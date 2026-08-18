@@ -35,7 +35,7 @@ type ViewState =
   | { status: 'error'; message: string };
 
 export function CvMatchSection() {
-  const { dashboard } = useOutletContext<ApprenticeShellContext>();
+  const { dashboard, refreshQuota } = useOutletContext<ApprenticeShellContext>();
   const cvSelectId = useId();
   const jobTextId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -66,6 +66,9 @@ export function CvMatchSection() {
 
     if (result.status === 'success') {
       setState({ status: 'success', match: result.data.match });
+      /* Generar es lo único que consume cupo, así que es el único momento en
+         que hace falta volver a preguntarlo. */
+      void refreshQuota();
       return;
     }
 

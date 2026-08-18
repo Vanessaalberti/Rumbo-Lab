@@ -56,6 +56,18 @@ export interface CvSummary {
   createdAt: string;
 }
 
+/**
+ * Marca personal de una postulación.
+ *
+ * No es un estado: `status` dice dónde está el proceso —lo decide la
+ * empresa— y esto dice qué piensa quien se postuló. Conviven sin relación,
+ * así que una postulación rechazada puede seguir siendo favorita.
+ *
+ * Es una sola y excluyente porque la tabla muestra **un** ícono a la
+ * izquierda del nombre.
+ */
+export type ApplicationMark = 'favorita' | 'probable' | 'improbable';
+
 export interface ApplicationSummary {
   id: string;
   /** Rótulo libre. Autogenerado como `Postulación-N` si se omite al crear. */
@@ -71,6 +83,8 @@ export interface ApplicationSummary {
    * aplica" (`cvId === null && !customCv`), que significa que no hacía falta.
    */
   customCv: boolean;
+  /** Marca personal, o `null` si no tiene ninguna. */
+  mark: ApplicationMark | null;
   /**
    * Lo más lejos que llegó el proceso, según `application_status_history`.
    * `null` si nunca pasó de `pendiente`. No es el estado actual: una
@@ -129,6 +143,8 @@ export interface ApplicationInput {
   spaceId?: string | null;
   appliedAt?: string | null;
   notes?: string | null;
+  /** `null` quita la marca. Ausente la deja como está. */
+  mark?: ApplicationMark | null;
 }
 
 export type ApplicationPatch = Partial<ApplicationInput>;

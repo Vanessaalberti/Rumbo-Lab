@@ -78,7 +78,7 @@ type Phase =
   | { name: 'results'; closing: InterviewClosing | null };
 
 export function EntrevistaSection() {
-  const { dashboard } = useOutletContext<ApprenticeShellContext>();
+  const { dashboard, refreshQuota } = useOutletContext<ApprenticeShellContext>();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recorder = useAudioRecorder({ maxSeconds: MAX_ANSWER_SECONDS });
 
@@ -123,6 +123,10 @@ export function EntrevistaSection() {
       setPhase({ name: 'setup' });
       return;
     }
+
+    /* La entrevista entera se cobra en este paso; los dos siguientes no
+       vuelven a consumir. */
+    void refreshQuota();
 
     const composed = composeInterview(result.data.preparation.questions);
     setRoleSummary(result.data.preparation.roleSummary);

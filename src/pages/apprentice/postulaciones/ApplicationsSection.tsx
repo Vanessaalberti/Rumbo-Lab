@@ -10,13 +10,14 @@ import {
 } from '@/services/data/dashboard/applications.service';
 import type {
   ApplicationInput,
+  ApplicationMark,
   ApplicationStatus,
   ApplicationSummary,
 } from '@/services/data/dashboard/dashboard.types';
 import { ApplicationDetail } from './ApplicationDetail';
 import { NewApplicationModal } from './NewApplicationModal';
-import { StatusFilter } from './StatusFilter';
-import { CvCell, StatusCell } from './TableCells';
+import { ApplicationsFilter } from './ApplicationsFilter';
+import { CvCell, MarkIcon, StatusCell } from './TableCells';
 import { ContactCell } from './ContactCell';
 import screen from '@/app/layouts/appShell.module.css';
 import styles from './applications.module.css';
@@ -75,6 +76,7 @@ export function ApplicationsSection() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<ApplicationStatus[]>([]);
+  const [markFilter, setMarkFilter] = useState<ApplicationMark[]>([]);
   const [search, setSearch] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -86,11 +88,20 @@ export function ApplicationsSection() {
   const [pendingRetiring, setPendingRetiring] = useState(false);
 
   const normalizedSearch = normalize(search.trim());
-  const isFiltered = statusFilter.length > 0 || normalizedSearch !== '';
+  const isFiltered =
+    statusFilter.length > 0 || markFilter.length > 0 || normalizedSearch !== '';
 
+  /* Los criterios se cruzan con Y, y dentro de cada uno con O: elegir
+     "Entrevista" y "Favorita" muestra las favoritas que están en entrevista,
+     no la suma de las dos listas. */
   const visible = applications
     .filter(
       (application) => statusFilter.length === 0 || statusFilter.includes(application.status),
+    )
+    .filter(
+      (application) =>
+        markFilter.length === 0 ||
+        (application.mark !== null && markFilter.includes(application.mark)),
     )
     .filter((application) => matchesSearch(application, normalizedSearch));
 
@@ -211,10 +222,15 @@ export function ApplicationsSection() {
               <Button size="sm" iconLeading="plus" onClick={() => setModalOpen(true)}>
                 Nueva postulación
               </Button>
-              <StatusFilter
-                selected={statusFilter}
-                onChange={(next) => {
+              <ApplicationsFilter
+                statuses={statusFilter}
+                onStatusesChange={(next) => {
                   setStatusFilter(next);
+                  setPage(1);
+                }}
+                marks={markFilter}
+                onMarksChange={(next) => {
+                  setMarkFilter(next);
                   setPage(1);
                 }}
               />
@@ -267,7 +283,12 @@ export function ApplicationsSection() {
                       aria-pressed={application.id === selectedId}
                       aria-label={`Ver el detalle de ${application.name}`}
                     >
-                      <td className={screen.cellStrong}>{application.name}</td>
+                      <td className={screen.cellStrong}>
+                        <span className={styles.nameCell}>
+                          <MarkIcon mark={application.mark} />
+                          {application.name}
+                        </span>
+                      </td>
                       <td className={screen.cellSoft}>{application.position ?? '—'}</td>
                       <td>
                         <CvCell

@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
+import type { ApprenticeShellContext } from '@/app/layouts/ApprenticeShell';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Icon, type IconName } from '@/components/ui/Icon';
@@ -56,6 +58,7 @@ interface OratoriaSelection {
 }
 
 export function OratoriaSection() {
+  const { refreshQuota } = useOutletContext<ApprenticeShellContext>();
   const [selection, setSelection] = useState<OratoriaSelection | null>(null);
   const [analysis, setAnalysis] = useState<AnalysisState>({ status: 'idle' });
   const recorder = useAudioRecorder();
@@ -84,6 +87,9 @@ export function OratoriaSection() {
 
     if (result.status === 'success') {
       setAnalysis({ status: 'success', analysis: result.data.analysis });
+      /* Analizar es lo único que consume cupo: es el único momento en que
+         hace falta volver a preguntarlo. */
+      void refreshQuota();
       return;
     }
 

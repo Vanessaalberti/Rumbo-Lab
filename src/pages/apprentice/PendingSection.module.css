@@ -202,11 +202,10 @@
 /* --- Preparación: cuántos usos de IA quedan ------------------------------ */
 
 /*
- * Va arriba de las tarjetas y no dentro de cada herramienta: el saldo es uno
- * solo y compartido, y verlo antes de elegir es justamente el punto — que
- * nadie escriba seis mil caracteres para enterarse recién al final.
- */
-/*
+ * El aviso va arriba de las tarjetas y no dentro de cada herramienta: verlo
+ * antes de elegir es el punto — que nadie escriba seis mil caracteres para
+ * enterarse recién al final.
+ *
  * El aviso y el botón, uno al lado del otro. `flex-start` en vez de estirar:
  * un aviso del ancho de la pantalla dejaba la etiqueta del plan en la otra
  * punta, tan lejos del texto que no se leía como parte de lo mismo.
@@ -247,6 +246,13 @@
 
 .creditsRefill {
   color: var(--text-soft);
+}
+
+/* Alineado con la línea de base del texto que lo rodea: un bloque suelto en
+   medio de una frase queda flotando y se nota más que el dato que falta. */
+.creditsSkeleton {
+  display: inline-block;
+  vertical-align: -0.1em;
 }
 
 /* La regla del cupo, en segunda línea: se lee una vez y después ya se sabe. */

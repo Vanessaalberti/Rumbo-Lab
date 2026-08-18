@@ -1,14 +1,11 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
+import type { ApprenticeShellContext } from '@/app/layouts/ApprenticeShell';
 import { Card } from '@/components/ui/Card';
 import { LinkButton } from '@/components/ui/Button';
 import { Icon, type IconName } from '@/components/ui/Icon';
 import { ROUTES } from '@/constants/routes';
-import {
-  readAiQuota,
-  timeUntilReset,
-  type AiQuota,
-} from '@/services/data/preparation/aiQuota.service';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { timeUntilReset, type AiQuota } from '@/services/data/preparation/aiQuota.service';
 import { cx } from '@/utils/classNames';
 import screen from '@/app/layouts/appShell.module.css';
 import styles from './PendingSection.module.css';
@@ -99,23 +96,12 @@ function sortByAvailability(tools: readonly Tool[]): Tool[] {
 
 export function PreparationSection() {
   const tools = sortByAvailability(TOOLS);
-  const [quota, setQuota] = useState<AiQuota | null>(null);
-
   /*
-   * El saldo se pide al entrar, que es el único momento en que sirve: la idea
-   * es que se vea antes de elegir herramienta y antes de escribir nada. Si la
-   * consulta falla no se muestra nada — quedarse sin el número no puede
-   * impedir usar la sección.
+   * El cupo lo carga `ApprenticeShell` una vez por sesión. Pedirlo acá hacía
+   * que se recargara en cada entrada a la sección, y el aviso parpadeara sin
+   * que hubiera cambiado nada.
    */
-  useEffect(() => {
-    let active = true;
-    void readAiQuota().then((result) => {
-      if (active && result.status === 'success') setQuota(result.data);
-    });
-    return () => {
-      active = false;
-    };
-  }, []);
+  const { quota } = useOutletContext<ApprenticeShellContext>();
 
   return (
     <>
@@ -126,7 +112,7 @@ export function PreparationSection() {
         </div>
       </div>
 
-      {quota && <QuotaBanner quota={quota} />}
+      <QuotaBanner quota={quota} />
 
       <div className={styles.tools}>
         {tools.map((tool) => {
@@ -184,10 +170,17 @@ export function PreparationSection() {
  * lado va el botón para mejorar, que es la acción que sigue naturalmente a
  * leer cuánto te queda.
  */
-function QuotaBanner({ quota }: { quota: AiQuota }) {
-  const remaining = timeUntilReset(quota.resetAt);
-  const hours = quota.windowHours;
+function QuotaBanner({ quota }: { quota: AiQuota | null }) {
+  const remaining = quota ? timeUntilReset(quota.resetAt) : null;
+  const hours = quota?.windowHours;
 
+  /*
+   * El aviso se dibuja entero desde el primer instante y sólo los dos datos
+   * que dependen del servidor —cada cuánto y cuánto falta— esperan como
+   * esqueleto. Antes el bloque completo aparecía de golpe cuando llegaba la
+   * respuesta, y eso empujaba las tarjetas hacia abajo justo cuando alguien
+   * estaba por hacer clic.
+   */
   return (
     <div className={styles.quotaRow}>
       <div className={styles.credits}>
@@ -195,18 +188,28 @@ function QuotaBanner({ quota }: { quota: AiQuota }) {
 
         <p className={styles.creditsText}>
           <strong className={styles.creditsCount}>
-            Los usos se renuevan cada {hours === 1 ? 'hora' : `${hours} horas`}
+            Los usos se renuevan cada{' '}
+            {hours === undefined ? (
+              <Skeleton width="4.5rem" height="0.95em" className={styles.creditsSkeleton} />
+            ) : (
+              `${hours === 1 ? '1 hora' : `${hours} horas`}`
+            )}
           </strong>
-          {remaining && <span className={styles.creditsRefill}> · faltan {remaining}</span>}
+          <span className={styles.creditsRefill}>
+            {' · faltan '}
+            {remaining ?? (
+              <Skeleton width="3.5rem" height="0.95em" className={styles.creditsSkeleton} />
+            )}
+          </span>
           <span className={styles.creditsNote}>
             Cada herramienta tiene su propio cupo y no se acumula de un bloque al siguiente.
           </span>
         </p>
 
-        {quota.plan === 'free' && <span className={styles.creditsPlan}>Plan gratuito</span>}
+        {quota?.plan === 'free' && <span className={styles.creditsPlan}>Plan gratuito</span>}
       </div>
 
-      {quota.plan === 'free' && (
+      {quota?.plan === 'free' && (
         <LinkButton href={ROUTES.myRumboPlans} variant="secondary" size="sm">
           Mejorar plan
         </LinkButton>
@@ -229,7 +232,16 @@ function ToolQuotaLabel({ tool, quota }: { tool: Tool; quota: AiQuota | null }) 
   }
 
   const toolQuota = quota?.tools[tool.quotaId];
-  if (!toolQuota) return null;
+
+  /* El lugar se reserva desde el principio: sin esto la tarjeta crecía unos
+     píxeles al llegar el dato y toda la grilla se movía. */
+  if (!toolQuota) {
+    return (
+      <span className={styles.toolCost}>
+        <Skeleton width="2.2rem" height="0.9em" />
+      </span>
+    );
+  }
 
   const empty = toolQuota.remaining === 0;
 

@@ -19,7 +19,8 @@ import type {
 import { cvChoiceOf } from '@/services/data/dashboard/dashboard.types';
 import { APPLICATION_STATUS_LABELS } from '../applicationStatus';
 import { cvChoiceLabel } from './cvChoice';
-import { StatusPill } from './TableCells';
+import { APPLICATION_MARKS } from './applicationMark';
+import { MarkIcon, StatusPill } from './TableCells';
 import { ListSkeleton } from '@/components/ui/Skeleton';
 import { formatLongDate } from '../perfil/formatters';
 import screen from '@/app/layouts/appShell.module.css';
@@ -69,6 +70,7 @@ export function ApplicationDetail({
     cvChoice: cvChoiceOf(application),
     appliedAt: application.appliedAt ?? '',
     notes: application.notes ?? '',
+    mark: application.mark,
   });
   const [saving, setSaving] = useState(false);
   const [removing, setRemoving] = useState(false);
@@ -116,6 +118,7 @@ export function ApplicationDetail({
          intacto el que la postulación tuviera. */
       appliedAt: form.appliedAt || null,
       notes: form.notes.trim() || null,
+      mark: form.mark,
     });
     setSaving(false);
 
@@ -153,7 +156,10 @@ export function ApplicationDetail({
     <section className={styles.detail}>
       <header className={styles.detailHead}>
         <div className={styles.detailHeadText}>
-          <p className={styles.detailTitle}>{application.name}</p>
+          <p className={styles.detailTitle}>
+            <MarkIcon mark={application.mark} />
+            {application.name}
+          </p>
           <div className={styles.detailStatus}>
             <StatusPill status={application.status} />
             <span className={styles.detailMeta}>
@@ -255,6 +261,37 @@ export function ApplicationDetail({
                 </option>
               ))}
             </select>
+          </div>
+
+          {/*
+            * La marca es una anotación de quien se postuló, no un estado del
+            * proceso, así que se elige acá y no en la tabla junto al estado.
+            * Volver a tocar la marca activa la desmarca: sin eso no habría
+            * forma de sacarla salvo agregando un cuarto botón de "ninguna".
+            */}
+          <div className={styles.field}>
+            <span className={styles.fieldLabel}>Marca</span>
+            <div className={styles.markPicker} role="group" aria-label="Marca de la postulación">
+              {APPLICATION_MARKS.map((meta) => {
+                const active = form.mark === meta.id;
+                return (
+                  <button
+                    key={meta.id}
+                    type="button"
+                    className={cx(styles.markOption, active && styles.markOptionActive)}
+                    onClick={() => setForm((f) => ({ ...f, mark: active ? null : meta.id }))}
+                    disabled={busy}
+                    aria-pressed={active}
+                  >
+                    <Icon name={meta.icon} size={15} />
+                    {meta.label}
+                  </button>
+                );
+              })}
+            </div>
+            <span className={styles.markHint}>
+              Opcional. Tocá la que ya está marcada para quitarla.
+            </span>
           </div>
 
           <div className={styles.field}>

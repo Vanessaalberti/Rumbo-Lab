@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { getMyRumboDashboard } from '@/services/data/dashboard/dashboard.service';
 import type { MyRumboDashboard } from '@/services/data/dashboard/dashboard.types';
+import { readAiQuota, type AiQuota } from '@/services/data/preparation/aiQuota.service';
 import { PageSkeleton, type SkeletonVariant } from '@/components/ui/Skeleton';
 import { AppRail } from './AppRail';
 import styles from './appShell.module.css';
@@ -17,6 +18,26 @@ export interface ApprenticeShellContext {
    * real, en vez de dejar un hueco entre una cosa y la otra.
    */
   refresh: () => Promise<void>;
+
+  /**
+   * Cupos de las herramientas de IA. `null` mientras no llegaron.
+   *
+   * Vive acá y no en Preparación por el mismo motivo que el dashboard: sin
+   * esto, cada vez que se entra a la sección se dispara el request de nuevo,
+   * y el aviso de cupos parpadea en cada navegación aunque no haya cambiado
+   * nada. Se pide una vez por sesión.
+   *
+   * No bloquea el render: la pantalla aparece con el dashboard y el cupo se
+   * completa cuando llega. Quien lo muestre tiene que contemplar el `null`.
+   */
+  quota: AiQuota | null;
+
+  /**
+   * Vuelve a pedir los cupos. La llaman las herramientas después de generar
+   * algo — es lo único que los cambia, así que no hace falta preguntar en
+   * ningún otro momento.
+   */
+  refreshQuota: () => Promise<void>;
 }
 
 type ShellState =
@@ -58,6 +79,7 @@ function skeletonFor(pathname: string): SkeletonVariant {
  */
 export function ApprenticeShell() {
   const [state, setState] = useState<ShellState>({ status: 'loading' });
+  const [quota, setQuota] = useState<AiQuota | null>(null);
   const location = useLocation();
 
   /**
@@ -87,8 +109,21 @@ export function ApprenticeShell() {
     });
   };
 
+  /*
+   * Los cupos van por su cuenta y no bloquean nada: si tardan o fallan, la
+   * pantalla se usa igual. Un fallo deja `null`, que es el mismo estado que
+   * "todavía no llegó" — y ahí la vista muestra el aviso sin los números en
+   * vez de un error, porque no poder decir cuántos usos quedan no impide
+   * usar la sección.
+   */
+  const loadQuota = (): Promise<void> =>
+    readAiQuota().then((result) => {
+      if (result.status === 'success') setQuota(result.data);
+    });
+
   useEffect(() => {
     void load(true);
+    void loadQuota();
   }, []);
 
   if (state.status === 'loading') {
@@ -119,6 +154,8 @@ export function ApprenticeShell() {
   const context: ApprenticeShellContext = {
     dashboard: state.data,
     refresh: () => load(),
+    quota,
+    refreshQuota: loadQuota,
   };
 
   return (

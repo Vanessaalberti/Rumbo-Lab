@@ -4,9 +4,11 @@ import { Popover } from '@/components/ui/Popover';
 import { cx } from '@/utils/classNames';
 import {
   cvChoiceOf,
+  type ApplicationMark,
   type ApplicationStatus,
   type CvSummary,
 } from '@/services/data/dashboard/dashboard.types';
+import { markMeta } from './applicationMark';
 import { cvChoiceLabel, cvChoiceOptions } from './cvChoice';
 import {
   APPLICATION_STATUS_LABELS,
@@ -14,6 +16,30 @@ import {
   statusPillStyle,
 } from '../applicationStatus';
 import styles from './applications.module.css';
+
+/**
+ * La marca de una postulación, a la izquierda de su nombre.
+ *
+ * Devuelve `null` sin marca en vez de un hueco: la columna del nombre no
+ * reserva lugar para el ícono, así que las filas sin marca se leen igual que
+ * antes y las marcadas se destacan por contraste.
+ *
+ * El `title` es lo único que dice qué significa cada figura — una estrella se
+ * entiende sola, pero una flecha hacia abajo no.
+ */
+export function MarkIcon({ mark }: { mark: ApplicationMark | null }) {
+  const meta = markMeta(mark);
+  if (!meta) return null;
+
+  /* El `title` va en un envoltorio y no en el `Icon`: ese componente expone
+     `label` para el nombre accesible pero no un tooltip, y acá hacen falta los
+     dos — la figura sola no dice qué significa. */
+  return (
+    <span className={cx(styles.markIcon, styles[`markIcon-${meta.id}`])} title={meta.title}>
+      <Icon name={meta.icon} size={15} label={meta.title} />
+    </span>
+  );
+}
 
 /** Píldora de estado, con el color propio de ese estado. */
 export function StatusPill({
