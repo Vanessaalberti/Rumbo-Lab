@@ -57,7 +57,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
-  align-items: flex-start;
+  align-items: center;
 }
 
 .field {
@@ -164,6 +164,91 @@
   font-size: var(--text-sm);
 }
 
+/* --- Arriba: elegir CV a la izquierda, resultado visual a la derecha ------- */
+
+.topGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+  align-items: start;
+  gap: var(--space-5);
+  width: 100%;
+}
+
+.formColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+@media (max-width: 760px) {
+  .topGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  min-height: 260px;
+  padding: var(--space-5);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.visualEmpty {
+  text-align: center;
+  max-width: 32ch;
+}
+
+/*
+ * Invita a bajar a ver el detalle una vez que ya hay resultado. La flecha
+ * rebota sola —sin esperar a un :hover que en mobile no existe— porque el
+ * punto es notarla de reojo, no encontrarla pasando el mouse.
+ */
+.scrollHint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  align-self: center;
+  padding: var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--text-faint);
+  transition: var(--transition-colors);
+}
+
+.scrollHint:hover,
+.scrollHint:focus-visible {
+  color: var(--brand-strong);
+}
+
+.scrollHintIcon {
+  animation: rumbo-scroll-hint-bounce 1.6s var(--ease-in-out) infinite;
+}
+
+@keyframes rumbo-scroll-hint-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scrollHintIcon {
+    animation: none;
+  }
+}
+
 /* --- Resultado -------------------------------------------------------------- */
 
 .result {
@@ -215,17 +300,25 @@
   border-bottom: 1px solid var(--border-soft);
 }
 
+/* El radar de espera queda centrado en la tarjeta en vez de pegado a la
+   izquierda, que es donde cae por defecto en un contenedor en columna. */
+.centeredLoading {
+  align-self: center;
+}
+
 /* --- Categorías ------------------------------------------------------------ */
 
 .categories {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--space-4);
-  padding-bottom: var(--space-4);
-  border-bottom: 1px solid var(--border-soft);
+  width: 100%;
 }
 
-@media (min-width: 640px) {
+/* El panel visual es más angosto que el ancho completo de la pantalla desde
+   que quedó al lado del formulario — dos columnas de barras recién entran
+   cómodas a partir de un viewport bien ancho, no de los 640px de antes. */
+@media (min-width: 900px) {
   .categories {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

@@ -127,18 +127,22 @@
   stroke: var(--brand);
   stroke-width: 2;
   stroke-linejoin: round;
-  animation: rumbo-radar-appear var(--duration-slow) var(--ease-out) both;
+  transform-origin: 150px 150px;
+  animation: rumbo-radar-appear var(--duration-reveal) var(--ease-out) both;
 }
 
 .primaryDot {
   fill: var(--brand);
-  animation: rumbo-radar-appear var(--duration-slow) var(--ease-out) both;
+  transform-origin: 150px 150px;
+  animation: rumbo-radar-appear var(--duration-reveal) var(--ease-out) both;
 }
 
 /*
  * Cada respuesta individual, apenas visible. No están para leerse una por
  * una: juntas muestran si el desempeño fue parejo (contornos apretados) o
- * irregular (contornos dispersos).
+ * irregular (contornos dispersos). Mismo crecimiento que la serie principal,
+ * así el conjunto entero se arma de una vez y no queda una forma quieta
+ * detrás de otra que sí se mueve.
  */
 .ghostShape {
   fill: none;
@@ -146,24 +150,32 @@
   stroke-width: 1;
   stroke-opacity: 0.4;
   stroke-linejoin: round;
+  transform-origin: 150px 150px;
+  animation: rumbo-radar-appear var(--duration-reveal) var(--ease-out) both;
 }
 
+/*
+ * El polígono crece desde el centro hasta su forma final — no es sólo un
+ * fundido, es la lectura del resultado tomando forma. `transform-origin` va
+ * en coordenadas fijas del `viewBox` (150,150 = `CENTER`) en vez de `center`:
+ * `center` se calcula sobre la caja del propio trazo, que cambia de tamaño
+ * con cada resultado, y el crecimiento quedaba descentrado.
+ */
 @keyframes rumbo-radar-appear {
   from {
     opacity: 0;
-    transform: scale(0.92);
-    transform-origin: center;
+    transform: scale(0);
   }
   to {
     opacity: 1;
     transform: scale(1);
-    transform-origin: center;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .primaryShape,
-  .primaryDot {
+  .primaryDot,
+  .ghostShape {
     animation: none;
   }
 }

@@ -4,6 +4,8 @@ import type { ApprenticeShellContext } from '@/app/layouts/ApprenticeShell';
 import { Button } from '@/components/ui/Button';
 import { Icon, type IconName } from '@/components/ui/Icon';
 import { ProgressBar } from '@/components/ui/ProgressBar';
+import { RadarChart, type RadarAxis } from '@/components/ui/RadarChart';
+import { LoadingState } from '@/components/ui/LoadingState';
 import { TextLink } from '@/components/ui/TextLink';
 import { ROUTES } from '@/constants/routes';
 import {
@@ -39,6 +41,7 @@ type ViewState =
 export function AtsTesterSection() {
   const { dashboard } = useOutletContext<ApprenticeShellContext>();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const detailRef = useRef<HTMLDivElement>(null);
 
   const [source, setSource] = useState<CvSource>(dashboard.cvs.length > 0 ? 'saved' : 'upload');
   const [cvId, setCvId] = useState(dashboard.cvs[0]?.id ?? '');
@@ -88,97 +91,173 @@ export function AtsTesterSection() {
         exacta de ninguno en particular.
       </p>
 
-      <form onSubmit={(event) => void handleSubmit(event)} className={styles.form} noValidate>
-        <div className={styles.field}>
-          <span className={styles.fieldLabel}>Tu CV</span>
+      {/*
+        Tres secciones: el CV a elegir y el resultado visual (puntaje, radar,
+        las 6 categorías) uno al lado del otro arriba, y toda la descripción
+        —problemas detectados, comprobación por comprobación— abajo, a lo
+        ancho. Así lo primero que se ve al terminar es el número y la forma
+        del resultado, sin tener que bajar a buscarlos.
+      */}
+      <div className={styles.topGrid}>
+        {/* Una sola columna del grid: el form y la flecha van uno debajo del
+            otro. Si fueran dos hijos sueltos del grid, el acomodo automático
+            de dos columnas los repartiría uno al lado del otro en vez de
+            apilarlos — por eso el wrapper. */}
+        <div className={styles.formColumn}>
+        <form onSubmit={(event) => void handleSubmit(event)} className={styles.form} noValidate>
+          <div className={styles.field}>
+            <span className={styles.fieldLabel}>Tu CV</span>
 
-          <div className={styles.sourceSwitch} role="group" aria-label="De dónde sale el CV a evaluar">
-            <button
-              type="button"
-              className={cx(styles.sourceOption, source === 'saved' && styles.sourceOptionActive)}
-              onClick={() => setSource('saved')}
-              disabled={state.status === 'loading'}
-            >
-              Uno de mis CVs
-            </button>
-            <button
-              type="button"
-              className={cx(styles.sourceOption, source === 'upload' && styles.sourceOptionActive)}
-              onClick={() => setSource('upload')}
-              disabled={state.status === 'loading'}
-            >
-              Subir sin guardar
-            </button>
+            <div className={styles.sourceSwitch} role="group" aria-label="De dónde sale el CV a evaluar">
+              <button
+                type="button"
+                className={cx(styles.sourceOption, source === 'saved' && styles.sourceOptionActive)}
+                onClick={() => setSource('saved')}
+                disabled={state.status === 'loading'}
+              >
+                Uno de mis CVs
+              </button>
+              <button
+                type="button"
+                className={cx(styles.sourceOption, source === 'upload' && styles.sourceOptionActive)}
+                onClick={() => setSource('upload')}
+                disabled={state.status === 'loading'}
+              >
+                Subir sin guardar
+              </button>
+            </div>
+
+            {source === 'saved' ? (
+              dashboard.cvs.length === 0 ? (
+                <p className={styles.fieldEmpty}>
+                  Todavía no subiste ningún CV. <TextLink href={ROUTES.myRumboCvs}>Ir a CVs</TextLink>
+                </p>
+              ) : (
+                <select
+                  className={styles.select}
+                  value={cvId}
+                  onChange={(event) => setCvId(event.target.value)}
+                  disabled={state.status === 'loading'}
+                >
+                  {dashboard.cvs.map((cv) => (
+                    <option key={cv.id} value={cv.id}>
+                      {cv.name}
+                    </option>
+                  ))}
+                </select>
+              )
+            ) : (
+              <div className={styles.upload}>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  className={styles.hiddenInput}
+                  accept={UPLOAD_ACCEPT_ATTRIBUTE}
+                  onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+                  disabled={state.status === 'loading'}
+                />
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={state.status === 'loading'}
+                >
+                  {file ? 'Cambiar archivo' : 'Elegir archivo'}
+                </Button>
+                <span className={styles.uploadName}>{file ? file.name : 'PDF, Word o imagen'}</span>
+                <p className={styles.fieldHint}>
+                  Se usa solo para esta evaluación. No se agrega a tus CVs ni queda guardado en ningún
+                  lado.
+                </p>
+              </div>
+            )}
           </div>
 
-          {source === 'saved' ? (
-            dashboard.cvs.length === 0 ? (
-              <p className={styles.fieldEmpty}>
-                Todavía no subiste ningún CV. <TextLink href={ROUTES.myRumboCvs}>Ir a CVs</TextLink>
-              </p>
-            ) : (
-              <select
-                className={styles.select}
-                value={cvId}
-                onChange={(event) => setCvId(event.target.value)}
-                disabled={state.status === 'loading'}
-              >
-                {dashboard.cvs.map((cv) => (
-                  <option key={cv.id} value={cv.id}>
-                    {cv.name}
-                  </option>
-                ))}
-              </select>
-            )
-          ) : (
-            <div className={styles.upload}>
-              <input
-                ref={fileInputRef}
-                type="file"
-                className={styles.hiddenInput}
-                accept={UPLOAD_ACCEPT_ATTRIBUTE}
-                onChange={(event) => setFile(event.target.files?.[0] ?? null)}
-                disabled={state.status === 'loading'}
-              />
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={state.status === 'loading'}
-              >
-                {file ? 'Cambiar archivo' : 'Elegir archivo'}
-              </Button>
-              <span className={styles.uploadName}>{file ? file.name : 'PDF, Word o imagen'}</span>
-              <p className={styles.fieldHint}>
-                Se usa solo para esta evaluación. No se agrega a tus CVs ni queda guardado en ningún
-                lado.
-              </p>
-            </div>
+          <Button type="submit" disabled={!canSubmit || state.status === 'loading'}>
+            {state.status === 'loading' ? 'Evaluando…' : 'Evaluar CV'}
+          </Button>
+        </form>
+
+          {/* Debajo del form, no dentro: es un accesorio de navegación, no un
+              campo. Sólo tiene sentido una vez que hay detalle para ir a
+              buscar — antes de eso no hay nada abajo todavía. */}
+          {state.status === 'success' && (
+            <button
+              type="button"
+              className={styles.scrollHint}
+              onClick={() => detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            >
+              <span>Ver el detalle de tu resultado</span>
+              <Icon name="chevronDown" size={18} className={styles.scrollHintIcon} />
+            </button>
           )}
         </div>
 
-        <Button type="submit" disabled={!canSubmit || state.status === 'loading'}>
-          {state.status === 'loading' ? 'Evaluando…' : 'Evaluar CV'}
-        </Button>
-      </form>
+        <div className={styles.visual}>
+          {state.status === 'idle' && (
+            <p className={cx(styles.fieldEmpty, styles.visualEmpty)}>
+              Elegí un CV y evalualo — el puntaje y el radar van a aparecer acá.
+            </p>
+          )}
 
-      {state.status === 'loading' && (
-        <p className={screen.emptyState} aria-live="polite">
-          Leyendo tu CV y aplicando las reglas de evaluación…
-        </p>
+          {/* El mismo radar que después muestra el resultado, escaneando —
+              mismo patrón que "Comparar tu CV con una oferta": la figura que
+              ya va a estar ahí, no un cartel de "cargando" aparte. */}
+          {state.status === 'loading' && (
+            <RadarChart
+              axes={ATS_AXES}
+              series={[]}
+              state="scanning"
+              ariaLabel="Evaluando tu CV contra las reglas de un ATS."
+            />
+          )}
+          {state.status === 'loading' && (
+            <LoadingState messages={ATS_LOADING_STEPS} className={styles.centeredLoading} />
+          )}
+
+          {state.status === 'error' && (
+            <p className={styles.errorState} role="alert">
+              {state.message}
+            </p>
+          )}
+
+          {state.status === 'success' && <AtsResultVisual result={state.result} />}
+        </div>
+      </div>
+
+      {state.status === 'success' && (
+        <div ref={detailRef}>
+          <AtsResultDetail result={state.result} />
+        </div>
       )}
-
-      {state.status === 'error' && (
-        <p className={styles.errorState} role="alert">
-          {state.message}
-        </p>
-      )}
-
-      {state.status === 'success' && <AtsResult result={state.result} />}
     </div>
   );
 }
+
+/**
+ * Las seis categorías del backend (`CATEGORIES` en `lib/ats/index.ts`),
+ * siempre en este orden y siempre las seis. Etiquetas cortas para que entren
+ * en el radar — la versión larga sigue en las barras de abajo.
+ */
+const ATS_AXES: RadarAxis[] = [
+  { id: 'lectura', label: 'Lectura' },
+  { id: 'contacto', label: 'Contacto' },
+  { id: 'estructura', label: 'Estructura' },
+  { id: 'trayectoria', label: 'Trayectoria' },
+  { id: 'contenido', label: 'Contenido' },
+  { id: 'riesgos', label: 'Riesgos' },
+];
+
+/* No hay IA de por medio, pero las ~65 comprobaciones sobre un PDF grande
+   igual tardan un momento — los pasos describen el orden real en que corre
+   `runAtsTest` en el backend. */
+const ATS_LOADING_STEPS = [
+  'Leyendo el documento…',
+  'Revisando estructura y contacto…',
+  'Aplicando las reglas de un ATS…',
+  'Armando el resultado…',
+];
 
 /* La severidad ya viene resuelta del backend: es parte del resultado, no una
    lectura que el frontend deduzca del puntaje. */
@@ -225,19 +304,29 @@ const SEVERITY_ICON: Record<AtsSeverity, IconName> = {
 /** Los correctos se resumen: son la mayoría y no hay nada que hacer con ellos. */
 const MAX_OK_SHOWN = 6;
 
-function AtsResult({ result }: { result: AtsTestResult }) {
-  const [showDetail, setShowDetail] = useState(false);
-
-  const bySeverity: Record<AtsSeverity, AtsCheck[]> = { critical: [], warning: [], ok: [], unknown: [] };
-  for (const check of result.checks) bySeverity[check.severity].push(check);
+/** Sección de arriba: el número, el radar y las 6 categorías. Nada de texto largo. */
+function AtsResultVisual({ result }: { result: AtsTestResult }) {
+  /* Mismo orden que `ATS_AXES`. Se busca por id en vez de asumir que
+     `result.categories` llega en ese orden — el radar no se rompe si el
+     backend algún día reordena la lista. */
+  const axisValues = ATS_AXES.map((axis) => {
+    const category = result.categories.find((item) => item.id === axis.id);
+    if (!category || category.maxPoints <= 0) return 0;
+    return Math.round((category.points / category.maxPoints) * 100);
+  });
 
   return (
-    <div className={styles.result}>
+    <>
       <div className={styles.scoreHeader}>
         <span className={cx(styles.scoreValue, styles[`score-${result.severity}`])}>{result.score}</span>
         <span className={styles.scoreOutOf}>/100</span>
       </div>
-      <p className={styles.summary}>{result.summary}</p>
+
+      <RadarChart
+        axes={ATS_AXES}
+        series={[{ id: 'ats', label: 'Tu CV', values: axisValues }]}
+        ariaLabel={ATS_AXES.map((axis, index) => `${axis.label} ${axisValues[index]} de 100`).join(', ')}
+      />
 
       <div className={styles.categories}>
         {result.categories.map((category) => (
@@ -251,6 +340,20 @@ function AtsResult({ result }: { result: AtsTestResult }) {
           />
         ))}
       </div>
+    </>
+  );
+}
+
+/** Sección de abajo, a lo ancho: el resumen y todo el texto — problemas y el detalle completo. */
+function AtsResultDetail({ result }: { result: AtsTestResult }) {
+  const [showDetail, setShowDetail] = useState(false);
+
+  const bySeverity: Record<AtsSeverity, AtsCheck[]> = { critical: [], warning: [], ok: [], unknown: [] };
+  for (const check of result.checks) bySeverity[check.severity].push(check);
+
+  return (
+    <div className={styles.result}>
+      <p className={styles.summary}>{result.summary}</p>
 
       <div className={styles.problems}>
         <p className={styles.problemsTitle}>Problemas detectados</p>
