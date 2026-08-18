@@ -121,7 +121,6 @@ export function OratoriaSection() {
         </div>
       </div>
 
-      {}
       <p className={styles.disclaimer}>
         <Icon name="alert" size={15} className={styles.disclaimerIcon} />
         Esta práctica es una ayuda para ensayar tus respuestas: no reemplaza una entrevista ni un
@@ -228,12 +227,7 @@ export function OratoriaSection() {
   );
 }
 
-/** Consejos generales, no atados a ninguna pregunta puntual. */
-/*
- * Los consejos apuntan a lo mismo que ahora mide la evaluación: no alcanza
- * con hablar bien, hay que sostener lo que se afirma. El primero es el que
- * más importa y por eso va primero.
- */
+/** Consejos generales, no atados a una pregunta puntual: apuntan a lo mismo que mide la evaluación — no alcanza con hablar bien, hay que sostener lo que se afirma. El primero es el que más importa. */
 const ORATORIA_TIPS: readonly string[] = [
   'No alcanza con decir "soy responsable": explicá cómo se nota eso en lo que hacés.',
   'Mejor una sola característica bien explicada que cuatro enumeradas.',
@@ -501,15 +495,11 @@ function AnalysisResult({ result }: { result: OratoriaResult }) {
 }
 
 /**
- * La mecánica del habla.
- *
- * Los dos números van arriba porque son medibles y comparables entre
- * prácticas: cuántos silencios largos hubo y a qué ritmo hablaste. Debajo, las
- * observaciones — que son conductas ("cortaste dos frases a la mitad"), nunca
- * juicios sobre cómo sonaste.
- *
- * El ritmo se muestra sin color ni puntaje: no está bien ni mal hablar
- * pausado, y teñirlo lo convertiría en una nota que nadie pidió.
+ * La mecánica del habla. Los dos números van arriba porque son medibles y
+ * comparables entre prácticas: cuántos silencios largos hubo y a qué ritmo
+ * hablaste. Debajo, las observaciones — conductas ("cortaste dos frases a la
+ * mitad"), nunca juicios sobre cómo sonaste. El ritmo se muestra sin color ni
+ * puntaje: no está bien ni mal hablar pausado.
  */
 function SpeechBlock({ speech }: { speech: OratoriaResult['speech'] }) {
   const pace = paceLabel(speech.wordsPerMinute);

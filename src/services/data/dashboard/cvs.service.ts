@@ -6,12 +6,9 @@ import type { CvInput, CvPatch, CvSummary } from './dashboard.types';
 /**
  * CVs. La lista se lee desde `GET /api/me`; acá viven las escrituras.
  *
- * El archivo va **directo del navegador a Supabase Storage**, sin pasar por el
- * backend: las políticas del bucket `cvs` atan cada objeto a la carpeta
- * `{apprentice_id}/`, así que el propio Storage rechaza una subida ajena. Hacer
- * que el archivo viaje por el backend solo agregaría un salto y un límite de
- * tamaño de request, sin ganar seguridad.
- *
+ * El archivo va directo del navegador a Supabase Storage, sin pasar por el
+ * backend: las políticas del bucket `cvs` atan cada objeto a
+ * `{apprentice_id}/`, así que Storage rechaza una subida ajena por sí solo.
  * Postgres guarda únicamente la referencia (`storage_path`).
  */
 
@@ -19,13 +16,10 @@ import type { CvInput, CvPatch, CvSummary } from './dashboard.types';
 export const CV_LIMIT = 5;
 
 /**
- * 5 MB por archivo.
- *
- * Es una comprobación de **usabilidad**: avisa antes de gastar una subida.
- * Quien hace cumplir el límite de verdad es Supabase Storage (`file_size_limit`
- * del bucket) y, al registrar la fila, el backend, que consulta el tamaño real
- * del objeto ya subido en lugar de creerle a esta pantalla. Los tres números
- * tienen que coincidir: acá, en el bucket, y en `MAX_CV_SIZE_BYTES` del backend.
+ * 5 MB por archivo — comprobación de usabilidad, avisa antes de gastar una
+ * subida. Quien lo hace cumplir de verdad es Storage (`file_size_limit`) y el
+ * backend (`MAX_CV_SIZE_BYTES`, contra el objeto real); los tres números
+ * tienen que coincidir.
  */
 export const CV_MAX_BYTES = 5 * 1024 * 1024;
 
@@ -41,16 +35,10 @@ export const CV_ACCEPTED_TYPES: Record<string, string> = {
 export const CV_ACCEPT_ATTRIBUTE = '.pdf,.doc,.docx,.jpg,.jpeg';
 
 /**
- * Primeros bytes que identifican cada formato.
- *
- * `file.type` lo deduce el sistema operativo de la **extensión**: renombrar
- * `algo.exe` a `algo.pdf` alcanza para que el navegador informe
- * `application/pdf`. Leer la cabecera real del archivo es lo único que
- * distingue un PDF de algo que se hace pasar por uno.
- *
- * Los formatos de Office comparten firma: `.docx` es un ZIP (`PK\x03\x04`) y
- * `.doc` es un contenedor OLE2. Por eso la comprobación es "esta firma
- * corresponde al tipo declarado", no "este archivo es exactamente un .docx".
+ * Primeros bytes que identifican cada formato. `file.type` lo deduce el
+ * sistema operativo de la extensión: renombrar `algo.exe` a `algo.pdf`
+ * alcanza para que el navegador informe `application/pdf`. Leer la cabecera
+ * real es lo único que distingue un PDF de algo que se hace pasar por uno.
  */
 const MAGIC_NUMBERS: Record<string, number[][]> = {
   'application/pdf': [[0x25, 0x50, 0x44, 0x46]], // %PDF
@@ -137,13 +125,9 @@ export async function uploadCv(
     return failure({ kind: 'unexpected', message: badContent.message });
   }
 
-  /*
-   * El nombre físico es un UUID que genera el navegador, no el nombre del
-   * archivo que eligió la persona: así nadie controla cómo se llama un objeto
-   * del bucket, y el nombre visible —que sí es suyo— vive en la fila de
-   * Postgres. La carpeta es el `apprentice_id`, que es lo que la política de
-   * Storage exige y lo que el backend vuelve a verificar al registrar.
-   */
+  /* Nombre físico = UUID generado acá, no el nombre elegido por la persona
+     (ese vive en Postgres). Carpeta = `apprentice_id`, lo que exige la
+     política de Storage y lo que el backend vuelve a verificar al registrar. */
   const extension = CV_ACCEPTED_TYPES[file.type];
   const path = `${apprenticeId}/${crypto.randomUUID()}.${extension}`;
 
@@ -158,11 +142,8 @@ export async function uploadCv(
     });
   }
 
-  /*
-   * El tamaño y el tipo no se mandan: el backend los lee del objeto que acaba
-   * de quedar en Storage. Enviar los que declara el navegador sería pedirle al
-   * servidor que confíe en el dato que justamente no puede verificar.
-   */
+  /* Tamaño y tipo no se mandan: el backend los lee del objeto ya en Storage,
+     en vez de confiar en lo que declara el navegador. */
   const registered = await createCv({
     name,
     storagePath: path,

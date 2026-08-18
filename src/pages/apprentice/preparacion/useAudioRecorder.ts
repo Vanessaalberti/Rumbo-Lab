@@ -2,19 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 export type RecorderStatus = 'idle' | 'requesting' | 'recording' | 'paused' | 'stopped' | 'error';
 
-/**
- * Tope de una grabación cuando quien la usa no dice otra cosa.
- *
- * Es un límite de costo tanto como de forma: cada segundo grabado se transcribe
- * y se analiza. "Práctica de entrevista" pide un tope más corto.
- */
+/** Tope por defecto — límite de costo tanto como de forma: cada segundo grabado se transcribe y se analiza. "Entrevista" pide uno más corto. */
 const DEFAULT_MAX_RECORDING_SECONDS = 180;
 
-/**
- * Cuántas barras tiene el medidor de voz. Es historia, no el instante: si sólo
- * se mostrara el nivel actual, un micrófono que se corta un segundo pasaría
- * desapercibido.
- */
+/** Cuántas barras tiene el medidor. Es historia, no el instante — sólo el nivel actual dejaría pasar un corte de un segundo desapercibido. */
 const LEVEL_BARS = 32;
 
 /** Cada cuánto se agrega una barra. 70 ms ≈ 14 por segundo: se ve fluido sin
@@ -23,13 +14,10 @@ const LEVEL_STEP_MS = 70;
 
 /**
  * Desde qué nivel se considera que entró voz, y cuánto tiene que sostenerse.
- *
- * El umbral es deliberadamente bajo. No está para juzgar si se habló fuerte:
- * está para distinguir "hay señal" de "silencio digital", que es lo que llega
- * cuando el micrófono está desconectado o el navegador tomó el dispositivo
- * equivocado. Cualquier voz real lo supera de sobra; ponerlo más alto haría que
- * una grabación buena pero de voz baja quedara marcada como vacía, y ese error
- * es mucho peor que el contrario.
+ * El umbral es deliberadamente bajo: no juzga si se habló fuerte, sólo
+ * distingue "hay señal" de silencio digital (micrófono desconectado, etc.).
+ * Ponerlo más alto marcaría como vacía una grabación de voz baja pero real,
+ * un error mucho peor que el contrario.
  */
 const VOICE_RMS_THRESHOLD = 0.012;
 const VOICE_SUSTAIN_MS = 500;
@@ -61,13 +49,7 @@ export interface UseAudioRecorder {
    * nuevo. Se dibuja como barras para que se vea que la voz está entrando.
    */
   levels: number[];
-  /**
-   * Si en algún momento de esta grabación entró voz de verdad.
-   *
-   * Existe para un problema concreto: terminar toda una práctica y recién
-   * después descubrir que el micrófono no estaba tomando nada, con la
-   * evaluación hecha sobre un audio vacío y un uso ya gastado.
-   */
+  /** Si en algún momento entró voz de verdad — evita terminar la práctica y recién ahí descubrir que el micrófono no tomaba nada, con un uso ya gastado. */
   voiceDetected: boolean;
   audioBlob: Blob | null;
   /** Para reproducir lo grabado antes de mandarlo — `URL.createObjectURL` del blob. */
@@ -157,11 +139,9 @@ export function useAudioRecorder(options: AudioRecorderOptions = {}): UseAudioRe
 
   /**
    * Lee el micrófono cuadro a cuadro y saca el valor eficaz (RMS) de la onda.
-   *
-   * El analizador se cuelga del mismo `MediaStream` que graba, así que mide
-   * exactamente lo que se está por mandar. No se lo conecta a la salida de
-   * audio a propósito: eso devolvería el micrófono por los parlantes y armaría
-   * un acople.
+   * El analizador cuelga del mismo `MediaStream` que graba, así que mide
+   * exactamente lo que se va a mandar; no se conecta a la salida de audio a
+   * propósito, eso armaría un acople.
    */
   const startMetering = useCallback((stream: MediaStream) => {
     const context = new AudioContext();

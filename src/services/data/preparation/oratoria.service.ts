@@ -5,18 +5,16 @@ import type { AsyncState } from '@/services/data/types';
  * Práctica de oratoria.
  *
  * Manda la grabación —nunca se guarda, ni acá ni en el backend— junto con la
- * pregunta que se está practicando. El backend la reenvía al workflow de n8n
- * que transcribe y analiza con Gemini.
+ * pregunta que se está practicando. Whisper (Groq) la transcribe verbatim y
+ * mide las pausas por sus marcas de tiempo; Gemini analiza esa transcripción
+ * anotada, sin escuchar el audio (se probó y se revirtió: daba resultados
+ * inconsistentes entre corridas de la misma grabación).
  *
- * La herramienta evalúa **cómo se construyó la respuesta**, no sólo cómo se
+ * La herramienta evalúa cómo se construyó la respuesta, no sólo cómo se
  * habló. Antes medía cuatro cosas —si contestó, si se entendía, si tenía
- * estructura y si usaba muletillas— y con eso una respuesta de puros
- * adjetivos sin explicar sacaba buena nota. Ahora son siete criterios y los
- * que más pesan son los que miran el contenido.
- *
- * La transcripción la hace Whisper y **la IA escucha el audio**, no lee el
- * texto. Por eso la fluidez y la mecánica del habla dejaron de ser una
- * inferencia sobre una transcripción y pasaron a medir algo real.
+ * estructura y si usaba muletillas— y una respuesta de puros adjetivos sin
+ * explicar sacaba buena nota. Ahora son siete criterios, y los que más pesan
+ * miran el contenido.
  */
 
 /** Una muletilla real: relleno repetido, no un conector natural del habla. */

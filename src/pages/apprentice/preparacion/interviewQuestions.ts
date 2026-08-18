@@ -2,17 +2,13 @@ import { ORATORIA_CATEGORIES } from './oratoriaQuestions';
 import type { InterviewQuestion } from '@/services/data/preparation/entrevista.service';
 
 /**
- * Arma el orden de la entrevista mezclando dos orígenes:
- *
- *   - **Preguntas personales**, tomadas al azar del banco de "Práctica de
- *     oratoria". No pasan por la IA — son las mismas preguntas generales de
- *     siempre, así que generarlas sería gastar una llamada en algo que ya
- *     está escrito.
- *   - **Preguntas del puesto y del CV**, que sí genera el workflow a partir
- *     de la oferta y del CV de la persona.
- *
- * El orden imita una entrevista real: se abre con una presentación, el
- * cuerpo es sobre el puesto y la experiencia, y hacia el final aparece la
+ * Arma el orden de la entrevista mezclando dos orígenes: **preguntas
+ * personales**, tomadas al azar del banco de "Práctica de oratoria" (no
+ * pasan por la IA — son las mismas preguntas generales de siempre, generarlas
+ * sería gastar una llamada en algo ya escrito), y **preguntas del puesto y
+ * del CV**, que sí genera el workflow a partir de la oferta y del CV de la
+ * persona. El orden imita una entrevista real: se abre con una presentación,
+ * el cuerpo es sobre el puesto y la experiencia, y hacia el final aparece la
  * pregunta de motivación.
  */
 

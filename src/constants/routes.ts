@@ -1,21 +1,15 @@
 /**
- * Rutas de la aplicación.
- *
- * `createSpace` y `signIn` son dos flujos distintos a propósito:
- * "Crear mi espacio" abre el onboarding de una persona nueva; "Iniciar sesión"
- * es la puerta de quien ya tiene su espacio. Nunca deben unificarse en un
- * mismo formulario.
- *
- * `chooseExperience` decide con qué experiencia (Aprendiz, Mentor) opera la
- * cuenta — ambas pueden coexistir (Notion 02 · Mi Rumbo §3 bis), así que
- * esta pantalla también sirve para activar la segunda más adelante, no solo
- * para la primera elección.
- *
- * `myRumbo` y `mentorPanel` son las dos ramas privadas, cada una protegida
- * por `RequireAuth` + `RequireExperience` en `app/guards`. Dentro de
- * `myRumbo`, las subrutas siguen la composición propuesta en Notion
- * (`02 · Mi Rumbo` §16, todavía `PENDIENTE` de cerrarse): Mi Perfil vive en
- * el índice y el resto cuelga como hijas de `ApprenticeShell`.
+ * Rutas de la aplicación. `createSpace` y `signIn` son dos flujos distintos a
+ * propósito y nunca deben unificarse en un mismo formulario: "Crear mi
+ * espacio" abre el onboarding de una persona nueva, "Iniciar sesión" es la
+ * puerta de quien ya tiene su espacio. `chooseExperience` decide con qué
+ * experiencia (Aprendiz, Mentor) opera la cuenta —ambas pueden coexistir
+ * (Notion 02 · Mi Rumbo §3 bis)— así que también sirve para activar la
+ * segunda más adelante. `myRumbo` y `mentorPanel` son las dos ramas privadas,
+ * protegidas por `RequireAuth` + `RequireExperience` en `app/guards`; dentro
+ * de `myRumbo` las subrutas siguen la composición de Notion (`02 · Mi Rumbo`
+ * §16, todavía `PENDIENTE`): Mi Perfil vive en el índice y el resto cuelga
+ * como hijas de `ApprenticeShell`.
  */
 export const ROUTES = {
   landing: '/',

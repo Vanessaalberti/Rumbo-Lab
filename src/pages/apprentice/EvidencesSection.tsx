@@ -39,25 +39,18 @@ type State =
   | { status: 'error' };
 
 /**
- * Evidencias.
- *
- * Línea cronológica de los acontecimientos relevantes para comprender la
- * evolución del Aprendiz (Notion `07 · Evidencias`, DECIDIDO). Arranca en la
- * creación de la cuenta, se genera **sola** y es **inmutable**: no hay crear,
- * editar, eliminar ni reordenar, y por eso esta pantalla no ofrece ninguna de
- * esas acciones.
- *
- * **No es un activity log.** Solo entra lo que aporta significado al recorrido:
- * abrir una página o cambiar el estado de una postulación no genera una
- * evidencia — esos cambios viven en el historial propio de la postulación.
- *
- * Cada registro dice lo mínimo para reconocer el acontecimiento; el detalle
- * pertenece a la sección dueña. De un feedback se registra que ocurrió y de
- * quién, nunca su contenido.
- *
- * El filtro arranca en `Esta semana` y eso **no es una decisión visual**: sirve
- * para no consultar un historial que crece sin límite. Por lo mismo la lista
- * se pagina de a 20.
+ * Evidencias: línea cronológica de los acontecimientos relevantes para
+ * comprender la evolución del Aprendiz (Notion `07 · Evidencias`, DECIDIDO).
+ * Arranca en la creación de la cuenta, se genera **sola** y es **inmutable**
+ * —no hay crear, editar, eliminar ni reordenar—, y esta pantalla no ofrece
+ * ninguna de esas acciones. **No es un activity log**: sólo entra lo que
+ * aporta significado al recorrido; abrir una página o cambiar el estado de
+ * una postulación no genera evidencia, eso vive en el historial propio de la
+ * postulación. Cada registro dice lo mínimo para reconocer el acontecimiento
+ * — de un feedback se registra que ocurrió y de quién, nunca su contenido. El
+ * filtro arranca en `Esta semana` y **no es una decisión visual**: sirve para
+ * no consultar un historial que crece sin límite; por lo mismo la lista se
+ * pagina de a 20.
  */
 export function EvidencesSection() {
   const [range, setRange] = useState<EvidenceRange>('week');

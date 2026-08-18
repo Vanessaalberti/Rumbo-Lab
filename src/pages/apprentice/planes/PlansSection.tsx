@@ -15,22 +15,16 @@ import screen from '@/app/layouts/appShell.module.css';
 import styles from './planes.module.css';
 
 /**
- * Planes y cupos de las herramientas de IA.
- *
- * Primera versión: muestra qué incluye cada plan y cuánto cuesta el pago.
- * **Todavía no se puede contratar** — no hay integración de pagos, así que el
- * botón dice lo que realmente pasa en vez de simular un checkout que no
- * existe.
- *
- * Los límites no están escritos acá: vienen de `/preparation/planes`, que los
- * arma con la misma configuración que aplica el cobro. Escribirlos a mano
- * garantizaría que en algún momento la pantalla prometa algo distinto de lo
- * que el backend permite.
- *
- * Ese viaje cuesta una llamada, y por eso hay esqueleto: lo único que se
- * espera son los números, así que el resto de la tarjeta —título, precio,
- * descripción— se dibuja de entrada y sólo la lista aparece después. Lo que
- * se ve moverse es una lista completándose, no la pantalla entera apareciendo.
+ * Planes y cupos de las herramientas de IA. Primera versión: muestra qué
+ * incluye cada plan y cuánto cuesta el pago. **Todavía no se puede
+ * contratar** — no hay integración de pagos, así que el botón dice lo que
+ * realmente pasa en vez de simular un checkout que no existe. Los límites no
+ * están escritos acá: vienen de `/preparation/planes`, que los arma con la
+ * misma configuración que aplica el cobro, para que la pantalla nunca
+ * prometa algo distinto de lo que el backend permite. Por eso hay esqueleto:
+ * lo único que se espera es esa llamada, así que el resto de la tarjeta
+ * —título, precio, descripción— se dibuja de entrada y sólo la lista aparece
+ * después.
  */
 
 const PRICE_ARS = 5000;
@@ -47,12 +41,9 @@ const TOOL_LABELS: Record<string, string> = {
 const TOOL_ORDER = ['cvMatch', 'oratoria', 'entrevista', 'linkedin'];
 
 /**
- * Cuánto mide, más o menos, cada fila de la lista mientras carga.
- *
- * Salen de los largos reales de `TOOL_LABELS`, en el mismo orden: la fila más
- * larga es "Comparaciones de CV con una oferta" y la más corta "Prácticas de
- * oratoria". Un esqueleto que no se parece a lo que viene después no anticipa
- * nada.
+ * Cuánto mide, más o menos, cada fila de la lista mientras carga. Salen de
+ * los largos reales de `TOOL_LABELS`, en el mismo orden: un esqueleto que no
+ * se parece a lo que viene después no anticipa nada.
  */
 const SKELETON_WIDTHS = ['88%', '62%', '78%', '70%'];
 
@@ -154,16 +145,10 @@ function PlanCard({
 
       <p className={styles.planDescription}>{description}</p>
 
-      {/* Mientras los límites no llegaron va el esqueleto y no una lista con
-          ceros: un plan que dice "0 comparaciones" por un instante promete
-          algo falso, aunque sea por medio segundo. */}
+      {/* Mientras los límites no llegaron va el esqueleto y no una lista con ceros: un plan que dice "0 comparaciones" por un instante promete algo falso. */}
       {!plan && (
         <ul className={styles.planTools} aria-hidden="true">
-          {/* Cada fila ocupa lo mismo que va a ocupar el texto real: el
-              cuadradito del ícono y una barra del largo de la etiqueta. Los
-              anchos son distintos entre filas porque los nombres lo son —
-              cuatro barras idénticas se leen como una tabla vacía, no como
-              contenido cargando. */}
+          {/* Anchos distintos entre filas porque los nombres lo son — cuatro barras idénticas se leen como una tabla vacía, no como contenido cargando. */}
           {SKELETON_WIDTHS.map((width, index) => (
             <li key={index} className={styles.planTool}>
               <Skeleton width="15px" height="15px" shape="block" className={styles.planToolIcon} />

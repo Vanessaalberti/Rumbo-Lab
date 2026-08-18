@@ -1,18 +1,14 @@
 import { APPLICATIONS } from './learnerActivity';
 
 /**
- * "Mi progreso" — las métricas de Mi Perfil.
- *
- * Réplica de lo que calcula `pages/apprentice/perfil/metrics.ts` en la
- * aplicación real. Mi Perfil dejó de resumir otras secciones: no muestra más
- * contadores de objetivos, evidencias ni feedback. Muestra **cinco lecturas
- * sobre un solo material, las postulaciones**, y esas cinco son las que van acá.
- *
- * Todo se deriva de `APPLICATIONS` en vez de escribirse a mano, por la misma
- * razón que en el producto: si mañana cambian las postulaciones de ejemplo, los
- * números siguen siendo coherentes con la tabla que la landing muestra dos
- * secciones más abajo. Ninguno de estos valores es un número elegido para que
- * quede lindo.
+ * "Mi progreso" — las métricas de Mi Perfil. Réplica de lo que calcula
+ * `pages/apprentice/perfil/metrics.ts` en la aplicación real: Mi Perfil dejó
+ * de resumir otras secciones y muestra **cinco lecturas sobre un solo
+ * material, las postulaciones**. Todo se deriva de `APPLICATIONS` en vez de
+ * escribirse a mano, por la misma razón que en el producto: si cambian las
+ * postulaciones de ejemplo, los números siguen coherentes con la tabla que la
+ * landing muestra más abajo — ninguno es un número elegido para que quede
+ * lindo.
  */
 
 /** Color del estado, con el mismo criterio de tono que usa la tabla real. */

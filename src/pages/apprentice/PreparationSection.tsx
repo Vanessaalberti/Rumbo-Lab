@@ -17,23 +17,13 @@ interface Tool {
   tone: 'brand' | 'teal' | 'amber';
   /** Sin ruta, la herramienta todavía no existe: se muestra como "Próximamente". */
   href?: string;
-  /**
-   * Con qué cupo se cuenta esta herramienta. Tiene que coincidir con las
-   * claves de `AI_TOOLS` del backend, que es quien lleva la cuenta.
-   *
-   * Sin `quotaId` la herramienta no tiene límite — hoy, sólo el Tester ATS,
-   * que no usa IA.
-   */
+  /** Tiene que coincidir con las claves de `AI_TOOLS` del backend. Sin `quotaId`, sin límite — hoy sólo el Tester ATS, que no usa IA. */
   quotaId?: 'cvMatch' | 'oratoria' | 'linkedin' | 'entrevista';
 }
 
 /**
- * Herramientas de Preparación, en su orden temático.
- *
- * El orden de la pantalla no es este: las disponibles van primero (ver
- * `sortByAvailability`). Esta lista mantiene el agrupamiento por tema para
- * que se lea bien al editarla, y desbloquear una herramienta es sólo
- * agregarle su `href` — sube sola.
+ * Herramientas de Preparación, en su orden temático — el de pantalla es
+ * distinto, ver `sortByAvailability`. Desbloquear una es sólo agregarle `href`.
  */
 const TOOLS: Tool[] = [
   {
@@ -83,24 +73,14 @@ const TOOLS: Tool[] = [
   },
 ];
 
-/**
- * Lo que ya se puede usar, primero; lo que falta, después.
- *
- * `sort` es estable en JavaScript, así que dentro de cada grupo se conserva
- * el orden temático en que están declaradas — no hay una segunda lista que
- * mantener sincronizada.
- */
+/** Lo usable primero, lo que falta después. `sort` es estable, así que cada grupo conserva el orden en que están declaradas. */
 function sortByAvailability(tools: readonly Tool[]): Tool[] {
   return [...tools].sort((a, b) => Number(Boolean(b.href)) - Number(Boolean(a.href)));
 }
 
 export function PreparationSection() {
   const tools = sortByAvailability(TOOLS);
-  /*
-   * El cupo lo carga `ApprenticeShell` una vez por sesión. Pedirlo acá hacía
-   * que se recargara en cada entrada a la sección, y el aviso parpadeara sin
-   * que hubiera cambiado nada.
-   */
+  /* El cupo lo carga `ApprenticeShell` una vez por sesión; pedirlo acá hacía parpadear el aviso en cada entrada. */
   const { quota } = useOutletContext<ApprenticeShellContext>();
 
   return (
@@ -158,29 +138,17 @@ export function PreparationSection() {
 }
 
 /**
- * Cuántos usos le quedan a la persona en este bloque.
- *
- * Dice las dos cosas que hacen falta para no quedarse esperando de gusto:
- * **cada cuánto** se renueva el cupo y **cuánto falta** para la próxima
- * renovación. Sin la segunda, "sin usos" se lee como "volvé mañana", cuando
- * en realidad puede faltar un rato corto.
- *
- * El bloque ocupa sólo lo que necesita, no el ancho de la pantalla: estirado,
- * la etiqueta del plan quedaba en la otra punta y pasaba desapercibida. Al
- * lado va el botón para mejorar, que es la acción que sigue naturalmente a
- * leer cuánto te queda.
+ * Cuántos usos le quedan a la persona en este bloque. Dice cada cuánto se
+ * renueva y cuánto falta para la próxima renovación — sin la segunda, "sin
+ * usos" se lee como "volvé mañana" cuando puede faltar un rato corto.
  */
 function QuotaBanner({ quota }: { quota: AiQuota | null }) {
   const remaining = quota ? timeUntilReset(quota.resetAt) : null;
   const hours = quota?.windowHours;
 
-  /*
-   * El aviso se dibuja entero desde el primer instante y sólo los dos datos
-   * que dependen del servidor —cada cuánto y cuánto falta— esperan como
-   * esqueleto. Antes el bloque completo aparecía de golpe cuando llegaba la
-   * respuesta, y eso empujaba las tarjetas hacia abajo justo cuando alguien
-   * estaba por hacer clic.
-   */
+  /* El aviso se dibuja entero desde el primer instante; sólo los dos datos
+     del servidor esperan como esqueleto, para no empujar las tarjetas hacia
+     abajo cuando llega la respuesta. */
   return (
     <div className={styles.quotaRow}>
       <div className={styles.credits}>
@@ -219,12 +187,9 @@ function QuotaBanner({ quota }: { quota: AiQuota | null }) {
 }
 
 /**
- * El cupo de una herramienta, dentro de su tarjeta.
- *
- * Sólo el número: "3/5". El aviso de arriba ya explicó que son usos y cada
- * cuánto se renuevan, así que repetirlo en cada tarjeta es ruido. Mientras el
- * dato no llegó no se muestra nada — mejor vacío que un cero que después va a
- * cambiar solo.
+ * El cupo de una herramienta, dentro de su tarjeta. Sólo el número ("3/5") —
+ * el aviso de arriba ya explicó el resto. Sin dato, no muestra nada: mejor
+ * vacío que un cero que va a cambiar solo.
  */
 function ToolQuotaLabel({ tool, quota }: { tool: Tool; quota: AiQuota | null }) {
   if (!tool.quotaId) {

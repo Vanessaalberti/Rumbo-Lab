@@ -9,24 +9,13 @@ import styles from './UserMenu.module.css';
 
 /**
  * Menú de la cuenta: la única pieza que el header muestra cuando hay sesión.
- *
- * Reemplaza al selector permanente `Aprendiz | Mentor` que vivía en el header.
- * Cambiar de panel es una acción de la cuenta, no una pestaña de navegación.
- *
- * Estructura:
- *   avatar · nombre · correo · panel en el que está
- *   ───────────────────────────────────────────────
- *   Ir al panel de <el otro>   — solo si tiene esa experiencia activada
- *   Configuración
- *   Cerrar sesión
- *
- * El cambio de panel se nombra por el **destino**, no por la acción genérica:
- * estando en Aprendiz dice "Ir al panel de Mentor". Si la cuenta no tiene la
- * otra experiencia activada, no se ofrece el panel — se ofrece activarla, que
- * es otra cosa y lleva a la pantalla que ya existe para eso.
- *
- * Identidad y experiencias salen de `useAuth()`, la misma fuente global que
- * usan las rutas protegidas. No consulta nada por su cuenta.
+ * Reemplaza al selector permanente `Aprendiz | Mentor` que vivía en el header
+ * — cambiar de panel es una acción de la cuenta, no una pestaña de
+ * navegación. El cambio de panel se nombra por el **destino**, no por la
+ * acción genérica: estando en Aprendiz dice "Ir al panel de Mentor". Si la
+ * cuenta no tiene la otra experiencia activada, se ofrece activarla en vez
+ * del panel. Identidad y experiencias salen de `useAuth()`, la misma fuente
+ * global que usan las rutas protegidas.
  */
 export function UserMenu() {
   const { user, experiences, signOut } = useAuth();

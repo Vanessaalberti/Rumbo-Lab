@@ -1,17 +1,15 @@
 /**
  * Lo que la aprendiz registra y recibe: postulaciones, feedback y la línea de
- * evidencias que resulta de todo lo anterior.
- *
- * Cada bloque sigue la especificación funcional de su sección en
- * `01 · Producto → Aprendiz`. No se inventan campos, estados ni tipos de
- * acontecimiento que esa documentación no establezca.
+ * evidencias que resulta de todo lo anterior. Cada bloque sigue la
+ * especificación funcional de su sección en `01 · Producto → Aprendiz`; no se
+ * inventan campos, estados ni tipos de acontecimiento que esa documentación
+ * no establezca.
  */
 
 /**
- * `04 · Postulaciones` — taxonomía cerrada de nueve estados.
- *
- * No se agregan estados adicionales. `Entrevista` no se desdobla en variantes:
- * la especificidad se expresa con el tipo de entrevista, que es otra cosa.
+ * `04 · Postulaciones` — taxonomía cerrada de nueve estados. No se agregan
+ * estados adicionales: `Entrevista` no se desdobla en variantes (la
+ * especificidad se expresa con el tipo de entrevista, otra cosa) y
  * `CV enviado` es un campo, nunca un estado.
  */
 export const APPLICATION_STATES = [
@@ -27,18 +25,13 @@ export const APPLICATION_STATES = [
 ] as const;
 
 /**
- * `04 · Postulaciones` — gestor personal, no portal de empleo: sin ofertas, sin
- * salarios, sin botón de postularse.
- *
- * Cinco campos estructurales, en el orden decidido:
- * `Nombre · Puesto · CV enviado · URL · Estado`.
- *
- * - `Nombre` es un rótulo libre que elige la persona para identificar el
- *   registro. Puede coincidir con la empresa, pero no es un campo `Empresa`.
- * - `Puesto` puede quedar vacío; no se inventa uno.
- * - `CV enviado` arranca en `No aplica` y conserva el CV que se usó.
- * - Toda postulación nace en `Pendiente`, que significa "todavía no me
- *   postulé", no "la empresa no respondió".
+ * `04 · Postulaciones` — gestor personal, no portal de empleo: sin ofertas,
+ * sin salarios, sin botón de postularse. Cinco campos estructurales, en el
+ * orden decidido: `Nombre · Puesto · CV enviado · URL · Estado`. `Nombre` es
+ * un rótulo libre que elige la persona (puede coincidir con la empresa, pero
+ * no es un campo `Empresa`); `Puesto` puede quedar vacío, no se inventa uno;
+ * `CV enviado` arranca en `No aplica`; toda postulación nace en `Pendiente`,
+ * que significa "todavía no me postulé", no "la empresa no respondió".
  */
 export const APPLICATIONS = [
   {
@@ -88,18 +81,13 @@ export const APPLICATIONS = [
 ] as const;
 
 /**
- * El CV que la persona más usó al postularse.
- *
- * Se deriva del campo `CV enviado` de las postulaciones, que existe justamente
- * para poder analizar después con qué CV se presentó a cada oportunidad. Por eso
- * se calcula en lugar de escribirse a mano: si cambian las postulaciones, el
- * dato sigue siendo cierto.
- *
- * `No aplica` no cuenta: es un valor válido del campo, pero no es un CV.
- *
- * No es lo mismo que "CV activo", que `05 · CVs` deja sin definir porque con
- * varios CVs la palabra se vuelve ambigua: *activo* ¿para qué? "Más usado"
- * responde una pregunta concreta y verificable.
+ * El CV que la persona más usó al postularse. Se deriva del campo
+ * `CV enviado` de las postulaciones en vez de escribirse a mano, así el dato
+ * sigue siendo cierto si cambian las postulaciones. `No aplica` no cuenta: es
+ * un valor válido del campo, pero no es un CV. No es lo mismo que "CV
+ * activo", que `05 · CVs` deja sin definir porque con varios CVs la palabra
+ * se vuelve ambigua; "más usado" responde una pregunta concreta y
+ * verificable.
  */
 export const MOST_USED_CV = (() => {
   const uses = new Map<string, number>();
@@ -116,18 +104,13 @@ export const MOST_USED_CV = (() => {
 })();
 
 /**
- * `06 · Feedback` — historial de las devoluciones que el Aprendiz recibe de sus
- * Mentores. No es un chat: se consulta, no se responde.
- *
- * Anatomía decidida: elemento relacionado · Mentor · fecha y hora · contenido.
- * El elemento siempre se identifica de forma específica —qué CV, qué
- * postulación—, nunca "el CV" a secas.
- *
- * Ordenados del más reciente al más antiguo.
- *
- * `datetime` es el dato de la sección Feedback, donde la anatomía pide fecha y
- * hora. `date` es la forma corta para los resúmenes de otras vistas, que
- * referencian el feedback sin reproducir su ficha completa.
+ * `06 · Feedback` — historial de las devoluciones que el Aprendiz recibe de
+ * sus Mentores. No es un chat: se consulta, no se responde. Anatomía
+ * decidida: elemento relacionado · Mentor · fecha y hora · contenido, donde
+ * el elemento siempre se identifica de forma específica —qué CV, qué
+ * postulación—, nunca "el CV" a secas. Ordenados del más reciente al más
+ * antiguo. `datetime` es el dato de la sección Feedback (fecha y hora); `date`
+ * es la forma corta para los resúmenes de otras vistas.
  */
 /**
  * Total real de devoluciones recibidas. `FEEDBACK_ENTRIES` solo guarda las
@@ -162,17 +145,12 @@ export const FEEDBACK_ENTRIES = [
 ] as const;
 
 /**
- * `07 · Evidencias` — línea cronológica de los acontecimientos relevantes para
- * comprender la evolución del Aprendiz.
- *
- * Se genera automáticamente, arranca en la creación de la cuenta y es inmutable
- * para la persona: no puede crear, editar ni eliminar evidencias.
- *
- * No es un activity log. Y los cambios de estado de una postulación **no**
- * generan evidencias: viven en el historial propio de `04 · Postulaciones`.
- * Sí lo hace la creación de la postulación, que es un acontecimiento del
- * recorrido.
- *
+ * `07 · Evidencias` — línea cronológica de los acontecimientos relevantes
+ * para comprender la evolución del Aprendiz. Se genera automáticamente,
+ * arranca en la creación de la cuenta y es inmutable para la persona. No es
+ * un activity log: los cambios de estado de una postulación **no** generan
+ * evidencias (viven en el historial propio de `04 · Postulaciones`), pero la
+ * creación de la postulación sí, porque es un acontecimiento del recorrido.
  * Orden fijo: más reciente → más antigua.
  */
 /**

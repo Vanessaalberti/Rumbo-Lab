@@ -45,17 +45,14 @@ interface PreviewState {
 }
 
 /**
- * CVs del Aprendiz.
- *
- * Una grilla de documentos: la tarjeta abre la previsualización y el `…` las
- * acciones. Un aprendiz puede tener hasta {@link CV_LIMIT} CVs en la versión
- * gratuita, y exactamente uno principal — la tabla lo garantiza con un índice
- * único parcial, así que marcar uno desmarca el anterior del lado del backend.
- *
- * El archivo va directo del navegador al bucket privado `cvs`, bajo políticas
- * que atan cada objeto a la carpeta del propio Aprendiz. Postgres solo guarda
- * la referencia. Para verlo o descargarlo se pide una URL firmada de un
- * minuto: el bucket no es público y no hay enlaces permanentes.
+ * CVs del Aprendiz: una grilla de documentos donde la tarjeta abre la
+ * previsualización y el `…` las acciones. Hasta {@link CV_LIMIT} CVs en la
+ * versión gratuita, y exactamente uno principal — la tabla lo garantiza con un
+ * índice único parcial, así que marcar uno desmarca el anterior en el
+ * backend. El archivo va directo del navegador al bucket privado `cvs`, bajo
+ * políticas que atan cada objeto a la carpeta del propio Aprendiz; Postgres
+ * sólo guarda la referencia, y para verlo o descargarlo se pide una URL
+ * firmada de un minuto, ya que el bucket no es público.
  */
 export function CvsSection() {
   const { dashboard, refresh } = useOutletContext<ApprenticeShellContext>();
@@ -198,12 +195,7 @@ export function CvsSection() {
           {uploading ? 'Subiendo…' : 'Subir CV'}
         </Button>
 
-        {/*
-         * Crear un CV dentro de la plataforma necesita un modelo de contenido
-         * —qué secciones tiene, cómo se guarda, cómo se exporta— que `05 · CVs`
-         * todavía deja sin definir. El botón queda a la vista porque la sección
-         * lo contempla, pero no se simula un editor que no existe.
-         */}
+        {/* Crear un CV dentro de la plataforma necesita un modelo de contenido que `05 · CVs` todavía deja sin definir; el botón queda a la vista, pero no se simula un editor que no existe. */}
         <Button
           variant="ghost"
           size="sm"

@@ -23,21 +23,16 @@ interface NewApplicationModalProps {
 }
 
 /**
- * Alta de una postulación · `+ Nueva postulación`.
- *
- * Es la **única** forma de crear un registro: no se inserta una fila a mano
- * (Notion `04 · Postulaciones` §18bis.6). El alta ocurre en un modal; el
- * detalle nunca — eso vive en el panel persistente (§18bis.2).
- *
- * **Solo la URL es obligatoria** (§18bis.6ter). Por eso el modal tiene dos
- * modos: registro rápido —pegar el enlace y seguir— o completar de una vez lo
- * que ya se sabe. El interior del modal figura como `PENDIENTE` de Experiencia
- * y Diseño, así que estos dos modos son una decisión de diseño tomada acá, no
- * una regla heredada.
- *
- * Lo que **no** se pide nunca: el nombre no es obligatorio (lo genera la base
- * como `Postulación-N`) y el estado tampoco (toda postulación nace en
- * `Pendiente`, §19.3).
+ * Alta de una postulación · `+ Nueva postulación`. Es la **única** forma de
+ * crear un registro: no se inserta una fila a mano (Notion
+ * `04 · Postulaciones` §18bis.6). El alta ocurre en un modal; el detalle
+ * nunca — eso vive en el panel persistente (§18bis.2). **Sólo la URL es
+ * obligatoria** (§18bis.6ter), por eso el modal tiene dos modos: registro
+ * rápido —pegar el enlace y seguir— o completar de una vez lo que ya se sabe;
+ * el interior del modal figura como `PENDIENTE` de Experiencia y Diseño, así
+ * que estos dos modos son una decisión tomada acá, no una regla heredada. Lo
+ * que **no** se pide nunca: el nombre (lo genera la base como
+ * `Postulación-N`) ni el estado (toda postulación nace en `Pendiente`, §19.3).
  */
 export function NewApplicationModal({ open, cvs, onClose, onSubmit }: NewApplicationModalProps) {
   const [detailed, setDetailed] = useState(false);

@@ -12,33 +12,20 @@ interface AuthProviderProps {
 }
 
 /**
- * Fuente de verdad de la sesión en tiempo de ejecución.
+ * Fuente de verdad de la sesión en tiempo de ejecución. Se suscribe una sola
+ * vez a `onAuthStateChange` (emite el estado inicial y cada cambio, no hace
+ * falta `getSession()` aparte). Qué experiencias tiene la cuenta se le
+ * pregunta al backend, no a la tabla directo, para que quede un solo lugar
+ * que decida esa lógica.
  *
- * Se suscribe una sola vez a `onAuthStateChange`: Supabase Auth emite el
- * estado inicial apenas alguien se suscribe (`INITIAL_SESSION`) y luego cada
- * cambio — login, logout, refresco de token, expiración —, así que no hace
- * falta además llamar `getSession()` por separado ni duplicar esa lógica acá.
- *
- * Identidad y sesión son lo único que este provider resuelve directo contra
- * Supabase. Qué experiencias (Aprendiz, Mentor) tiene la cuenta activa se le
- * pregunta a `rumbo-lab-backend` — no a la tabla directamente — para que
- * quede un solo lugar que decida esa lógica.
- *
- * **Un evento de auth no es un login.** `onAuthStateChange` emite mucho más
- * que inicios de sesión: `TOKEN_REFRESHED` cuando renueva credenciales, y
- * —esto es lo que rompía la app— un `SIGNED_IN` **cada vez que la pestaña
- * vuelve a estar visible**. Supabase lo hace desde `_recoverAndRefresh()`,
- * que al recuperar la sesión de `localStorage` notifica `SIGNED_IN` aunque el
- * token siga perfectamente vigente y la persona sea exactamente la misma.
- *
- * Tratar eso como un login nuevo ponía `loading` en `true`, lo que hacía que
- * los guards devolvieran una pantalla de carga en vez del contenido, React
- * desmontara todo el árbol privado, se perdiera el estado de `ApprenticeShell`
- * y hubiera que volver a pedir `/experiences` y `/me`. Un cambio de pestaña de
- * tres segundos recargaba Mi Rumbo entero.
- *
- * Por eso lo que manda acá es la **identidad**, no el evento: si el `user.id`
- * no cambió, la sesión se actualiza en silencio y nadie se entera.
+ * **Un evento de auth no es un login.** Supabase reemite `SIGNED_IN` cada vez
+ * que la pestaña vuelve a estar visible (`_recoverAndRefresh()` al recuperar
+ * la sesión de `localStorage`), con el mismo token y la misma persona.
+ * Tratarlo como login nuevo ponía `loading` en `true`, desmontaba el árbol
+ * privado entero y repetía `/experiences` + `/me` — un cambio de pestaña de
+ * tres segundos recargaba Mi Rumbo entero. Por eso lo que manda acá es la
+ * identidad, no el evento: si `user.id` no cambió, la sesión se actualiza en
+ * silencio.
  */
 export function AuthProvider({ children }: AuthProviderProps) {
   const [session, setSession] = useState<Session | null>(null);
@@ -47,11 +34,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [bootstrapping, setBootstrapping] = useState(true);
   const [resolvingIdentity, setResolvingIdentity] = useState(false);
 
-  /**
-   * Identidad que este provider ya resolvió. Es una ref y no un estado porque
-   * se compara dentro del callback de la suscripción, que se registra una
-   * sola vez: leerlo del estado daría siempre el valor del primer render.
-   */
+  /** Ref y no estado: se compara dentro del callback de la suscripción, que se registra una sola vez — leerlo del estado daría siempre el valor del primer render. */
   const resolvedUserIdRef = useRef<string | null>(null);
   const hasResolvedOnceRef = useRef(false);
 
@@ -73,15 +56,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const firstEvent = !hasResolvedOnceRef.current;
       const identityChanged = firstEvent || nextUserId !== resolvedUserIdRef.current;
 
-      /*
-       * La sesión se guarda con la referencia anterior cuando el token es el
-       * mismo: el `SIGNED_IN` de la vuelta a la pestaña trae exactamente el
-       * objeto que ya teníamos, y crear una identidad nueva re-renderizaría a
-       * todos los consumidores de `useAuth()` sin que haya cambiado nada.
-       *
-       * Cuando el token **sí** cambió (renovación real) se actualiza: el
-       * `access_token` vigente tiene que quedar disponible.
-       */
+      /* Se guarda la referencia anterior cuando el token es el mismo —el
+         `SIGNED_IN` de vuelta a la pestaña trae el objeto que ya teníamos— para
+         no re-renderizar a todos los consumidores de `useAuth()` sin motivo. */
       setSession((previous) =>
         previous?.access_token === nextSession?.access_token &&
         previous?.user?.id === nextUserId
@@ -91,14 +68,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser((previous) => (previous?.id === nextUserId ? previous : (nextSession?.user ?? null)));
 
       if (!identityChanged) {
-        /*
-         * Misma persona: `TOKEN_REFRESHED`, o el `SIGNED_IN` que Supabase
-         * reemite al recuperar el foco. No se toca `bootstrapping` ni
-         * `resolvingIdentity`, así que ningún guard desmonta nada y el
-         * dashboard que ya está en memoria sigue ahí. Tampoco se vuelve a
-         * pedir `/experiences`: las experiencias de una cuenta no cambian
-         * porque se renueve un token.
-         */
+        /* Misma persona: no se toca `bootstrapping`/`resolvingIdentity` ni se
+           vuelve a pedir `/experiences` — no cambian porque se renueve un token. */
         return;
       }
 

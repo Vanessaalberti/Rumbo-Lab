@@ -2,16 +2,10 @@ import { httpClient } from '@/services/api/httpClient';
 import type { AsyncState } from '@/services/data/types';
 
 /**
- * Práctica de entrevista.
- *
- * La única herramienta con un flujo de varios pasos. **El backend no guarda
- * estado**: la entrevista vive en esta pantalla, que va mandando lo que hace
- * falta en cada paso. Nada del CV, la oferta, el audio ni las
- * transcripciones queda guardado en ningún lado.
- *
- * Por eso `roleSummary` viaja de vuelta en cada llamada: es un resumen corto
- * del puesto que devuelve el primer paso y reemplaza a la oferta completa
- * como contexto, para no reenviarla entera cada vez.
+ * Práctica de entrevista — la única herramienta con flujo de varios pasos. El
+ * backend no guarda estado: la entrevista vive en esta pantalla, que manda lo
+ * que hace falta en cada paso. `roleSummary` viaja de vuelta en cada llamada
+ * porque reemplaza a la oferta completa como contexto, para no reenviarla.
  */
 
 export interface InterviewQuestion {
@@ -27,15 +21,12 @@ export interface InterviewPreparation {
 }
 
 /**
- * Los ocho criterios con que se evalúa una respuesta. El orden acá es el
- * mismo en que se muestran, de mayor a menor peso — los pesos los define el
- * backend (ver `ENTREVISTA_CRITERIA` en `config/entrevista.ts`).
- *
- * `comunicacionOral` es el único que describe **cómo** se dijo la respuesta.
- * Los otros siete describen **qué** se dijo — esa separación es el cambio
- * central del rediseño de ago 2026: antes una respuesta con buen contenido
- * pero muchas muletillas caía a 40-45 puntos, un número que describe una
- * respuesta mala y no una buena mal comunicada.
+ * Los ocho criterios, en el mismo orden en que se muestran (mayor a menor
+ * peso; los pesos viven en `ENTREVISTA_CRITERIA` del backend).
+ * `comunicacionOral` es el único que describe cómo se dijo la respuesta, no
+ * qué se dijo — separación clave del rediseño ago 2026, antes buen contenido
+ * con muletillas caía a 40-45 puntos, describiendo una respuesta mala en vez
+ * de una buena mal comunicada.
  */
 export interface AnswerScores {
   calidadContenido: number;
@@ -51,10 +42,9 @@ export interface AnswerScores {
 export type EntrevistaCriterion = keyof AnswerScores;
 
 /**
- * Qué tipo de pregunta era. Decide si tiene sentido esperar una estructura
- * tipo STAR (situación, tarea, acción, resultado): sólo `conductual` la
- * espera. Antes de esto, el badge de STAR aparecía incluso en preguntas
- * generales o situacionales que no la requieren.
+ * Qué tipo de pregunta era. Decide si cabe esperar una estructura STAR
+ * (situación, tarea, acción, resultado) — sólo `conductual` la espera; antes,
+ * el badge de STAR aparecía hasta en preguntas que no la requerían.
  */
 export type EntrevistaQuestionType = 'general' | 'conductual' | 'situacional' | 'tecnica';
 
@@ -81,16 +71,12 @@ export const ENTREVISTA_QUESTION_TYPE_HINT: Record<EntrevistaQuestionType, strin
 };
 
 /**
- * La evaluación de una respuesta. **Sin la transcripción**: esa llega en el
- * paso anterior y la pantalla ya la tiene, así que el backend no la devuelve
- * de nuevo.
- *
- * `overallScore`, `contentScore` y `communicationScore` los calcula el
- * backend a partir de `scores` — nunca el modelo. `contentScore` es el
- * promedio de los siete criterios que no son `comunicacionOral`;
- * `communicationScore` es `comunicacionOral` solo. Verlos separados es lo que
- * permite distinguir "tu respuesta está mal" de "tu respuesta está bien pero
- * tenés que mejorar cómo la comunicás".
+ * La evaluación de una respuesta. Sin la transcripción —la pantalla ya la
+ * tiene del paso anterior. `overallScore`/`contentScore`/`communicationScore`
+ * los calcula el backend a partir de `scores`, nunca el modelo:
+ * `contentScore` promedia los siete criterios que no son `comunicacionOral`;
+ * verlos separados distingue "tu respuesta está mal" de "está bien pero
+ * mejorá cómo la comunicás".
  */
 export interface AnswerEvaluation {
   questionType: EntrevistaQuestionType;
@@ -216,13 +202,10 @@ export function prepareInterviewWithUpload(
 }
 
 /**
- * Paso 2 — todas las grabaciones juntas, en una sola llamada.
- *
- * El orden es el contrato: la transcripción número tres corresponde a la
- * grabación número tres. Las preguntas viajan sólo como contexto.
- *
- * Una pregunta salteada entra igual, con un blob vacío, para no correr un
- * lugar a todas las que siguen.
+ * Paso 2 — todas las grabaciones juntas, en una sola llamada. El orden es el
+ * contrato: la transcripción número tres corresponde a la grabación número
+ * tres. Una pregunta salteada entra igual, con un blob vacío, para no correr
+ * un lugar a las que siguen.
  */
 export function transcribeInterviewAnswers(
   recordings: ReadonlyArray<{ audio: Blob; question: string }>,

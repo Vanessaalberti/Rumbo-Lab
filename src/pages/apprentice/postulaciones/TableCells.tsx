@@ -18,14 +18,10 @@ import {
 import styles from './applications.module.css';
 
 /**
- * La marca de una postulación, a la izquierda de su nombre.
- *
- * Devuelve `null` sin marca en vez de un hueco: la columna del nombre no
- * reserva lugar para el ícono, así que las filas sin marca se leen igual que
- * antes y las marcadas se destacan por contraste.
- *
- * El `title` es lo único que dice qué significa cada figura — una estrella se
- * entiende sola, pero una flecha hacia abajo no.
+ * La marca de una postulación, a la izquierda de su nombre. Devuelve `null`
+ * sin marca en vez de un hueco: la columna no reserva lugar para el ícono, así
+ * que las filas sin marca se leen igual que antes. El `title` es lo único que
+ * dice qué significa cada figura — una flecha hacia abajo no se entiende sola.
  */
 export function MarkIcon({ mark }: { mark: ApplicationMark | null }) {
   const meta = markMeta(mark);
@@ -33,7 +29,7 @@ export function MarkIcon({ mark }: { mark: ApplicationMark | null }) {
 
   /* El `title` va en un envoltorio y no en el `Icon`: ese componente expone
      `label` para el nombre accesible pero no un tooltip, y acá hacen falta los
-     dos — la figura sola no dice qué significa. */
+     dos. */
   return (
     <span className={cx(styles.markIcon, styles[`markIcon-${meta.id}`])} title={meta.title}>
       <Icon name={meta.icon} size={15} label={meta.title} />
@@ -64,20 +60,14 @@ interface StatusCellProps {
 }
 
 /**
- * Estado editable desde la propia tabla.
- *
- * "Cambiar estado" es una de las cinco responsabilidades de la vista y actúa
- * sobre **una** postulación, generando un evento de historial (Notion
- * `04 · Postulaciones` §18bis.7bis). El trigger de la base escribe ese evento.
- *
- * Es un menú propio y no un `<select>` nativo porque las opciones tienen que
- * mostrarse con el color de cada estado, y el navegador no permite estilar las
- * `<option>`. Va en un `Popover` —portal + `position: fixed`— porque la tabla
- * scrollea en horizontal y un panel posicionado dentro de ella quedaría
- * cortado por ese contenedor.
- *
- * Las nueve opciones son la taxonomía completa de §19 y las transiciones son
- * libres, así que se ofrecen todas sin deshabilitar ninguna.
+ * Estado editable desde la propia tabla; cambia una postulación y genera un
+ * evento de historial (Notion `04 · Postulaciones` §18bis.7bis) vía trigger
+ * de la base. Menú propio y no un `<select>` nativo porque las opciones se
+ * muestran con el color de cada estado y el navegador no permite estilar las
+ * `<option>`; va en un `Popover` —portal + `position: fixed`— porque la tabla
+ * scrollea en horizontal y un panel dentro de ella quedaría cortado. Las
+ * nueve opciones (taxonomía completa de §19) se ofrecen todas: las
+ * transiciones son libres.
  */
 export function StatusCell({ status, busy, onChange }: StatusCellProps) {
   const [open, setOpen] = useState(false);

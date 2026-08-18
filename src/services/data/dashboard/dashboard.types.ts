@@ -1,13 +1,7 @@
 /**
  * Contrato de "Mi Rumbo" tal como lo sirve `rumbo-lab-backend` (`GET /api/me`).
- *
- * Refleja tablas reales (apprentices, cvs, applications, space_apprentices,
- * feedbacks, evidences, space_mentors) y la composición que fija el mockup de
- * la landing (`LearnerProfileScreen`).
- *
- * No hay objetivos: no existe tabla `goals` y `02 · Mi Rumbo` los deja sin
- * ubicación en el modelo. El bloque "Objetivos en curso" del mockup se
- * conserva en la vista con su estado vacío, sin fuente inventada.
+ * No hay objetivos: no existe tabla `goals`, y el bloque del mockup se
+ * conserva con su estado vacío en vez de una fuente inventada.
  */
 export interface ApprenticeProfile {
   id: string;
@@ -57,14 +51,10 @@ export interface CvSummary {
 }
 
 /**
- * Marca personal de una postulación.
- *
- * No es un estado: `status` dice dónde está el proceso —lo decide la
- * empresa— y esto dice qué piensa quien se postuló. Conviven sin relación,
- * así que una postulación rechazada puede seguir siendo favorita.
- *
- * Es una sola y excluyente porque la tabla muestra **un** ícono a la
- * izquierda del nombre.
+ * Marca personal, no un estado: `status` dice dónde está el proceso (lo
+ * decide la empresa), esto dice qué piensa quien se postuló — una rechazada
+ * puede seguir siendo favorita. Una sola y excluyente porque la tabla muestra
+ * un ícono a la izquierda del nombre.
  */
 export type ApplicationMark = 'favorita' | 'probable' | 'improbable';
 
@@ -112,15 +102,10 @@ export interface ApplicationStatusChange {
   note: string | null;
 }
 
-/** Alta y edición. `url` es lo único obligatorio en el alta rápida. */
 /**
- * Con qué CV se presentó la persona. Un único campo con tres respuestas
- * excluyentes, para que no puedan convivir un CV elegido y la marca de
- * "personalizado".
- *
- *   `'none'`   — no hacía falta CV
- *   `'custom'` — mandó uno a medida, que no está guardado acá
- *   `<uuid>`   — uno de sus CVs de la plataforma
+ * Con qué CV se presentó: `'none'` (no hacía falta), `'custom'` (uno a
+ * medida, no guardado acá) o `<uuid>` (uno de sus CVs). Un solo campo para
+ * que no convivan un CV elegido y la marca de "personalizado".
  */
 export type CvChoice = 'none' | 'custom' | (string & {});
 

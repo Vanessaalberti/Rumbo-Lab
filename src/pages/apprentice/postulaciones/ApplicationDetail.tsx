@@ -35,22 +35,13 @@ interface ApplicationDetailProps {
 }
 
 /**
- * Panel de detalle de la postulación seleccionada.
- *
- * **No es un modal ni un drawer** (Notion `04 · Postulaciones` §18bis.2):
- * ocupa un espacio reservado al lado de la tabla y convive con ella. Al elegir
- * otra fila cambia su contenido; la tabla no se tapa ni se pierde el contexto.
- *
- * Responde "¿qué sé sobre esta oportunidad?". Arranca en solo lectura y el
- * **lápiz** abre la edición — es el único control de edición de la vista
- * (§18bis.7bis), y actúa sobre este registro, nunca sobre la tabla.
- *
- * El historial es la tercera zona: responde "¿qué ocurrió y cuándo?". Lo
- * escribe el trigger `log_application_status_change`; acá es de solo lectura y
- * se pide aparte porque no viaja en `GET /api/me`.
- *
- * El estado no se edita desde acá: se cambia en la tabla, que es donde vive la
- * gestión rápida.
+ * Panel de detalle de la postulación seleccionada. No es un modal ni un
+ * drawer (Notion `04 · Postulaciones` §18bis.2): ocupa un espacio reservado
+ * al lado de la tabla, que no se tapa ni pierde contexto al cambiar de fila.
+ * Arranca en sólo lectura; el lápiz abre la edición, el único control de
+ * edición de la vista, y actúa sobre este registro, nunca sobre la tabla. El
+ * historial se pide aparte porque no viaja en `GET /api/me`. El estado no se
+ * edita acá — se cambia en la tabla.
  */
 export function ApplicationDetail({
   application,
@@ -263,12 +254,7 @@ export function ApplicationDetail({
             </select>
           </div>
 
-          {/*
-            * La marca es una anotación de quien se postuló, no un estado del
-            * proceso, así que se elige acá y no en la tabla junto al estado.
-            * Volver a tocar la marca activa la desmarca: sin eso no habría
-            * forma de sacarla salvo agregando un cuarto botón de "ninguna".
-            */}
+          {/* Tocar de nuevo la marca activa la desmarca: sin eso no habría forma de sacarla salvo un cuarto botón de "ninguna". */}
           <div className={styles.field}>
             <span className={styles.fieldLabel}>Marca</span>
             <div className={styles.markPicker} role="group" aria-label="Marca de la postulación">
@@ -369,11 +355,7 @@ export function ApplicationDetail({
         )}
       </div>
 
-      {/*
-       * Eliminar es destructivo e irreversible y no hay papelera: la
-       * confirmación es explícita y dice exactamente qué se pierde
-       * (Notion `04 · Postulaciones` §27.2).
-       */}
+      {/* Destructivo, irreversible, sin papelera: la confirmación dice exactamente qué se pierde (Notion `04 · Postulaciones` §27.2). */}
       <Modal
         open={confirmingDelete}
         title="¿Eliminar esta postulación?"
@@ -420,27 +402,17 @@ export function ApplicationDetail({
 }
 
 /**
- * Notas, recortadas a cinco líneas.
- *
- * Son el único campo libre de la ficha y el único que puede ser largo: sin
- * recorte empujaban el historial fuera de vista y obligaban a scrollear el
- * panel entero para llegar a algo que está debajo.
- *
- * El recorte es visual (`-webkit-line-clamp`), así que el texto completo sigue
- * en el DOM: se puede buscar en la página y un lector de pantalla lo lee entero.
- * "Ver más" solo lo despliega. **No lleva scroll propio**: una caja que
- * scrollea dentro de un panel que también scrollea deja a la persona sin saber
- * cuál de los dos está moviendo.
+ * Notas, recortadas a cinco líneas — sin recorte empujaban el historial
+ * fuera de vista. El recorte es visual (`-webkit-line-clamp`): el texto
+ * completo sigue en el DOM, buscable y leído entero por un lector de
+ * pantalla. Sin scroll propio: una caja que scrollea dentro de un panel que
+ * también scrollea confunde cuál de los dos se está moviendo.
  */
 function Notes({ text }: { text: string }) {
   const [expanded, setExpanded] = useState(false);
   const [clamped, setClamped] = useState(false);
 
-  /*
-   * El botón aparece solo si el texto realmente no entra. Cinco líneas no es lo
-   * mismo que cinco saltos de línea: depende del ancho del panel, así que se
-   * mide el elemento en lugar de contar caracteres.
-   */
+  /* El botón aparece sólo si el texto no entra — depende del ancho del panel, así que se mide en vez de contar caracteres. */
   const measure = (node: HTMLParagraphElement | null) => {
     if (node) setClamped(node.scrollHeight > node.clientHeight + 1);
   };

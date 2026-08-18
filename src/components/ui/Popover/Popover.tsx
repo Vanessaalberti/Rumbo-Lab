@@ -27,21 +27,15 @@ const VIEWPORT_MARGIN = 8;
 const ANCHOR_GAP = 6;
 
 /**
- * Panel flotante anclado a un elemento, renderizado en un portal.
- *
- * Existe por un motivo concreto: un menú posicionado dentro de un contenedor
- * con `overflow` —la tabla de postulaciones scrollea en horizontal, la tarjeta
- * de un CV recorta su contenido— queda **cortado por ese contenedor**, y en el
- * caso de la tabla además agranda su área scrolleable. Ninguna combinación de
- * `z-index` lo arregla: el recorte lo hace el contexto de scroll, no el
- * apilamiento.
- *
- * La solución es sacar el panel del árbol con un portal y posicionarlo con
- * `position: fixed` contra el rectángulo del ancla. Se reposiciona ante scroll
- * y resize, y se voltea hacia arriba cuando no entra abajo.
- *
- * Al vivir fuera del ancla, el cierre por click afuera tiene que mirar **los
- * dos** elementos: si solo mirara el ancla, cualquier click dentro del propio
+ * Panel flotante anclado a un elemento, renderizado en un portal. Existe
+ * porque un menú posicionado dentro de un contenedor con `overflow` —la tabla
+ * de postulaciones, la tarjeta de un CV— queda **cortado por ese contenedor**;
+ * ninguna combinación de `z-index` lo arregla, el recorte lo hace el contexto
+ * de scroll, no el apilamiento. La solución es sacar el panel del árbol con un
+ * portal y posicionarlo con `position: fixed` contra el rectángulo del ancla,
+ * reposicionándolo ante scroll/resize y volteándolo hacia arriba cuando no
+ * entra abajo. Al vivir fuera del ancla, el cierre por click afuera mira
+ * **los dos** elementos: si sólo mirara el ancla, un click dentro del propio
  * panel lo cerraría.
  */
 export function Popover({

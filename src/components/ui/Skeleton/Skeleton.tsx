@@ -2,21 +2,12 @@ import { cx } from '@/utils/classNames';
 import styles from './Skeleton.module.css';
 
 /**
- * Marcas de posición mientras algo carga.
- *
- * Un esqueleto sirve cuando **anticipa la forma de lo que va a aparecer**:
- * la página no salta al llegar los datos y la espera se entiende sin leer un
- * cartel. Un bloque de barras genéricas no hace eso — ocupa espacio sin
- * decir nada y después el contenido real lo reemplaza por algo con otra
- * pinta.
- *
- * Por eso hay un esqueleto por sección, cada uno calcado de su pantalla.
- * `ApprenticeShell` elige cuál mostrar según la ruta, que es lo único que
- * sabe antes de tener los datos.
- *
- * En este producto la espera larga tiene una causa concreta: el servidor se
- * apaga cuando nadie lo usa y la primera visita después de un rato tiene que
- * esperar a que arranque.
+ * Marcas de posición mientras algo carga. Un esqueleto sirve cuando
+ * **anticipa la forma de lo que va a aparecer** — un bloque de barras
+ * genéricas no hace eso. Por eso hay uno por sección, cada uno calcado de su
+ * pantalla; `ApprenticeShell` elige cuál mostrar según la ruta, que es lo
+ * único que sabe antes de tener los datos. La espera larga tiene una causa
+ * concreta: el servidor se apaga cuando nadie lo usa.
  */
 
 interface SkeletonProps {

@@ -25,23 +25,19 @@ export interface AuthContextValue {
   experiences: Experiences | null;
   /**
    * `true` únicamente hasta que Supabase entrega el **primer** estado de
-   * sesión al arrancar la app. Es el arranque en frío: todavía no se sabe si
-   * hay alguien o no.
-   *
-   * Es lo que deben mirar los guards para decidir si bloquean la pantalla.
-   * Nunca vuelve a `true`: una renovación de credenciales de alguien que ya
-   * está adentro no es un arranque, y no debe desmontar nada.
+   * sesión al arrancar la app — el arranque en frío, cuando todavía no se
+   * sabe si hay alguien. Es lo que miran los guards para bloquear la
+   * pantalla. Nunca vuelve a `true`: una renovación de credenciales de
+   * alguien que ya está adentro no es un arranque.
    */
   bootstrapping: boolean;
   /**
    * `true` durante el arranque y también mientras se resuelven las
    * experiencias de una identidad **nueva** (login, logout, cambio de
-   * cuenta). No se activa cuando llega un evento de auth de la misma
-   * persona —`TOKEN_REFRESHED`, o el `SIGNED_IN` que Supabase reemite al
-   * volver a la pestaña—, porque ahí no cambió nada que recargar.
-   *
-   * Sirve para que la UI pública no muestre la versión de visitante antes de
-   * saber si hay sesión.
+   * cuenta) — no con un evento de auth de la misma persona
+   * (`TOKEN_REFRESHED`, o el `SIGNED_IN` que Supabase reemite al volver a la
+   * pestaña), porque ahí no cambió nada que recargar. Evita que la UI
+   * pública muestre la versión de visitante antes de saber si hay sesión.
    */
   loading: boolean;
   isAuthenticated: boolean;

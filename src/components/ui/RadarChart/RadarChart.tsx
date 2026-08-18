@@ -3,16 +3,11 @@ import styles from './RadarChart.module.css';
 
 /**
  * Gráfico de radar (o "telaraña"): varias dimensiones con la misma escala,
- * dibujadas alrededor de un centro.
- *
- * SVG propio, sin librería. Es trigonometría simple y así respeta los tokens
- * del producto y el modo oscuro, igual que el set de íconos o `ProgressBar`.
- *
- * **Cuándo usarlo y cuándo no.** Un radar sirve para leer *la forma* del
- * conjunto —dónde se hunde, qué tan parejo es— y para comparar varias series
- * entre sí. No sirve para leer valores exactos: el área encerrada crece con
- * el cuadrado del valor, así que exagera las diferencias. Para un solo
- * resultado con números que importan, `ProgressBar` comunica mejor.
+ * dibujadas alrededor de un centro. SVG propio, sin librería, así respeta los
+ * tokens del producto y el modo oscuro. Sirve para leer *la forma* del
+ * conjunto y comparar series entre sí, no para valores exactos —el área
+ * encerrada crece con el cuadrado del valor y exagera las diferencias—; para
+ * un solo resultado con números que importan, `ProgressBar` comunica mejor.
  */
 
 export interface RadarAxis {
@@ -105,11 +100,8 @@ function wedgePath(fromDegrees: number, toDegrees: number, radius: number): stri
 
 /**
  * El barrido: una línea que gira y, detrás, tres cuñas cada vez más tenues
- * que hacen de estela.
- *
- * SVG no tiene degradado cónico, así que la estela se aproxima apilando
- * cuñas con opacidad decreciente — se lee igual que el desvanecido de un
- * radar de verdad y no necesita ni filtros ni una librería.
+ * que hacen de estela. SVG no tiene degradado cónico, así que se aproxima
+ * apilando cuñas con opacidad decreciente.
  */
 function ScanSweep() {
   return (
@@ -145,13 +137,7 @@ export function RadarChart({ axes, series, state = 'ready', ariaLabel, className
         aria-busy={scanning || undefined}
       >
         <g className={styles.grid}>
-          {/*
-            Buscando, la grilla es circular; con resultado, poligonal.
-            Las puntas son el resultado: dibujar el rombo antes de tener
-            datos insinuaría una forma que todavía no se midió. Un radar
-            que barre es un círculo, y el polígono aparece recién cuando
-            hay algo que lo forme.
-          */}
+          {/* Buscando, la grilla es circular; con resultado, poligonal — dibujar el rombo antes de tener datos insinuaría una forma que todavía no se midió. */}
           {gridPolygons.map((polygon) =>
             scanning ? (
               <circle

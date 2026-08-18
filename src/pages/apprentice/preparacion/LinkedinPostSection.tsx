@@ -31,15 +31,12 @@ import screen from '@/app/layouts/appShell.module.css';
 import styles from './linkedinPost.module.css';
 
 /**
- * Preparación · Creador de publicaciones para LinkedIn.
- *
- * La idea de la herramienta es que nadie tenga que llegar con el texto medio
- * armado: se escribe todo lo que uno quiere que aparezca, desordenado y como
- * salga, y las preferencias de abajo deciden en qué se convierte.
- *
- * Esas preferencias se eligen **antes** de generar, no después: cambian cómo
- * se escribe el texto desde cero, no son un filtro que se le aplica a algo ya
- * escrito.
+ * Preparación · Creador de publicaciones para LinkedIn. La idea es que nadie
+ * tenga que llegar con el texto medio armado: se escribe todo lo que uno
+ * quiere que aparezca, desordenado y como salga, y las preferencias de abajo
+ * deciden en qué se convierte. Esas preferencias se eligen **antes** de
+ * generar, no después: cambian cómo se escribe el texto desde cero, no son un
+ * filtro aplicado a algo ya escrito.
  */
 
 /** Lo mismo que el backend exige antes de llamar a Gemini. */
@@ -412,13 +409,11 @@ function PostResult({ result, draft, onDraftChange, onRegenerate }: PostResultPr
 }
 
 /**
- * Cambia el arranque conservando el resto.
- *
- * El gancho es el primer párrafo, no la publicación entera: se corta en la
- * primera línea en blanco, que es como separa los párrafos el workflow. Si no
- * hay ninguna, se cae al primer salto de línea; y si el texto es un bloque sin
- * cortes, el gancho se antepone en vez de reemplazarlo — reemplazar ahí sería
- * borrar toda la publicación.
+ * Cambia el arranque conservando el resto. El gancho es el primer párrafo, no
+ * la publicación entera: se corta en la primera línea en blanco (como separa
+ * párrafos el workflow) o, si no hay, en el primer salto de línea; y si el
+ * texto es un bloque sin cortes, el gancho se antepone en vez de
+ * reemplazarlo — reemplazar ahí borraría toda la publicación.
  */
 function replaceOpening(post: string, hook: string): string {
   const paragraphBreak = post.indexOf('\n\n');

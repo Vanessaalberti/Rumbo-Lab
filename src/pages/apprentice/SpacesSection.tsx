@@ -7,24 +7,18 @@ import { formatLongDate } from './perfil/formatters';
 import screen from '@/app/layouts/appShell.module.css';
 
 /**
- * Espacios en los que participa el Aprendiz.
- *
- * Son una **relación**, no una posesión (Notion 02 · Mi Rumbo §5: "no son
- * hijos ni propiedad de Mi Rumbo"): esta vista responde "de qué espacios formo
- * parte", nada más. Crear, editar o administrar un Espacio pertenece al
- * contexto de Mentor y no se ofrece acá.
- *
- * Los mentores del Espacio salen de `space_mentors → mentors`, visibles para
- * el Aprendiz por la política `mentors_select_by_shared_space`.
- *
- * **El feedback se lee acá.** Dejó de ser una sección propia del rail: siempre
- * viene de un Mentor y casi siempre dentro de un Espacio, así que tenerlo
- * separado obligaba a ir y volver entre dos pantallas para entender una sola
- * conversación. Cada Espacio muestra sus devoluciones más recientes; el
- * historial completo tiene su propia pantalla.
- *
- * No hay "entrar al Espacio": no existe todavía una ruta de detalle de Espacio
- * en la aplicación, y no se inventa una que llevaría a una pantalla vacía.
+ * Espacios en los que participa el Aprendiz. Son una **relación**, no una
+ * posesión (Notion 02 · Mi Rumbo §5: "no son hijos ni propiedad de Mi
+ * Rumbo"): esta vista responde "de qué espacios formo parte", nada más —
+ * crear, editar o administrar un Espacio pertenece al contexto de Mentor. Los
+ * mentores del Espacio salen de `space_mentors → mentors`, visibles para el
+ * Aprendiz por la política `mentors_select_by_shared_space`. **El feedback se
+ * lee acá**: dejó de ser una sección propia del rail porque siempre viene de
+ * un Mentor y casi siempre dentro de un Espacio, así que tenerlo separado
+ * obligaba a ir y volver entre dos pantallas. Cada Espacio muestra sus
+ * devoluciones más recientes; el historial completo tiene su propia
+ * pantalla. No hay "entrar al Espacio": no existe todavía una ruta de
+ * detalle de Espacio, y no se inventa una que llevaría a una pantalla vacía.
  */
 export function SpacesSection() {
   const {

@@ -5,19 +5,12 @@ import type {
 import { APPLICATION_STATUS_ORDER } from '../applicationStatus';
 
 /**
- * Métricas de "Mi progreso".
- *
- * Todas salen de datos reales de las postulaciones. Ninguna se estima ni se
- * proyecta: cuando no hay con qué calcular, la métrica devuelve `null` y la
- * vista muestra que todavía no hay nada que medir — nunca un cero que se lea
- * como un resultado.
+ * Métricas de "Mi progreso". Todas salen de datos reales; ninguna se estima:
+ * sin con qué calcular, devuelven `null` y la vista muestra que no hay nada
+ * que medir todavía, nunca un cero que se lea como resultado.
  */
 
-/**
- * Cuánto avanzó un proceso. Es una escala de **avance**, no el orden de la
- * taxonomía: los tres finales sin avance valen 0 porque no dicen hasta dónde
- * se llegó. Misma escala que `config/applicationStatus.ts` en el backend.
- */
+/** Escala de avance, no el orden de la taxonomía: los tres finales sin avance valen 0. Misma escala que `config/applicationStatus.ts` en el backend. */
 const PROGRESS_RANK: Record<ApplicationStatus, number> = {
   pendiente: 0,
   rechazado: 0,
@@ -58,12 +51,10 @@ export interface FurthestReached {
 }
 
 /**
- * La postulación que llegó más lejos.
- *
- * Mira `furthestStatus`, que sale del historial, no el estado actual: una
- * postulación rechazada después de dos entrevistas llegó más lejos que una que
- * sigue esperando respuesta. Ante empate gana la más reciente, que es la que
- * mejor describe el momento actual.
+ * La postulación que llegó más lejos. Mira `furthestStatus` (del historial),
+ * no el estado actual: una rechazada tras dos entrevistas llegó más lejos que
+ * una que sigue esperando respuesta. Ante empate (`>` estricto) gana la
+ * primera del array.
  */
 export function furthestReached(
   applications: ApplicationSummary[],
@@ -89,14 +80,10 @@ export interface ClosedWithoutApplying {
 }
 
 /**
- * Oportunidades que se cerraron antes de mandar nada.
- *
- * Son las que quedaron en `cerrado` sin haber pasado nunca por `postulado`:
- * la vacante se cerró mientras la postulación seguía guardada como pendiente.
- * Es el número que mide cuánto se pierde por demorar, no un error de carga.
- *
- * El porcentaje es sobre **todas** las postulaciones, no sobre las cerradas:
- * la pregunta que responde es "de todo lo que registré, cuánto se me escapó".
+ * Oportunidades cerradas sin haber pasado nunca por `postulado` — se me
+ * cerró la vacante mientras seguía guardada como pendiente. El porcentaje es
+ * sobre todas las postulaciones, no sólo las cerradas: responde "de todo lo
+ * que registré, cuánto se me escapó".
  */
 export function closedWithoutApplying(
   applications: ApplicationSummary[],
@@ -115,13 +102,9 @@ export function closedWithoutApplying(
 }
 
 /**
- * Un promedio por período.
- *
- * `perWeek` y `perMonth` son `null` hasta que haya una semana —o un mes— de
- * historial. Proyectar un promedio mensual con tres días de datos no es una
- * estimación optimista: es un número inventado. Quien lleva cuatro días usando
- * la app no tiene un "promedio mensual", y mostrarle uno lo invita a sacar
- * conclusiones sobre algo que todavía no ocurrió.
+ * Un promedio por período. `perWeek`/`perMonth` son `null` hasta que haya esa
+ * cantidad de historial — proyectar un promedio mensual con tres días de
+ * datos no es una estimación, es un número inventado.
  */
 export interface Cadence {
   total: number;
@@ -138,30 +121,16 @@ export interface ActivityRate {
   registered: Cadence;
   /** Las que efectivamente envió. */
   applied: Cadence;
-  /**
-   * Qué proporción de lo anotado terminó enviando, en porcentaje.
-   *
-   * Es la lectura que le da sentido a las otras dos: anotar mucho y mandar
-   * poco es un problema distinto de anotar poco. `null` si todavía no
-   * registró nada.
-   */
+  /** Qué proporción de lo anotado terminó enviando. `null` si todavía no registró nada. */
   conversion: number | null;
 }
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 /**
- * Ritmo de postulación.
- *
- * Cuenta **solo las que se enviaron de verdad** — las que pasaron por
- * `postulado`, según el historial. Una postulación guardada como pendiente no
- * es una postulación enviada, y contarla inflaría el ritmo con intenciones en
- * lugar de acciones.
- *
- * El período va desde el primer envío hasta hoy. Se mide sobre lo que la
- * persona efectivamente hizo, no desde que se creó la cuenta: alguien que
- * empezó a postularse la semana pasada no tiene por qué ver su ritmo diluido
- * por los meses anteriores.
+ * Ritmo de postulación. Cuenta sólo las enviadas de verdad (pasaron por
+ * `postulado`) — una pendiente contaría intenciones, no acciones. El período
+ * va desde el primer envío hasta hoy, no desde que se creó la cuenta.
  */
 function cadence(count: number, days: number): Cadence {
   const perDay = count / days;
@@ -176,22 +145,14 @@ function cadence(count: number, days: number): Cadence {
 }
 
 /**
- * Ritmo de la búsqueda: cuánto anota y cuánto manda.
+ * Ritmo de la búsqueda: cuánto anota y cuánto manda — la diferencia entre las
+ * dos es el dato útil (anotar 5/día y mandar media es un problema que ningún
+ * número por separado muestra).
  *
- * Son dos acciones distintas y la diferencia entre ellas es el dato útil.
- * Anotar una vacante es capturarla para no perderla; enviarla es postularse.
- * Alguien que anota cinco por día y manda media tiene un problema que ningún
- * número por separado muestra.
- *
- * **Las registradas se cuentan por `createdAt`, no por estar en `pendiente`.**
- * Una que se anotó y después se envió igual se registró ese día: contar solo
- * las que hoy siguen pendientes haría que el número **baje** justamente cuando
- * la persona actúa, que es lo contrario de lo que la métrica quiere mostrar.
- *
- * Ambas series se calculan sobre **la misma ventana** —los días desde la
- * primera vacante anotada—. Con ventanas distintas, "1,2 anotadas por día"
- * contra "0,5 enviadas por día" no sería comparable, y la comparación es todo
- * el punto.
+ * Las registradas se cuentan por `createdAt`, no por seguir en `pendiente`:
+ * si se contaran sólo las pendientes hoy, el número bajaría justo cuando la
+ * persona actúa. Ambas series usan la misma ventana (días desde la primera
+ * vacante anotada) para que sean comparables entre sí.
  */
 export function activityRate(applications: ApplicationSummary[]): ActivityRate | null {
   const registeredDates = applications
@@ -223,13 +184,9 @@ export interface ResponseRate {
 }
 
 /**
- * Cuántas de las enviadas tuvieron alguna respuesta.
- *
- * Métrica agregada porque es la que cierra la pregunta que abren las otras:
- * el ritmo dice cuánto se manda, el estado más lejano dice hasta dónde se
- * llegó una vez, y esta dice **cada cuántos envíos pasa algo**. Cuenta como
- * respuesta cualquier avance más allá de `postulado` y también el rechazo: un
- * "no" es una respuesta, el silencio no.
+ * Cuántas de las enviadas tuvieron alguna respuesta — cada cuántos envíos
+ * pasa algo. Cuenta como respuesta cualquier avance más allá de `postulado` y
+ * también el rechazo: un "no" es respuesta, el silencio no.
  */
 export function responseRate(applications: ApplicationSummary[]): ResponseRate | null {
   const applied = applications.filter((application) => application.firstAppliedAt !== null);

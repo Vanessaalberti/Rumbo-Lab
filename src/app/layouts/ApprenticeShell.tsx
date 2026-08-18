@@ -10,33 +10,20 @@ import styles from './appShell.module.css';
 export interface ApprenticeShellContext {
   dashboard: MyRumboDashboard;
   /**
-   * Vuelve a pedir el dashboard al backend, sin vaciar la pantalla.
-   *
-   * Devuelve una promesa que resuelve cuando los datos nuevos ya están en
-   * estado. Quien muestre algo provisorio mientras tanto —una fila optimista,
-   * por ejemplo— puede esperarla para descartarlo recién cuando llegó el dato
-   * real, en vez de dejar un hueco entre una cosa y la otra.
+   * Vuelve a pedir el dashboard sin vaciar la pantalla. La promesa resuelve
+   * cuando los datos nuevos ya están en estado, para que algo provisorio (una
+   * fila optimista) pueda esperarla antes de descartarse.
    */
   refresh: () => Promise<void>;
 
   /**
-   * Cupos de las herramientas de IA. `null` mientras no llegaron.
-   *
-   * Vive acá y no en Preparación por el mismo motivo que el dashboard: sin
-   * esto, cada vez que se entra a la sección se dispara el request de nuevo,
-   * y el aviso de cupos parpadea en cada navegación aunque no haya cambiado
-   * nada. Se pide una vez por sesión.
-   *
-   * No bloquea el render: la pantalla aparece con el dashboard y el cupo se
-   * completa cuando llega. Quien lo muestre tiene que contemplar el `null`.
+   * Cupos de las herramientas de IA, `null` mientras no llegaron. Vive acá y
+   * no en Preparación para pedirse una sola vez por sesión, en vez de
+   * parpadear en cada navegación. No bloquea el render.
    */
   quota: AiQuota | null;
 
-  /**
-   * Vuelve a pedir los cupos. La llaman las herramientas después de generar
-   * algo — es lo único que los cambia, así que no hace falta preguntar en
-   * ningún otro momento.
-   */
+  /** Vuelve a pedir los cupos — sólo las herramientas la llaman, después de generar algo. */
   refreshQuota: () => Promise<void>;
 }
 
@@ -45,14 +32,7 @@ type ShellState =
   | { status: 'success'; data: MyRumboDashboard }
   | { status: 'error' };
 
-/**
- * Qué esqueleto mostrar mientras cargan los datos.
- *
- * La ruta es lo único que el layout sabe antes de tener nada: alcanza para
- * anticipar la forma de la pantalla a la que se está entrando, que es lo que
- * hace útil a un esqueleto. Una sección sin entrada acá cae en la lista, que
- * es la forma más común entre las que quedan.
- */
+/** Qué esqueleto mostrar mientras cargan los datos. La ruta es lo único que el layout sabe antes de tener nada. */
 function skeletonFor(pathname: string): SkeletonVariant {
   const section = pathname.replace(/^\/mi-rumbo\/?/, '').split('/')[0];
 
@@ -71,11 +51,9 @@ function skeletonFor(pathname: string): SkeletonVariant {
 }
 
 /**
- * Layout del área de Aprendiz: rail lateral + contenido.
- *
- * Carga `GET /api/me` una sola vez acá arriba y lo comparte con todas las
- * secciones (Mi Perfil, Postulaciones, CVs, Espacios) vía contexto de rutas
- * anidadas — evita que cada sección repita el mismo request.
+ * Layout del área de Aprendiz: rail lateral + contenido. Carga `GET /api/me`
+ * una sola vez acá y lo comparte con todas las secciones vía contexto de
+ * rutas anidadas, para que ninguna repita el mismo request.
  */
 export function ApprenticeShell() {
   const [state, setState] = useState<ShellState>({ status: 'loading' });
@@ -83,18 +61,12 @@ export function ApprenticeShell() {
   const location = useLocation();
 
   /**
-   * `initial` distingue la **primera** carga de las revalidaciones posteriores.
-   *
-   * Antes había una sola: `refresh()` volvía a `loading` y eso reemplazaba la
-   * pantalla completa por "Cargando tu Mi Rumbo…". Como se llama después de
-   * cada escritura, crear una postulación hacía desaparecer la tabla entera
-   * —incluidas las postulaciones que ya estaban y que no cambiaron— hasta que
-   * el backend respondiera.
-   *
-   * En una revalidación los datos previos siguen siendo válidos: se mantienen
-   * en pantalla y se reemplazan recién cuando llega la respuesta. Un error acá
-   * tampoco tumba la vista: lo que ya se estaba mirando sigue sirviendo, y la
-   * acción que lo provocó reporta su propio fallo donde ocurrió.
+   * `initial` distingue la primera carga de las revalidaciones. Antes había
+   * una sola: `refresh()` volvía a `loading` y reemplazaba toda la pantalla
+   * por "Cargando…", así que crear una postulación hacía desaparecer la
+   * tabla entera hasta que el backend respondiera. En una revalidación los
+   * datos previos siguen válidos y se mantienen en pantalla; un error acá
+   * tampoco tumba la vista, la acción que lo provocó reporta su propio fallo.
    */
   const load = (initial = false): Promise<void> => {
     if (initial) setState({ status: 'loading' });
@@ -109,13 +81,8 @@ export function ApprenticeShell() {
     });
   };
 
-  /*
-   * Los cupos van por su cuenta y no bloquean nada: si tardan o fallan, la
-   * pantalla se usa igual. Un fallo deja `null`, que es el mismo estado que
-   * "todavía no llegó" — y ahí la vista muestra el aviso sin los números en
-   * vez de un error, porque no poder decir cuántos usos quedan no impide
-   * usar la sección.
-   */
+  /* Los cupos van por su cuenta: si tardan o fallan, la pantalla se usa
+     igual. Un fallo deja `null`, el mismo estado que "todavía no llegó". */
   const loadQuota = (): Promise<void> =>
     readAiQuota().then((result) => {
       if (result.status === 'success') setQuota(result.data);

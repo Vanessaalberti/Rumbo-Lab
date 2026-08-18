@@ -1,10 +1,9 @@
 /**
- * Validación y saneamiento de datos que no controlamos.
- *
- * Todo lo que entre por un formulario, por la URL o por una respuesta de la API
- * pasa por acá antes de usarse. React escapa el texto que renderiza, así que el
- * riesgo real no está en mostrar una cadena sino en los casos donde el valor
- * deja de ser texto: un `href`, un destino de redirección, una clave de objeto.
+ * Validación y saneamiento de datos que no controlamos: todo lo que entre por
+ * un formulario, la URL o una respuesta de la API pasa por acá antes de
+ * usarse. React escapa el texto que renderiza, así que el riesgo real no está
+ * en mostrar una cadena sino en los casos donde deja de ser texto: un `href`,
+ * un destino de redirección, una clave de objeto.
  */
 
 /**
