@@ -8,3 +8,103 @@
   color: var(--text-soft);
   font-size: var(--text-base);
 }
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.mark {
+  width: 64px;
+  height: 64px;
+  color: var(--brand);
+  overflow: visible;
+}
+
+/*
+ * El trazo se dibuja de punta a punta con `stroke-dasharray`: un guion del
+ * largo exacto de la línea, desplazado ese mismo largo, la deja invisible, y
+ * llevar el desplazamiento a cero la revela de izquierda a derecha.
+ *
+ * 25,46 es la suma real de los tres tramos de la ruta (√72 + √32 + √128).
+ * Con un valor más grande la línea termina de dibujarse antes de que la
+ * animación llegue al final y se queda quieta un instante.
+ */
+.line {
+  stroke-dasharray: 25.46;
+  stroke-dashoffset: 25.46;
+  animation: rumbo-auth-draw 2.2s var(--ease-in-out) infinite;
+}
+
+/* La cabeza de flecha entra recién cuando la línea la alcanza. */
+.arrow {
+  stroke-dasharray: 12;
+  stroke-dashoffset: 12;
+  animation: rumbo-auth-draw-arrow 2.2s var(--ease-in-out) infinite;
+}
+
+@keyframes rumbo-auth-draw {
+  0% {
+    stroke-dashoffset: 25.46;
+  }
+  45%,
+  75% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -25.46;
+  }
+}
+
+@keyframes rumbo-auth-draw-arrow {
+  0%,
+  40% {
+    stroke-dashoffset: 12;
+  }
+  60%,
+  75% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -12;
+  }
+}
+
+.message {
+  font-size: var(--text-sm);
+  color: var(--text-soft);
+  text-align: center;
+  max-width: 34ch;
+  line-height: var(--leading-relaxed);
+  /* El texto cambia solo cuando la espera se estira; que aparezca en vez de
+     saltar evita que se lea como un parpadeo. */
+  animation: rumbo-auth-message var(--duration-slow) var(--ease-out) both;
+}
+
+@keyframes rumbo-auth-message {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/*
+ * Sin movimiento: la marca queda dibujada y quieta. Se pierde el trazo
+ * animado, no la señal de que la app está trabajando — para eso está el
+ * mensaje, que sigue cambiando según cuánto se demore.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .line,
+  .arrow {
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+
+  .message {
+    animation: none;
+  }
+}
