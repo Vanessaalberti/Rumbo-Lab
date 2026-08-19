@@ -7,15 +7,12 @@ export interface MostUsedCv {
 }
 
 /**
- * El CV con el que la persona más se presentó.
- *
- * Se calcula sobre el campo `CV enviado` de las postulaciones (`cv_id`), que
- * existe precisamente para poder leer con qué CV se presentó a cada
- * oportunidad. No es el "CV activo": esa noción sigue sin definirse en
- * `05 · CVs`, porque con varios CVs la palabra se vuelve ambigua.
- *
- * Las postulaciones sin CV asociado no cuentan como uso, pero sí entran en el
- * total: "en 3 de 5 postulaciones" mide sobre todas las que existen.
+ * El CV con el que la persona más se presentó. Se calcula sobre el campo
+ * `CV enviado` de las postulaciones (`cv_id`). No es el "CV activo": esa
+ * noción sigue sin definirse en `05 · CVs`, porque con varios CVs la palabra
+ * se vuelve ambigua. Las postulaciones sin CV asociado no cuentan como uso,
+ * pero sí entran en el total: "en 3 de 5 postulaciones" mide sobre todas las
+ * que existen.
  */
 export function mostUsedCv(
   applications: ApplicationSummary[],

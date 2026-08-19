@@ -7,16 +7,13 @@ import { cx } from '@/utils/classNames';
 import styles from './SettingsPage.module.css';
 
 /**
- * Configuración de la cuenta.
- *
- * Alcance deliberado: lo que pertenece a **la cuenta** —identidad de acceso,
- * qué experiencias tiene activadas, preferencias de la interfaz y cerrar
- * sesión—. Los datos profesionales (nombre visible, presentación, objetivo,
- * áreas de interés) se editan en Mi Rumbo · Mi Perfil y no se duplican acá:
- * dos lugares para editar lo mismo es una fuente garantizada de confusión.
- *
- * Solo muestra ajustes que hoy existen de verdad. No hay secciones vacías
- * anticipando funcionalidades que todavía no se decidieron.
+ * Configuración de la cuenta. Alcance deliberado: lo que pertenece a **la
+ * cuenta** —identidad de acceso, qué experiencias tiene activadas,
+ * preferencias de la interfaz y cerrar sesión—. Los datos profesionales
+ * (nombre visible, presentación, objetivo, áreas de interés) se editan en Mi
+ * Rumbo · Mi Perfil y no se duplican acá: dos lugares para editar lo mismo es
+ * una fuente garantizada de confusión. Sólo muestra ajustes que hoy existen
+ * de verdad.
  */
 export function SettingsPage() {
   const { user, experiences, signOut } = useAuth();

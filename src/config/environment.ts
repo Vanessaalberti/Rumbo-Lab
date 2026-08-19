@@ -1,13 +1,11 @@
 /**
- * Configuración de entorno.
- *
- * Único punto donde se leen las variables de Vite: el resto del código consume
- * este objeto. Evita que aparezcan `import.meta.env` dispersos por la app.
- *
- * `supabaseUrl` y `supabaseAnonKey` son públicos por diseño — es la clave
- * pensada para el cliente, protegida por RLS — pero son obligatorios: sin
- * ellos no hay identidad ni sesión posible. Fallan rápido y en desarrollo,
- * no con un error de red críptico la primera vez que alguien inicia sesión.
+ * Configuración de entorno. Único punto donde se leen las variables de Vite:
+ * el resto del código consume este objeto, y evita que aparezcan
+ * `import.meta.env` dispersos por la app. `supabaseUrl` y `supabaseAnonKey`
+ * son públicos por diseño —la clave pensada para el cliente, protegida por
+ * RLS— pero obligatorios: sin ellos no hay identidad ni sesión posible.
+ * Fallan rápido y en desarrollo, no con un error de red críptico la primera
+ * vez que alguien inicia sesión.
  */
 function readRequired(value: string | undefined, name: string): string {
   if (!value) {

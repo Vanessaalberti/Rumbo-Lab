@@ -3,18 +3,13 @@ import styles from './AuthLoadingScreen.module.css';
 
 /**
  * Pantalla de espera mientras se restaura la sesión, se resuelve el perfil de
- * Aprendiz o se consultan las experiencias de la cuenta.
- *
- * Sin esto, una persona autenticada vería el formulario de login parpadear
- * antes de ser redirigida a su espacio — el contenido incorrecto es peor que
- * un instante de pantalla neutra.
- *
- * **Es la espera más larga del producto.** `RequireExperience` pide
- * `GET /experiences` al backend, y cuando el servidor estuvo inactivo tarda
- * decenas de segundos en arrancar. Por eso acá no alcanza con una frase
- * quieta: la marca se dibuja sola en bucle, y si la espera se estira el
- * mensaje explica qué está pasando en vez de dejar a la persona mirando un
- * texto que no cambia.
+ * Aprendiz o se consultan las experiencias de la cuenta. Sin esto, una
+ * persona autenticada vería el formulario de login parpadear antes de ser
+ * redirigida a su espacio. **Es la espera más larga del producto**:
+ * `RequireExperience` pide `GET /experiences` al backend, y cuando el
+ * servidor estuvo inactivo tarda decenas de segundos en arrancar — por eso
+ * acá no alcanza con una frase quieta, la marca se dibuja sola en bucle, y si
+ * la espera se estira el mensaje explica qué está pasando.
  */
 
 /** A partir de acá, la espera dejó de ser normal y conviene explicarla. */
@@ -41,11 +36,7 @@ export function AuthLoadingScreen() {
   return (
     <div className={styles.screen} role="status" aria-live="polite">
       <div className={styles.content}>
-        {/*
-          El mismo trazo ascendente de la marca, dibujándose. No es un
-          adorno genérico: es la figura del producto — un recorrido que
-          sube — y sale de la misma ruta que usa el ícono `trending`.
-        */}
+        {/* El mismo trazo ascendente de la marca, dibujándose: es la figura del producto —un recorrido que sube— y sale de la misma ruta que usa el ícono `trending`. */}
         <svg
           className={styles.mark}
           viewBox="0 0 24 24"

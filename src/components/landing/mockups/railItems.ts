@@ -6,15 +6,12 @@ export interface RailItem {
 }
 
 /**
- * Mi Rumbo: el entorno personal del aprendiz.
- *
- * **Esta lista tiene que ser idéntica a `app/layouts/apprenticeRail.ts`**, que
- * es el rail que la persona ve al entrar. Si la landing muestra otra navegación,
- * el mockup deja de ser una ventana al producto y pasa a ser una ilustración.
- *
- * Quedó desactualizada una vez: mostraba `Feedback` como sección propia —dejó de
- * serlo, ahora se lee dentro de Espacios— y le faltaban `Objetivos` y
- * `Preparación`. Además el orden no coincidía.
+ * Mi Rumbo: el entorno personal del aprendiz. **Esta lista tiene que ser
+ * idéntica a `app/layouts/apprenticeRail.ts`**, el rail real: si la landing
+ * muestra otra navegación, el mockup deja de ser una ventana al producto y
+ * pasa a ser una ilustración. Quedó desactualizada una vez: mostraba
+ * `Feedback` como sección propia —dejó de serlo, ahora se lee dentro de
+ * Espacios— y le faltaban `Objetivos` y `Preparación`.
  */
 export const LEARNER_RAIL: RailItem[] = [
   { label: 'Mi Perfil', icon: 'profile' },
@@ -26,9 +23,9 @@ export const LEARNER_RAIL: RailItem[] = [
 ];
 
 /**
- * Preparación va aparte, separada por un filete, igual que en el rail real: las
- * otras seis secciones **registran** lo que la persona hizo y esta la **entrena**
- * para lo que viene.
+ * Preparación va aparte, separada por un filete, igual que en el rail real:
+ * las otras seis secciones **registran** lo que la persona hizo y esta la
+ * **entrena** para lo que viene.
  */
 export const LEARNER_RAIL_PRACTICE: RailItem[] = [
   { label: 'Preparación', icon: 'spark' },

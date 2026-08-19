@@ -2,14 +2,12 @@ import { cx } from '@/utils/classNames';
 import styles from './micLevel.module.css';
 
 /**
- * El medidor de voz que se mueve mientras se graba.
- *
- * No es decoración. Está para que no vuelva a pasar lo de terminar una práctica
- * entera y recién al recibir la devolución descubrir que el micrófono no estaba
- * tomando nada: la evaluación hecha sobre silencio, y el uso ya gastado.
- *
- * Por eso son barras y no un número: un nivel que se mueve al hablar es la
- * única confirmación que se entiende sin explicación.
+ * El medidor de voz que se mueve mientras se graba. No es decoración: está
+ * para que no vuelva a pasar lo de terminar una práctica entera y recién al
+ * recibir la devolución descubrir que el micrófono no estaba tomando nada, la
+ * evaluación hecha sobre silencio y el uso ya gastado. Por eso son barras y no
+ * un número: un nivel que se mueve al hablar es la única confirmación que se
+ * entiende sin explicación.
  */
 
 /** Cuánto se espera antes de avisar que no entra voz. */
@@ -56,12 +54,11 @@ export function MicLevelMeter({ levels, paused, voiceDetected, seconds }: MicLev
 }
 
 /**
- * El aviso de cuando la grabación terminó y quedó vacía.
- *
- * Acá sí se corta el paso: mandarla significa gastar un uso para recibir una
- * evaluación en cero sobre un audio sin voz. El umbral que decide esto es muy
- * bajo a propósito —distingue señal de silencio, no voz fuerte de voz baja—,
- * así que llegar hasta acá quiere decir que realmente no entró nada.
+ * El aviso de cuando la grabación terminó y quedó vacía. Acá sí se corta el
+ * paso: mandarla significa gastar un uso para recibir una evaluación en cero
+ * sobre un audio sin voz. El umbral que decide esto es muy bajo a propósito
+ * —distingue señal de silencio, no voz fuerte de voz baja—, así que llegar
+ * hasta acá quiere decir que realmente no entró nada.
  */
 export function SilentRecordingNotice() {
   return (

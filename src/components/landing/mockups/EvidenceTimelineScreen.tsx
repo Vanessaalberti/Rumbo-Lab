@@ -17,19 +17,16 @@ interface EvidenceTimelineScreenProps {
 }
 
 /**
- * Mockups Oficiales · 5.10 — Evidencias.
- *
- * Línea cronológica de los acontecimientos relevantes para comprender la
- * evolución del Aprendiz. Arranca en la creación de la cuenta, se genera
- * automáticamente y es privada: no está pensada como vista para Mentores.
- *
- * No es un activity log. Solo entra lo que aporta significado al recorrido, y
- * los cambios de estado de una postulación quedan fuera: viven en el historial
- * propio de Postulaciones.
- *
- * El orden es fijo, del más reciente al más antiguo. El filtro temporal ofrece
- * `Esta semana` —el valor por defecto del producto—, `Este mes` y `Todo`; acá
- * se muestra `Todo` para que se lea el recorrido completo.
+ * Mockups Oficiales · 5.10 — Evidencias. Línea cronológica de los
+ * acontecimientos relevantes para comprender la evolución del Aprendiz.
+ * Arranca en la creación de la cuenta, se genera automáticamente y es
+ * privada: no está pensada como vista para Mentores. No es un activity log:
+ * sólo entra lo que aporta significado al recorrido, y los cambios de estado
+ * de una postulación quedan fuera, viven en el historial propio de
+ * Postulaciones. El orden es fijo, del más reciente al más antiguo. El
+ * filtro temporal ofrece `Esta semana` —el valor por defecto del
+ * producto—, `Este mes` y `Todo`; acá se muestra `Todo` para que se lea el
+ * recorrido completo.
  */
 export function EvidenceTimelineScreen({
   limit,

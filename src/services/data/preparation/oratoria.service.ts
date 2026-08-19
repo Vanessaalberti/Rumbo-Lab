@@ -2,18 +2,15 @@ import { httpClient } from '@/services/api/httpClient';
 import type { AsyncState } from '@/services/data/types';
 
 /**
- * Práctica de oratoria.
- *
- * Manda la grabación —nunca se guarda, ni acá ni en el backend— junto con la
- * pregunta que se está practicando. Whisper (Groq) la transcribe verbatim y
- * mide las pausas por sus marcas de tiempo; Gemini analiza esa transcripción
- * anotada, sin escuchar el audio (se probó y se revirtió: daba resultados
- * inconsistentes entre corridas de la misma grabación).
- *
- * La herramienta evalúa cómo se construyó la respuesta, no sólo cómo se
- * habló. Antes medía cuatro cosas —si contestó, si se entendía, si tenía
+ * Práctica de oratoria. Manda la grabación —nunca se guarda, ni acá ni en el
+ * backend— junto con la pregunta que se está practicando. Whisper (Groq) la
+ * transcribe verbatim y mide las pausas por sus marcas de tiempo; Gemini
+ * analiza esa transcripción anotada, sin escuchar el audio (se probó y se
+ * revirtió: daba resultados inconsistentes entre corridas de la misma
+ * grabación). La herramienta evalúa cómo se construyó la respuesta, no sólo
+ * cómo se habló: antes medía forma —si contestó, si se entendía, si tenía
  * estructura y si usaba muletillas— y una respuesta de puros adjetivos sin
- * explicar sacaba buena nota. Ahora son siete criterios, y los que más pesan
+ * explicar sacaba buena nota; ahora son siete criterios, y los que más pesan
  * miran el contenido.
  */
 
@@ -40,11 +37,9 @@ export interface OratoriaScores {
 export type OratoriaCriterion = keyof OratoriaScores;
 
 /**
- * La mecánica del habla.
- *
- * Son conductas observables, nunca juicios sobre la persona: la herramienta
- * no dice si sonaste seguro o nervioso, porque no lo puede saber y porque
- * saberlo no te daría nada para corregir.
+ * La mecánica del habla. Son conductas observables, nunca juicios sobre la
+ * persona: la herramienta no dice si sonaste seguro o nervioso, porque no lo
+ * puede saber y porque saberlo no te daría nada para corregir.
  */
 export interface OratoriaSpeech {
   /** Silencios de tres segundos o más dentro de la respuesta. */
@@ -70,15 +65,10 @@ export interface OratoriaResult {
 }
 
 /**
- * Cómo se presenta cada criterio.
- *
- * `hint` no es decoración: "cohesión" y "coherencia" suenan casi igual y la
- * diferencia entre las dos es justamente lo que la herramienta quiere
- * enseñar. Sin una línea que las distinga, dos barras distintas con nombres
- * parecidos no comunican nada.
- *
- * `major` marca los criterios que más pesan, para que se lea de un vistazo
- * cuáles decidieron el resultado.
+ * Cómo se presenta cada criterio. `hint` no es decoración: "cohesión" y
+ * "coherencia" suenan casi igual y la diferencia entre las dos es justamente
+ * lo que la herramienta quiere enseñar. `major` marca los criterios que más
+ * pesan, para que se lea de un vistazo cuáles decidieron el resultado.
  */
 export interface CriterionMeta {
   id: OratoriaCriterion;
@@ -157,11 +147,9 @@ export function analyzeOratoriaRecording(params: {
 }
 
 /**
- * Cómo se lee un ritmo de habla.
- *
- * Los rangos salen de lo que se recomienda para hablar en público: por debajo
- * de 110 se percibe lento, por encima de 170 cuesta seguirlo. No es un
- * puntaje ni entra en la evaluación — es un dato para que la persona lo mire.
+ * Cómo se lee un ritmo de habla. Los rangos salen de lo que se recomienda
+ * para hablar en público: por debajo de 110 se percibe lento, por encima de
+ * 170 cuesta seguirlo. No es un puntaje ni entra en la evaluación.
  */
 export function paceLabel(wordsPerMinute: number | null): string | null {
   if (wordsPerMinute === null) return null;

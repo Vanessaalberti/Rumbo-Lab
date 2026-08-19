@@ -37,12 +37,10 @@ const MIN_JOB_TEXT_LENGTH = 100;
 type CvSource = 'saved' | 'upload';
 
 /**
- * Una pregunta de la entrevista y todo lo que se le va acumulando.
- *
- * `audio` se conserva hasta que la devolución llega bien. Es lo que permite
- * reintentar sin volver a grabar cuando el envío falla: las seis respuestas
- * viajan juntas en una sola llamada, así que un error se llevaría la
- * entrevista entera si el navegador ya hubiese soltado las grabaciones.
+ * Una pregunta de la entrevista y todo lo que se le va acumulando. `audio` se
+ * conserva hasta que la devolución llega bien: permite reintentar sin volver
+ * a grabar cuando el envío falla, ya que las seis respuestas viajan juntas en
+ * una sola llamada.
  */
 interface AnsweredQuestion {
   question: InterviewQuestion;
@@ -140,11 +138,10 @@ export function EntrevistaSection() {
   };
 
   /**
-   * Guarda la grabación y pasa a la siguiente.
-   *
-   * No manda nada todavía: las respuestas viajan todas juntas al final. Eso
-   * baja la entrevista de catorce llamadas a Gemini a tres, a costa de una
-   * espera real al terminar en vez de una imperceptible.
+   * Guarda la grabación y pasa a la siguiente. No manda nada todavía: las
+   * respuestas viajan todas juntas al final, lo que baja la entrevista de
+   * catorce llamadas a Gemini a tres, a costa de una espera real al terminar
+   * en vez de una imperceptible.
    */
   const advance = (recorded: Blob | null) => {
     const next = answers.map((entry, position) =>
@@ -167,14 +164,11 @@ export function EntrevistaSection() {
   const handleSkip = () => advance(null);
 
   /**
-   * Los dos pasos finales: pasar todo a texto y después evaluarlo.
-   *
-   * Recibe la lista por parámetro y no la lee del estado: `advance` acaba de
-   * guardar la última grabación y `answers` todavía no la refleja.
-   *
-   * Ante un fallo no se pierde nada — las grabaciones siguen en `answers` y
-   * `closingFailed` ofrece reintentar. Es la contrapartida obligatoria de
-   * mandar las seis juntas.
+   * Los dos pasos finales: pasar todo a texto y después evaluarlo. Recibe la
+   * lista por parámetro y no la lee del estado: `advance` acaba de guardar la
+   * última grabación y `answers` todavía no la refleja. Ante un fallo no se
+   * pierde nada — las grabaciones siguen en `answers` y `closingFailed`
+   * ofrece reintentar.
    */
   const finishInterview = async (finished: AnsweredQuestion[]) => {
     setPhase({ name: 'closing' });
@@ -627,9 +621,9 @@ function InterviewStep({ index, total, question, recorder, onNext, onSkip }: Int
 /**
  * Los cortes quedaron alineados con la escala de referencia del rediseño:
  * 70+ es "buena" para arriba, 50-69 cubre "aceptable" y "débil", por debajo
- * de 50 es "deficiente" para abajo. Antes 40-50 era el resultado más común
- * para cualquier respuesta con problemas de comunicación — con los ocho
- * criterios separados, un 45 real es ahora una respuesta floja de verdad.
+ * de 50 es "deficiente". Antes 40-50 era el resultado más común para
+ * cualquier respuesta con problemas de comunicación — con los ocho criterios
+ * separados, un 45 real es ahora una respuesta floja de verdad.
  */
 function scoreTone(value: number): 'brand' | 'attention' | 'progress' {
   if (value >= 70) return 'brand';
@@ -649,11 +643,9 @@ function axisValues(scores: AnswerEvaluation['scores']): number[] {
 
 /**
  * El radar del conjunto: el promedio relleno, y cada respuesta como contorno
- * tenue detrás.
- *
- * Es lo que las barras por respuesta no muestran — si el bajón en "detalle"
- * fue de una respuesta puntual o si viene pasando en todas. Contornos
- * apretados significan un desempeño parejo; dispersos, irregular.
+ * tenue detrás. Es lo que las barras por respuesta no muestran — si el bajón
+ * en "detalle" fue de una respuesta puntual o si viene pasando en todas.
+ * Contornos apretados significan un desempeño parejo; dispersos, irregular.
  */
 function InterviewRadar({ evaluations }: { evaluations: readonly AnswerEvaluation[] }) {
   if (evaluations.length === 0) return null;

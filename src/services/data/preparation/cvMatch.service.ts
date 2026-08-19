@@ -2,19 +2,13 @@ import { httpClient } from '@/services/api/httpClient';
 import type { AsyncState } from '@/services/data/types';
 
 /**
- * Comparar tu CV con una oferta.
- *
- * Único endpoint de Preparación con algo real detrás: manda un CV al backend
- * junto con el texto de una oferta, que a su vez llama al workflow de n8n
- * ("Rumbo Lab · Comparar CV con oferta") + Gemini.
- *
- * El CV llega de dos formas mutuamente excluyentes:
- *
- *   - `compareCvWithOffer` — un CV ya guardado en CVs, por `id`.
- *   - `compareUploadedCvWithOffer` — un archivo suelto, para comparar sin
- *     agregarlo a CVs. El backend lo lee, le saca el texto y descarta el
- *     archivo con la request: no toca Storage ni la tabla `cvs` en ningún
- *     momento.
+ * Comparar tu CV con una oferta. Manda un CV al backend junto con el texto de
+ * una oferta, que a su vez llama al workflow de n8n ("Rumbo Lab · Comparar CV
+ * con oferta") + Gemini. El CV llega de dos formas mutuamente excluyentes:
+ * `compareCvWithOffer` — un CV ya guardado en CVs, por `id` — o
+ * `compareUploadedCvWithOffer` — un archivo suelto, para comparar sin
+ * agregarlo a CVs; el backend lo lee, le saca el texto y descarta el archivo
+ * con la request, sin tocar Storage ni la tabla `cvs`.
  */
 
 /**

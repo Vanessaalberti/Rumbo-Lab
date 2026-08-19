@@ -8,15 +8,11 @@ interface ApprenticeRailItem {
 }
 
 /**
- * Secciones de Mi Rumbo.
- *
- * **Feedback no está**: dejó de ser una sección propia y se lee dentro de
- * Espacios, que es donde ocurre el acompañamiento. El feedback siempre viene
- * de un Mentor y casi siempre dentro de un Espacio, así que separarlo obligaba
- * a ir y volver entre dos pantallas para entender una sola conversación.
- *
- * No lleva una entrada de inicio: el rótulo del rail ya nombra el entorno, y
- * Mi Perfil es la vista índice.
+ * Secciones de Mi Rumbo. **Feedback no está**: dejó de ser una sección propia
+ * y se lee dentro de Espacios, que es donde ocurre el acompañamiento — separado
+ * obligaba a ir y volver entre dos pantallas para entender una sola
+ * conversación. No lleva una entrada de inicio: el rótulo del rail ya nombra
+ * el entorno, y Mi Perfil es la vista índice.
  */
 export const APPRENTICE_RAIL: ApprenticeRailItem[] = [
   { label: 'Mi Perfil', icon: 'profile', href: ROUTES.myRumbo },
@@ -28,11 +24,9 @@ export const APPRENTICE_RAIL: ApprenticeRailItem[] = [
 ];
 
 /**
- * Preparación va aparte, separada por un filete.
- *
- * No es una sección más del recorrido: las otras seis **registran** lo que la
- * persona hizo, y esta la **entrena** para lo que viene. Mezclarlas en la
- * misma lista escondería esa diferencia.
+ * Preparación va aparte, separada por un filete: no es una sección más del
+ * recorrido, las otras seis **registran** lo que la persona hizo y esta la
+ * **entrena** para lo que viene.
  */
 export const APPRENTICE_RAIL_PRACTICE: ApprenticeRailItem[] = [
   { label: 'Preparación', icon: 'spark', href: ROUTES.myRumboPreparation },

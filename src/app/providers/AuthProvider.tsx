@@ -16,16 +16,13 @@ interface AuthProviderProps {
  * vez a `onAuthStateChange` (emite el estado inicial y cada cambio, no hace
  * falta `getSession()` aparte). Qué experiencias tiene la cuenta se le
  * pregunta al backend, no a la tabla directo, para que quede un solo lugar
- * que decida esa lógica.
- *
- * **Un evento de auth no es un login.** Supabase reemite `SIGNED_IN` cada vez
- * que la pestaña vuelve a estar visible (`_recoverAndRefresh()` al recuperar
- * la sesión de `localStorage`), con el mismo token y la misma persona.
- * Tratarlo como login nuevo ponía `loading` en `true`, desmontaba el árbol
- * privado entero y repetía `/experiences` + `/me` — un cambio de pestaña de
- * tres segundos recargaba Mi Rumbo entero. Por eso lo que manda acá es la
- * identidad, no el evento: si `user.id` no cambió, la sesión se actualiza en
- * silencio.
+ * que decida esa lógica. **Un evento de auth no es un login**: Supabase
+ * reemite `SIGNED_IN` cada vez que la pestaña vuelve a estar visible, con el
+ * mismo token y la misma persona — tratarlo como login nuevo ponía `loading`
+ * en `true`, desmontaba el árbol privado entero y repetía `/experiences` +
+ * `/me`, así que un cambio de pestaña de tres segundos recargaba Mi Rumbo
+ * entero. Por eso lo que manda acá es la identidad, no el evento: si
+ * `user.id` no cambió, la sesión se actualiza en silencio.
  */
 export function AuthProvider({ children }: AuthProviderProps) {
   const [session, setSession] = useState<Session | null>(null);

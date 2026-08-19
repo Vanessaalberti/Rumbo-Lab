@@ -14,16 +14,13 @@ let frameRequested = false;
 let teardown: (() => void) | null = null;
 
 /**
- * Publica la posición actual.
- *
- * La altura del documento se mide acá y no en un caché: cachearla obliga a
- * adivinar cuándo invalidarla, y cualquier cambio que no se anticipe —una imagen
- * que carga, una sección que aparece, el menú que se abre— deja el cálculo
- * corrido sin que nada lo delate.
- *
- * Medirla es barato en este punto: corre dentro de `requestAnimationFrame`, como
- * mucho una vez por frame y con el layout ya resuelto. Lo caro sería leerla en
- * cada evento de scroll, que es lo que provoca los avisos de "forced reflow".
+ * Publica la posición actual. La altura del documento se mide acá y no en un
+ * caché: cachearla obliga a adivinar cuándo invalidarla, y cualquier cambio
+ * que no se anticipe —una imagen que carga, una sección que aparece— deja el
+ * cálculo corrido sin que nada lo delate. Medirla es barato en este punto:
+ * corre dentro de `requestAnimationFrame`, con el layout ya resuelto; lo caro
+ * sería leerla en cada evento de scroll, que es lo que provoca los avisos de
+ * "forced reflow".
  */
 function publish(): void {
   frameRequested = false;
@@ -65,11 +62,10 @@ function start(): void {
 }
 
 /**
- * Fuente única de la posición de scroll.
- *
- * Todos los componentes que reaccionan al scroll comparten este observador en
- * lugar de registrar su propio listener: un solo evento, un solo frame y una
- * sola medición por ráfaga.
+ * Fuente única de la posición de scroll. Todos los componentes que
+ * reaccionan al scroll comparten este observador en vez de registrar su
+ * propio listener: un solo evento, un solo frame y una sola medición por
+ * ráfaga.
  */
 export function subscribeToScroll(subscriber: ScrollSubscriber): () => void {
   subscribers.add(subscriber);

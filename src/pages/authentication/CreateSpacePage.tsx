@@ -18,15 +18,12 @@ interface FieldErrors {
 }
 
 /**
- * Entrada del flujo de registro.
- *
- * Muestra qué va a contener el espacio antes de pedir nada: la persona entiende
- * qué obtiene antes de invertir esfuerzo, que es lo contrario a la fatiga de
- * completar otro perfil más.
- *
- * No navega manualmente al éxito: si el registro deja sesión activa,
+ * Entrada del flujo de registro. Muestra qué va a contener el espacio antes
+ * de pedir nada: la persona entiende qué obtiene antes de invertir esfuerzo,
+ * lo contrario a la fatiga de completar otro perfil más. No navega
+ * manualmente al éxito: si el registro deja sesión activa,
  * `RedirectIfAuthenticated` reacciona al cambio y lleva a Mi Rumbo. Si
- * Supabase exige confirmar el correo primero, esta pantalla lo dice en lugar
+ * Supabase exige confirmar el correo primero, esta pantalla lo dice en vez
  * de simular que ya quedó adentro.
  */
 export function CreateSpacePage() {

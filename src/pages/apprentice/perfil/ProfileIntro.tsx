@@ -16,17 +16,14 @@ interface ProfileIntroProps {
 }
 
 /**
- * 1 · Quién es y hacia dónde va.
- *
- * Mi Perfil responde *quién soy y hacia dónde voy*, no *qué hice*: eso último
- * vive en el CV y no se duplica acá. Por eso el bloque muestra identidad,
- * presentación, objetivo profesional y áreas de interés, y del CV solo con
- * cuál se está presentando.
- *
- * Presentación, objetivo, ubicación e intereses viven en
- * `apprentices.profile_data` — el catch-all que la tabla declara para los
- * campos que `03 · Mi Perfil` todavía no cerró. Cuando faltan, el bloque
- * conserva su lugar y su etiqueta: la estructura no depende de que haya dato.
+ * 1 · Quién es y hacia dónde va. Mi Perfil responde *quién soy y hacia dónde
+ * voy*, no *qué hice* —eso vive en el CV y no se duplica acá— por eso el
+ * bloque muestra identidad, presentación, objetivo profesional y áreas de
+ * interés, y del CV sólo con cuál se está presentando. Presentación,
+ * objetivo, ubicación e intereses viven en `apprentices.profile_data` — el
+ * catch-all que la tabla declara para los campos que `03 · Mi Perfil` todavía
+ * no cerró. Cuando faltan, el bloque conserva su lugar y su etiqueta: la
+ * estructura no depende de que haya dato.
  */
 export function ProfileIntro({ apprentice, cv, onEdit }: ProfileIntroProps) {
   const displayName = apprentice.fullName ?? 'Sin nombre todavía';
@@ -52,10 +49,7 @@ export function ProfileIntro({ apprentice, cv, onEdit }: ProfileIntroProps) {
           </div>
         </div>
 
-        {/*
-         * Se calcula sobre el campo `CV enviado` de las postulaciones. No es
-         * el "CV activo": esa noción sigue sin definirse.
-         */}
+        {/* Se calcula sobre el campo `CV enviado` de las postulaciones. No es el "CV activo": esa noción sigue sin definirse. */}
         <aside className={styles.resource}>
           <span className={styles.resourceHead}>
             <Icon name="document" size={15} className={styles.resourceIcon} />

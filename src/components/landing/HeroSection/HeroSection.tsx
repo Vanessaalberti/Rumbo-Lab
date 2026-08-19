@@ -16,22 +16,16 @@ import { cx } from '@/utils/classNames';
 import styles from './HeroSection.module.css';
 
 /**
- * Sección 1 — Hero.
- *
- * Storytelling · Hero: el visitante debe pensar "esto fue diseñado para alguien
- * como yo". Por eso el título habla de su recorrido, no del software.
- *
- * Composición: junto con la navbar ocupa exactamente un viewport. El tamaño del
- * conjunto de ventanas está acotado para que se lea como la prueba de que hay un
- * producto detrás, sin convertirse en una captura gigante que domine la pantalla.
- *
- * Interacción: la composición se inclina levemente siguiendo al puntero. Las
- * capas están separadas en profundidad, así que la rotación genera paralaje real
- * entre la ventana principal, la secundaria y las tarjetas de actividad.
- *
- * La llamada a la acción depende de la sesión real (`useAuth`), no de la URL:
- * a quien ya tiene su espacio no se le vuelve a ofrecer crearlo. Es el mismo
- * botón, en el mismo lugar, con el destino que corresponde.
+ * Sección 1 — Hero. Storytelling: el visitante debe pensar "esto fue
+ * diseñado para alguien como yo", por eso el título habla de su recorrido, no
+ * del software. Composición: junto con la navbar ocupa exactamente un
+ * viewport, y el tamaño del conjunto de ventanas está acotado para que se lea
+ * como la prueba de que hay un producto detrás, sin convertirse en una
+ * captura gigante. Interacción: la composición se inclina levemente siguiendo
+ * al puntero, con las capas separadas en profundidad para que la rotación
+ * genere paralaje real. La llamada a la acción depende de la sesión real
+ * (`useAuth`), no de la URL: a quien ya tiene su espacio no se le vuelve a
+ * ofrecer crearlo.
  */
 export function HeroSection() {
   const { areaRef, rotateX, rotateY, shiftX, shiftY } =
@@ -108,14 +102,7 @@ export function HeroSection() {
               <ApplicationsScreen compact rows={3} />
             </ProductWindow>
 
-            {/*
-              Queda una sola. El recurso se usaba en siete de las once secciones
-              y ahí dejó de leerse como "algo que el producto te avisa" para
-              pasar a leerse como relleno: el adorno que delata una landing
-              generada. Sobrevive únicamente acá, donde el paralaje necesita una
-              capa en primer plano y donde una notificación de feedback es
-              exactamente lo que el producto empuja.
-            */}
+            {/* Queda una sola: el recurso se usaba en siete de las once secciones y ahí dejaba de leerse como "algo que el producto te avisa" para pasar a leerse como relleno. Sobrevive acá, donde el paralaje necesita una capa en primer plano. */}
             <FloatingCard
               icon="feedback"
               title="Nuevo feedback"

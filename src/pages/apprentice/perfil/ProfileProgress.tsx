@@ -53,19 +53,11 @@ function CadenceRow({ label, cadence }: { label: string; cadence: Cadence }) {
 }
 
 /**
- * Mi progreso.
- *
- * Cinco lecturas sobre el mismo material —las postulaciones— que responden
- * preguntas distintas:
- *
- *   dónde está todo        → la distribución por estado
- *   hasta dónde llegué     → la postulación más avanzada
- *   qué se me escapa       → las que se cerraron sin haber mandado nada
- *   a qué ritmo voy        → cuántas anoto y cuántas mando, por período
- *
- * Ninguna se estima. Cuando no hay con qué calcular, la métrica dice que
- * todavía no hay nada que medir en lugar de mostrar un cero que se leería como
- * un resultado.
+ * Mi progreso: cinco lecturas sobre el mismo material —las postulaciones—
+ * que responden preguntas distintas (dónde está todo, hasta dónde llegué, qué
+ * se me escapa, a qué ritmo voy). Ninguna se estima: cuando no hay con qué
+ * calcular, la métrica dice que todavía no hay nada que medir en vez de
+ * mostrar un cero que se leería como un resultado.
  */
 export function ProfileProgress({ applications }: ProfileProgressProps) {
   const breakdown = statusBreakdown(applications);
@@ -173,11 +165,7 @@ export function ProfileProgress({ applications }: ProfileProgressProps) {
           <span className={styles.metricLabel}>Tu ritmo: anotar vs. mandar</span>
           {pace ? (
             <>
-              {/*
-               * Las dos series, una debajo de la otra y sobre la misma ventana
-               * de días: anotar una vacante y postularse son acciones
-               * distintas, y la distancia entre ambas es el dato.
-               */}
+              {/* Las dos series, una debajo de la otra y sobre la misma ventana de días: anotar una vacante y postularse son acciones distintas, y la distancia entre ambas es el dato. */}
               <CadenceRow label="Vacantes que anotás" cadence={pace.registered} />
               <CadenceRow label="Postulaciones que mandás" cadence={pace.applied} />
 

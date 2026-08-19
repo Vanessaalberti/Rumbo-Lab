@@ -3,18 +3,14 @@ import { cx } from '@/utils/classNames';
 import styles from './LoadingState.module.css';
 
 /**
- * Espera de una operación larga — en la práctica, las herramientas de IA,
- * que tardan entre cinco y quince segundos.
- *
- * Va rotando los mensajes que se le pasan. **Tienen que describir pasos que
- * de verdad ocurren**: "Transcribiendo tu respuesta" mientras el workflow
- * transcribe, "Analizando cómo la estructuraste" mientras la analiza. Una
- * secuencia inventada para entretener sería mentirle a la persona sobre qué
- * está pasando; contar los pasos reales hace que la espera se entienda.
- *
- * La barra es indeterminada a propósito: el backend no sabe cuánto falta, y
- * una barra que avanza sin información real promete algo que no puede
- * cumplir.
+ * Espera de una operación larga — en la práctica, las herramientas de IA, que
+ * tardan entre cinco y quince segundos. Va rotando los mensajes que se le
+ * pasan, que **tienen que describir pasos que de verdad ocurren**:
+ * "Transcribiendo tu respuesta" mientras el workflow transcribe, "Analizando
+ * cómo la estructuraste" mientras la analiza — una secuencia inventada para
+ * entretener sería mentirle a la persona sobre qué está pasando. La barra es
+ * indeterminada a propósito: el backend no sabe cuánto falta, y una barra que
+ * avanza sin información real promete algo que no puede cumplir.
  */
 
 interface LoadingStateProps {

@@ -1,19 +1,16 @@
 /**
- * Conversación de ejemplo del Rumbo Assistant.
- *
- * El Assistant es una **interfaz conversacional de Rumbo Lab**, no un sistema
- * aparte ni "el bot de WhatsApp para aprendices": una acción hecha por mensaje
- * produce el mismo objeto de dominio que la misma acción hecha en la web.
- *
- * El intercambio sigue los dos casos de uso decididos —registrar desde un
- * enlace y cambiar el estado de un registro— y respeta lo que esos cambios
- * implican en `04 · Postulaciones`: la postulación nace en `Pendiente`, con
- * `CV enviado` en `No aplica` y un nombre generado que la persona puede
- * cambiar, y al cambiar de estado se pregunta cuándo ocurrió realmente.
- *
- * No aparece interpretación libre de lenguaje: los primeros flujos pueden ser
- * deterministas —menús y opciones numeradas—, porque "Assistant" no implica IA
- * generativa. Tampoco aparece ningún caso de uso de Organización: ese está
+ * Conversación de ejemplo del Rumbo Assistant. El Assistant es una
+ * **interfaz conversacional de Rumbo Lab**, no un sistema aparte ni "el bot de
+ * WhatsApp para aprendices": una acción hecha por mensaje produce el mismo
+ * objeto de dominio que la misma acción hecha en la web. El intercambio sigue
+ * los dos casos de uso decididos —registrar desde un enlace y cambiar el
+ * estado de un registro— y respeta lo que esos cambios implican en
+ * `04 · Postulaciones`: la postulación nace en `Pendiente`, con `CV enviado`
+ * en `No aplica` y un nombre generado que la persona puede cambiar, y al
+ * cambiar de estado se pregunta cuándo ocurrió realmente. No aparece
+ * interpretación libre de lenguaje: los primeros flujos pueden ser
+ * deterministas —menús y opciones numeradas—, porque "Assistant" no implica
+ * IA generativa. Tampoco aparece ningún caso de uso de Organización: ese está
  * bloqueado por un conflicto abierto.
  */
 

@@ -23,21 +23,14 @@ interface ApplicationsScreenProps {
 }
 
 /**
- * Mi Rumbo · Postulaciones.
- *
- * Gestor personal de un proceso que la persona ya inició por fuera de la
- * plataforma. No hay ofertas, ni salarios, ni botón para postularse: Rumbo Lab
- * registra el recorrido, no lo genera.
- *
- * La tabla tiene cinco columnas fijas —Nombre, Puesto, CV enviado, Dónde,
- * Estado—. "Dónde" no es "URL": el dato puede ser un enlace, un correo o un
- * teléfono.
- *
- * **La vista es de dos columnas.** Al elegir una fila se abre su ficha al
- * costado, y esa es la forma en que se usa: se recorre la tabla a la izquierda y
- * se lee el detalle a la derecha, sin cambiar de pantalla. El mockup mostraba
- * solo la tabla, que es media vista.
- *
+ * Mi Rumbo · Postulaciones. Gestor personal de un proceso que la persona ya
+ * inició por fuera de la plataforma: no hay ofertas, ni salarios, ni botón
+ * para postularse, Rumbo Lab registra el recorrido, no lo genera. La tabla
+ * tiene cinco columnas fijas —Nombre, Puesto, CV enviado, Dónde, Estado—;
+ * "Dónde" no es "URL", el dato puede ser un enlace, un correo o un teléfono.
+ * **La vista es de dos columnas**: al elegir una fila se abre su ficha al
+ * costado, y esa es la forma en que se usa — se recorre la tabla a la
+ * izquierda y se lee el detalle a la derecha, sin cambiar de pantalla.
  * `CV enviado` y `Estado` se editan desde la propia fila —por eso llevan el
  * indicador de desplegable—; el resto se edita desde la ficha.
  */

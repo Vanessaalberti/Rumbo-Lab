@@ -5,16 +5,13 @@ import screen from '@/app/layouts/appShell.module.css';
 import styles from './PendingSection.module.css';
 
 /**
- * Objetivos.
- *
- * **No hay fuente de datos.** No existe tabla `goals`, y `02 · Mi Rumbo` deja
- * los objetivos con seguimiento como un elemento sin ubicación asignada en el
- * modelo: no está decidido qué es un objetivo, si tiene pasos, quién lo crea
- * ni cómo se mide su avance.
- *
- * Lo que sí existe es el **objetivo profesional** —una frase, en Mi Perfil— y
- * eso es otra cosa: una dirección, no una meta con seguimiento. Esta pantalla
- * lo dice en lugar de simular una lista de objetivos que no se puede guardar.
+ * Objetivos. **No hay fuente de datos**: no existe tabla `goals`, y
+ * `02 · Mi Rumbo` deja los objetivos con seguimiento como un elemento sin
+ * ubicación asignada en el modelo — no está decidido qué es un objetivo, si
+ * tiene pasos, quién lo crea ni cómo se mide su avance. Lo que sí existe es
+ * el **objetivo profesional** —una frase, en Mi Perfil— y eso es otra cosa:
+ * una dirección, no una meta con seguimiento. Esta pantalla lo dice en vez de
+ * simular una lista de objetivos que no se puede guardar.
  */
 export function GoalsSection() {
   const {

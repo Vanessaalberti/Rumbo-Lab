@@ -17,20 +17,13 @@ interface ApplicationsFilterProps {
 }
 
 /**
- * Filtro de la tabla · `Filtrar`.
- *
- * Dos criterios, cada uno con selección múltiple: **estado** (Notion
- * `04 · Postulaciones` §18bis.6bis) y **marca** personal. No se filtra por
- * nombre, puesto, URL, CV enviado ni fecha: que un dato exista, o que sea útil
- * filtrarlo, no lo convierte en criterio.
- *
- * Los dos grupos se cruzan con Y y dentro de cada uno con O: elegir
- * "Entrevista" y "Favorita" muestra las favoritas que están en entrevista, no
- * la suma de las dos listas. Es lo que se espera de un panel de filtros, y es
- * lo contrario de lo que haría sumarlos.
- *
- * Filtrar no modifica ninguna postulación ni el historial: solo acota qué
- * filas se muestran.
+ * Filtro de la tabla · `Filtrar`. Dos criterios, cada uno con selección
+ * múltiple: **estado** (Notion `04 · Postulaciones` §18bis.6bis) y **marca**
+ * personal — no se filtra por nombre, puesto, URL, CV enviado ni fecha. Los
+ * dos grupos se cruzan con Y y dentro de cada uno con O: elegir "Entrevista"
+ * y "Favorita" muestra las favoritas que están en entrevista, no la suma de
+ * las dos listas. Filtrar no modifica ninguna postulación ni el historial:
+ * sólo acota qué filas se muestran.
  */
 export function ApplicationsFilter({
   statuses,

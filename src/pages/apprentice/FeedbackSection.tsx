@@ -7,20 +7,14 @@ import styles from './FeedbackSection.module.css';
 
 /**
  * Feedback — misma anatomía que el mockup de la landing (`FeedbackScreen`):
- * quién lo escribió, cuándo, en qué contexto y qué dice. Del más reciente al
- * más antiguo.
- *
- * No es un chat ni una bandeja: el Aprendiz consulta, no responde. Sin estado
- * de leído, sin reacciones.
- *
- * El mockup encabeza cada entrada con el *elemento relacionado* ("CV · CV
- * Frontend 2026"). La tabla `feedbacks` todavía no relaciona el feedback con
- * un CV o una postulación —`06 · Feedback` sigue `NO DEFINIDA`—, así que la
- * primera línea la ocupa el Mentor, que es el dato que sí existe. Cuando esa
- * relación se decida, se agrega sin mover la composición.
- *
- * Sin paginación por ahora: la vista muestra las devoluciones más recientes
- * que trae `GET /api/me`.
+ * quién lo escribió, cuándo, en qué contexto y qué dice, del más reciente al
+ * más antiguo. No es un chat ni una bandeja: el Aprendiz consulta, no
+ * responde, sin estado de leído ni reacciones. El mockup encabeza cada
+ * entrada con el *elemento relacionado* ("CV · CV Frontend 2026"), pero la
+ * tabla `feedbacks` todavía no relaciona el feedback con un CV o una
+ * postulación —`06 · Feedback` sigue `NO DEFINIDA`—, así que la primera línea
+ * la ocupa el Mentor, que es el dato que sí existe. Sin paginación por ahora:
+ * la vista muestra las devoluciones más recientes que trae `GET /api/me`.
  */
 export function FeedbackSection() {
   const {

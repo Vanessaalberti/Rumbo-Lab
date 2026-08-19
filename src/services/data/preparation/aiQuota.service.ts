@@ -2,16 +2,13 @@ import { httpClient } from '@/services/api/httpClient';
 import type { AsyncState } from '@/services/data/types';
 
 /**
- * Cuántos usos le quedan a la persona de cada herramienta.
- *
- * Cada herramienta tiene su **propio cupo por bloque de horas**, no
- * acumulativo: se renueva al empezar el bloque siguiente y lo que no se usó
- * se pierde. No hay un saldo común, así que practicar oratoria no le quita
- * comparaciones de CV a nadie.
- *
- * Se consulta al entrar a Preparación para poder mostrar el número **antes**
- * de que alguien escriba o grabe. Frenar a alguien con el trabajo ya hecho es
- * el peor momento para avisarle.
+ * Cuántos usos le quedan a la persona de cada herramienta. Cada una tiene su
+ * **propio cupo por bloque de horas**, no acumulativo: se renueva al empezar
+ * el bloque siguiente y lo que no se usó se pierde. No hay un saldo común, así
+ * que practicar oratoria no le quita comparaciones de CV a nadie. Se consulta
+ * al entrar a Preparación para poder mostrar el número **antes** de que
+ * alguien escriba o grabe — frenarla con el trabajo ya hecho es el peor
+ * momento para avisarle.
  */
 
 export interface AiToolQuota {
@@ -51,10 +48,9 @@ export function readAiQuota(): Promise<AsyncState<AiQuota>> {
 }
 
 /**
- * "48 min", "1 h 12 min", o `null` si no hay dato.
- *
- * Con bloques de dos horas la espera puede pasar la hora, así que el formato
- * tiene que contemplarlo: decir "83 min" es correcto y difícil de leer.
+ * "48 min", "1 h 12 min", o `null` si no hay dato. Con bloques de dos horas
+ * la espera puede pasar la hora, así que el formato tiene que contemplarlo:
+ * decir "83 min" es correcto y difícil de leer.
  */
 export function timeUntilReset(resetAt: string | null, now = Date.now()): string | null {
   if (!resetAt) return null;

@@ -18,20 +18,17 @@ const CAPABILITIES = [
 ];
 
 /**
- * Sección — Rumbo Assistant.
- *
- * Rumbo Lab tiene **un único dominio y múltiples interfaces**. El Assistant es
- * una de esas interfaces, con WhatsApp como primer canal: no es un producto
- * aparte, no tiene datos propios y no reimplementa ninguna regla de negocio.
- *
- * El problema que resuelve no es de funcionalidad sino de fricción: lo que el
- * producto necesita —que las cosas queden anotadas cuando ocurren— compite con
- * el esfuerzo de abrir una aplicación.
- *
- * Fronteras que esta sección no puede cruzar: el canal **no amplía permisos**,
- * registrar **no es** postularse, y no aparece ningún caso de uso de gestión de
- * candidatos por parte de una Organización, que está bloqueado por un conflicto
- * abierto. Tampoco se promete IA: los primeros flujos pueden ser deterministas.
+ * Sección — Rumbo Assistant. Rumbo Lab tiene **un único dominio y múltiples
+ * interfaces**; el Assistant es una de esas interfaces, con WhatsApp como
+ * primer canal: no es un producto aparte, no tiene datos propios y no
+ * reimplementa ninguna regla de negocio. El problema que resuelve no es de
+ * funcionalidad sino de fricción: lo que el producto necesita —que las cosas
+ * queden anotadas cuando ocurren— compite con el esfuerzo de abrir una
+ * aplicación. Fronteras que esta sección no puede cruzar: el canal **no
+ * amplía permisos**, registrar **no es** postularse, y no aparece ningún caso
+ * de uso de gestión de candidatos por parte de una Organización, bloqueado
+ * por un conflicto abierto. Tampoco se promete IA: los primeros flujos pueden
+ * ser deterministas.
  */
 export function AssistantSection() {
   return (
@@ -67,13 +64,7 @@ export function AssistantSection() {
           </p>
         </Reveal>
 
-        {/*
-          El teléfono va solo. La tarjeta flotante que había acá duplicaba en un
-          rectángulo lo que la conversación ya muestra —el registro creado— y era
-          lo que devolvía la composición al mismo patrón que el resto de las
-          secciones. Lo que prueba que el canal funciona es el hilo, no un cartel
-          al lado del hilo.
-        */}
+        {/* El teléfono va solo: la tarjeta flotante que había acá duplicaba en un rectángulo lo que la conversación ya muestra. Lo que prueba que el canal funciona es el hilo, no un cartel al lado del hilo. */}
         <Reveal className={styles.composition} delay={120}>
           <PhoneFrame className={styles.phone}>
             <AssistantScreen />

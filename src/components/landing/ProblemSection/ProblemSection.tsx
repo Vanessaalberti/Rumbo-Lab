@@ -59,18 +59,14 @@ const FRAGMENTS: Array<{
 const RELEASE_TRANSITION = { bounceStiffness: 280, bounceDamping: 30 } as const;
 
 /**
- * Sección 2 — Problema.
- *
- * El visitante reconoce una situación que ya vive (identificación) y entiende
- * que no le pasa solo a él (validación).
- *
- * Los fragmentos se pueden agarrar y mover con el mouse dentro de la sección.
- * La interacción es el argumento: manipular información suelta que no termina
- * de ordenarse hace sentir el problema en lugar de solo enunciarlo.
- *
- * El arrastre es un refuerzo, no un requisito: el texto de cada fragmento se
- * lee igual sin tocar nada, y la interacción se desactiva donde no corresponde
- * (pantallas táctiles, donde competiría con el scroll).
+ * Sección 2 — Problema. El visitante reconoce una situación que ya vive
+ * (identificación) y entiende que no le pasa sólo a él (validación). Los
+ * fragmentos se pueden agarrar y mover con el mouse dentro de la sección: la
+ * interacción es el argumento, manipular información suelta que no termina
+ * de ordenarse hace sentir el problema en vez de sólo enunciarlo. El
+ * arrastre es un refuerzo, no un requisito: el texto se lee igual sin tocar
+ * nada, y la interacción se desactiva donde no corresponde (pantallas
+ * táctiles, donde competiría con el scroll).
  */
 export function ProblemSection() {
   const constraintsRef = useRef<HTMLDivElement>(null);

@@ -17,18 +17,15 @@ interface ProductWindowProps {
 }
 
 /**
- * Marco de una vista del producto.
- *
- * Toda pantalla mostrada en material público se monta acá dentro: garantiza que
- * las distintas vistas se lean como partes del mismo ecosistema.
- *
- * **Arriba va el header real de la plataforma**, no cromo de navegador. Antes
- * había una barra de título con tres puntos y una píldora de ruta
- * (`Mi Rumbo / Perfil`): esa navegación no existe en ningún lado de Rumbo Lab.
- * Era el recurso de mockup genérico que puede envolver a cualquier SaaS, y
- * encima afirmaba una interfaz falsa. Lo que la persona ve de verdad al entrar
- * es lo que se replica acá: la marca a la izquierda, el cambio de tema y su
- * avatar a la derecha — `Navbar minimal`, el header del área privada.
+ * Marco de una vista del producto. Toda pantalla mostrada en material público
+ * se monta acá dentro: garantiza que las distintas vistas se lean como
+ * partes del mismo ecosistema. **Arriba va el header real de la
+ * plataforma**, no cromo de navegador. Antes había una barra de título con
+ * tres puntos y una píldora de ruta (`Mi Rumbo / Perfil`) que no existe en
+ * ningún lado de Rumbo Lab —el recurso de mockup genérico que puede envolver
+ * a cualquier SaaS, y encima afirmaba una interfaz falsa—. Lo que la persona
+ * ve de verdad al entrar es lo que se replica acá: la marca a la izquierda,
+ * el cambio de tema y su avatar a la derecha, `Navbar minimal`.
  */
 export function ProductWindow({
   children,

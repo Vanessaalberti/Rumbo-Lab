@@ -2,24 +2,20 @@ import { httpClient } from '@/services/api/httpClient';
 import type { AsyncState } from '@/services/data/types';
 
 /**
- * Creador de publicaciones para LinkedIn.
- *
- * La persona escribe de corrido todo lo que quiere contar —sin ordenarlo— y
- * elige cómo quiere que suene. El backend reenvía las dos cosas al workflow de
- * n8n ("Rumbo Lab · Creador de publicaciones para LinkedIn") + Gemini, que
- * devuelve la publicación escrita.
- *
- * Ni el texto que se escribe ni la publicación generada se guardan en ningún
- * lado: viven en la pantalla hasta que la persona la copia.
+ * Creador de publicaciones para LinkedIn. La persona escribe de corrido todo
+ * lo que quiere contar —sin ordenarlo— y elige cómo quiere que suene. El
+ * backend reenvía las dos cosas al workflow de n8n ("Rumbo Lab · Creador de
+ * publicaciones para LinkedIn") + Gemini, que devuelve la publicación
+ * escrita. Ni el texto que se escribe ni la publicación generada se guardan
+ * en ningún lado: viven en la pantalla hasta que la persona la copia.
  */
 
 /**
  * Las siete preferencias, con el mismo vocabulario que declara el backend en
- * `config/linkedinPost.ts`.
- *
- * Son identificadores, no etiquetas: lo que se muestra en pantalla vive en
- * `LinkedinPostSection`, y qué significa cada uno para la redacción vive en el
- * prompt del workflow. Agregar una opción es tocar los tres lugares.
+ * `config/linkedinPost.ts`. Son identificadores, no etiquetas: lo que se
+ * muestra en pantalla vive en `LinkedinPostSection`, y qué significa cada uno
+ * para la redacción vive en el prompt del workflow — agregar una opción es
+ * tocar los tres lugares.
  */
 export type LinkedinPostType =
   | 'logro'

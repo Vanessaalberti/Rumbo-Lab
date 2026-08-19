@@ -3,18 +3,14 @@ import { failure, success, type AsyncState } from '@/services/data/types';
 import { updateApprenticeProfile } from './dashboard.service';
 
 /**
- * Foto de perfil.
- *
- * El archivo va directo del navegador al bucket `avatars`, cuyas políticas de
- * escritura solo dejan tocar la carpeta `{apprentice_id}/`. A diferencia de
- * `cvs`, este bucket es de **lectura pública**: la foto se muestra en el header
- * en todas las pantallas, y una URL firmada que vence obligaría a renovarla en
- * cada carga. La ruta lleva un UUID irreproducible.
- *
- * La URL resultante se guarda en dos lugares a propósito:
- *   - `apprentices.avatar_url`, que es el dato del perfil;
- *   - los metadatos de la sesión, que es de donde lee el avatar del header sin
- *     hacer ninguna request.
+ * Foto de perfil. El archivo va directo del navegador al bucket `avatars`,
+ * cuyas políticas de escritura sólo dejan tocar la carpeta
+ * `{apprentice_id}/`. A diferencia de `cvs`, este bucket es de **lectura
+ * pública**: la foto se muestra en el header en todas las pantallas, y una
+ * URL firmada que vence obligaría a renovarla en cada carga — la ruta lleva
+ * un UUID irreproducible. La URL resultante se guarda en dos lugares a
+ * propósito: `apprentices.avatar_url` (el dato del perfil) y los metadatos de
+ * la sesión (de donde lee el avatar del header sin hacer ninguna request).
  */
 
 /** 2 MB — mismo tope que declara el bucket. */

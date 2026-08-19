@@ -10,17 +10,12 @@ import type {
 
 /**
  * Cómo se ven en pantalla las siete preferencias del creador de
- * publicaciones.
- *
- * Acá vive **sólo la etiqueta**: qué significa cada opción para la redacción
- * está descrito en el prompt del workflow de n8n, y cuáles son válidas las
- * declara el backend (`config/linkedinPost.ts`). Los tres tienen que
- * coincidir: si acá aparece una opción que el prompt no describe, la IA la
- * recibe y no sabe qué hacer con ella.
- *
- * `hint` no es decorativo: la diferencia entre "cercano" y "profesional", o
- * entre "reflexivo" y "emocional", no se adivina desde una palabra suelta.
- * Se muestra al pasar el cursor y como texto del grupo elegido.
+ * publicaciones. Acá vive **sólo la etiqueta**: qué significa cada opción
+ * para la redacción está descrito en el prompt del workflow de n8n, y cuáles
+ * son válidas las declara el backend (`config/linkedinPost.ts`) — los tres
+ * tienen que coincidir. `hint` no es decorativo: la diferencia entre
+ * "cercano" y "profesional", o entre "reflexivo" y "emocional", no se
+ * adivina desde una palabra suelta.
  */
 export interface Choice<T extends string> {
   id: T;

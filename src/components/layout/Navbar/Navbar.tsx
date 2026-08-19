@@ -26,18 +26,14 @@ interface NavbarProps {
 }
 
 /**
- * Barra de navegación pública.
- *
- * Flota transparente sobre el hero y gana superficie al desplazarse: la
- * atención pertenece al mensaje del hero, no al menú.
- *
- * "Crear mi espacio" no abre el registro: lleva al cierre de la landing. Quien
- * todavía no leyó el argumento no está en condiciones de decidir.
- *
- * Las acciones de la derecha dependen de la sesión, que se lee de `useAuth()`
- * —la misma fuente global que usan las rutas protegidas—, nunca de la URL ni
- * de un estado local: con sesión activa el header muestra únicamente el avatar
- * y su menú, sin selector de paneles.
+ * Barra de navegación pública. Flota transparente sobre el hero y gana
+ * superficie al desplazarse: la atención pertenece al mensaje del hero, no al
+ * menú. "Crear mi espacio" no abre el registro: lleva al cierre de la
+ * landing, porque quien todavía no leyó el argumento no está en condiciones
+ * de decidir. Las acciones de la derecha dependen de la sesión, que se lee de
+ * `useAuth()` —la misma fuente global que usan las rutas protegidas—, nunca
+ * de la URL ni de un estado local: con sesión activa el header muestra
+ * únicamente el avatar y su menú, sin selector de paneles.
  */
 export function Navbar({ minimal = false }: NavbarProps) {
   const scrolled = useScrollTrigger('offset', 12);

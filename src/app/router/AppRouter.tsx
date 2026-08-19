@@ -31,16 +31,13 @@ import { NotFoundPage } from '@/pages/errors';
 import { ROUTES } from '@/constants/routes';
 
 /**
- * Mapa de rutas de la aplicación.
- *
- * Los flujos de acceso usan su propio layout: sin navegación de secciones ni
- * pie, para que la única decisión posible sea avanzar. `RedirectIfAuthenticated`
- * los aparta de quien ya tiene sesión.
- *
- * El área privada cuelga de `RequireAuth`. `/elegir-experiencia` solo exige
- * sesión — es el lugar para activar Aprendiz y/o Mentor. `/mi-rumbo` exige
- * además la experiencia Aprendiz (`RequireExperience`) y monta `ApprenticeShell`
- * (rail + secciones), con Mi Perfil como índice.
+ * Mapa de rutas de la aplicación. Los flujos de acceso usan su propio
+ * layout: sin navegación de secciones ni pie, para que la única decisión
+ * posible sea avanzar; `RedirectIfAuthenticated` los aparta de quien ya
+ * tiene sesión. El área privada cuelga de `RequireAuth`: `/elegir-experiencia`
+ * sólo exige sesión —es el lugar para activar Aprendiz y/o Mentor—, y
+ * `/mi-rumbo` exige además la experiencia Aprendiz (`RequireExperience`) y
+ * monta `ApprenticeShell` (rail + secciones), con Mi Perfil como índice.
  */
 export function AppRouter() {
   return (

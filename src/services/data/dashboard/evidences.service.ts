@@ -2,12 +2,10 @@ import { httpClient } from '@/services/api/httpClient';
 import type { AsyncState } from '@/services/data/types';
 
 /**
- * Evidencias · línea cronológica de acontecimientos relevantes.
- *
- * **Solo lectura.** Se generan solas con triggers en las tablas de origen y el
+ * Evidencias · línea cronológica de acontecimientos relevantes. **Solo
+ * lectura**: se generan solas con triggers en las tablas de origen y el
  * Aprendiz no puede crearlas, editarlas ni eliminarlas (Notion
- * `07 · Evidencias`, DECIDIDO). Por eso este servicio no expone escrituras.
- *
+ * `07 · Evidencias`, DECIDIDO), por eso este servicio no expone escrituras.
  * Tiene endpoint propio en vez de viajar en `GET /api/me`: el filtro temporal
  * existe para no consultar un historial que crece sin límite, y meterlo en
  * `/me` obligaría a traerlo entero en cada pantalla de Mi Rumbo.

@@ -10,19 +10,15 @@ interface FeedbackScreenProps {
 }
 
 /**
- * Mockups Oficiales · 5.7 — Feedback.
- *
- * Historial de las devoluciones que el Aprendiz recibe de sus Mentores. No es
- * un chat, ni una bandeja, ni un hilo de comentarios: el Aprendiz consulta, no
- * responde. Tampoco hay estado de leído/no leído ni reacciones.
- *
- * Cada registro identifica de un vistazo sobre qué elemento es el feedback,
- * qué Mentor lo creó, cuándo y qué dice. El elemento siempre es específico:
- * qué CV, qué postulación — nunca "el CV" a secas.
- *
- * El contenido se muestra en una vista previa de tres líneas y se expande
- * dentro del mismo registro. El historial va del más reciente al más antiguo,
- * con un máximo de cinco por página.
+ * Mockups Oficiales · 5.7 — Feedback. Historial de las devoluciones que el
+ * Aprendiz recibe de sus Mentores. No es un chat, ni una bandeja, ni un hilo
+ * de comentarios: el Aprendiz consulta, no responde, sin estado de leído ni
+ * reacciones. Cada registro identifica de un vistazo sobre qué elemento es el
+ * feedback, qué Mentor lo creó, cuándo y qué dice — el elemento siempre es
+ * específico, qué CV, qué postulación, nunca "el CV" a secas. El contenido se
+ * muestra en una vista previa de tres líneas y se expande dentro del mismo
+ * registro. El historial va del más reciente al más antiguo, con un máximo
+ * de cinco por página.
  */
 export function FeedbackScreen({ compact = false, limit }: FeedbackScreenProps) {
   const entries = limit ? FEEDBACK_ENTRIES.slice(0, limit) : FEEDBACK_ENTRIES;

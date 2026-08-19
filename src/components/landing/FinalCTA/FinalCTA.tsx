@@ -17,15 +17,11 @@ const CONDITIONS: Array<{ icon: IconName; label: string }> = [
 ];
 
 /**
- * Sección 10 — CTA final.
- *
- * Cierra el recorrido sin generar urgencia.
- *
- * Acá la acción se llama "Crear cuenta", no "Crear mi espacio": quien llegó
- * hasta el final ya decidió empezar, y lo que sigue es el trámite concreto de
- * registro. "Crear mi espacio" nombra la intención; "Crear cuenta", el paso.
- *
- * Con sesión activa nada de eso aplica: la cuenta ya existe. El mismo botón
+ * Sección 10 — CTA final. Cierra el recorrido sin generar urgencia. Acá la
+ * acción se llama "Crear cuenta", no "Crear mi espacio": quien llegó hasta
+ * el final ya decidió empezar, y lo que sigue es el trámite concreto de
+ * registro — "Crear mi espacio" nombra la intención, "Crear cuenta" el paso.
+ * Con sesión activa nada de eso aplica: la cuenta ya existe, el mismo botón
  * lleva a su espacio y desaparece la línea de "¿Ya tenés tu espacio?".
  */
 export function FinalCTA() {

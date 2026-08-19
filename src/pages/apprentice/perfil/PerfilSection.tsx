@@ -8,24 +8,17 @@ import { mostUsedCv } from './mostUsedCv';
 import styles from './perfil.module.css';
 
 /**
- * Mi Perfil — la vista de inicio de Mi Rumbo.
- *
- * Dos tiempos:
- *
- *   1 · quién es y hacia dónde va — identidad, CV más usado, presentación,
- *                                   objetivo profesional, áreas de interés
- *   2 · cómo viene su búsqueda    — las métricas de sus postulaciones
- *
- * **Ya no resume otras secciones.** Antes repetía acá el acompañamiento, las
- * evidencias recientes y el último feedback; los tres tenían su propia
- * pantalla, así que Mi Perfil terminaba siendo un índice de cosas que estaban
- * a un click de distancia. Lo que queda es lo que solo se puede leer acá:
- * quién es la persona, y cómo le está yendo.
- *
- * La vista no lleva encabezado propio: el rótulo del rail nombra el entorno y
- * el ítem activo nombra la sección; el nombre de la persona abre la pantalla.
- * Los datos salen de `GET /api/me`, que los lee con la identidad del Aprendiz
- * autenticado y bajo sus políticas de RLS — nunca hay un aprendiz fijo acá.
+ * Mi Perfil — la vista de inicio de Mi Rumbo. Dos tiempos: quién es y hacia
+ * dónde va (identidad, CV más usado, presentación, objetivo profesional,
+ * áreas de interés) y cómo viene su búsqueda (las métricas de sus
+ * postulaciones). **Ya no resume otras secciones**: antes repetía acá el
+ * acompañamiento, las evidencias recientes y el último feedback, cada uno con
+ * su propia pantalla, así que terminaba siendo un índice de cosas a un click
+ * de distancia — lo que queda es lo que sólo se puede leer acá. La vista no
+ * lleva encabezado propio: el rótulo del rail nombra el entorno y el ítem
+ * activo nombra la sección; el nombre de la persona abre la pantalla. Los
+ * datos salen de `GET /api/me`, que los lee con la identidad del Aprendiz
+ * autenticado y bajo sus políticas de RLS.
  */
 export function PerfilSection() {
   const { dashboard, refresh } = useOutletContext<ApprenticeShellContext>();

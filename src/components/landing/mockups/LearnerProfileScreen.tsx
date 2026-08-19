@@ -22,24 +22,18 @@ interface LearnerProfileScreenProps {
 }
 
 /**
- * Mi Perfil — la vista de inicio de Mi Rumbo.
- *
- * Espejo de `pages/apprentice/perfil/PerfilSection.tsx`. Dos tiempos, los mismos
- * dos que la pantalla real:
- *
- *   1 · quién es y hacia dónde va — identidad, CV más usado, presentación,
- *                                   objetivo profesional, áreas de interés
- *   2 · cómo viene su búsqueda    — las métricas de sus postulaciones
- *
- * **Este mockup mostraba la versión anterior de Mi Perfil.** Tenía dos bloques
- * que el producto eliminó a propósito —"Objetivos en curso / Mi acompañamiento"
- * y "Evidencias recientes / Feedback reciente"— porque convertían a Mi Perfil en
- * un índice de cosas que estaban a un click de distancia. Y su "Mi progreso" era
- * una fila de cuatro contadores (objetivos, evidencias, feedback, postulaciones)
- * que la vista real reemplazó por lecturas sobre las postulaciones.
- *
- * La vista no lleva encabezado propio: el rótulo del rail nombra el entorno y el
- * ítem activo nombra la sección. El nombre de la persona abre la pantalla.
+ * Mi Perfil — la vista de inicio de Mi Rumbo. Espejo de
+ * `pages/apprentice/perfil/PerfilSection.tsx`, con los mismos dos tiempos que
+ * la pantalla real: quién es y hacia dónde va (identidad, CV más usado,
+ * presentación, objetivo profesional, áreas de interés) y cómo viene su
+ * búsqueda (las métricas de sus postulaciones). **Este mockup mostraba la
+ * versión anterior de Mi Perfil**, con dos bloques que el producto eliminó a
+ * propósito —"Objetivos en curso / Mi acompañamiento" y "Evidencias
+ * recientes / Feedback reciente"— porque convertían a Mi Perfil en un índice
+ * de cosas a un click de distancia, y "Mi progreso" era una fila de cuatro
+ * contadores que la vista real reemplazó por lecturas sobre las
+ * postulaciones. La vista no lleva encabezado propio: el rótulo del rail
+ * nombra el entorno y el ítem activo nombra la sección.
  */
 export function LearnerProfileScreen({
   compact = false,
@@ -61,10 +55,7 @@ export function LearnerProfileScreen({
           <div className={styles.introTop}>
             <ProfileIdentity />
 
-            {/*
-             * Se calcula sobre el campo `CV enviado` de las postulaciones. No es
-             * el "CV activo": esa noción sigue sin definirse.
-             */}
+            {/* Se calcula sobre el campo `CV enviado` de las postulaciones. No es el "CV activo": esa noción sigue sin definirse. */}
             <aside className={styles.resource}>
               <span className={styles.resourceHead}>
                 <Icon
@@ -143,11 +134,7 @@ export function LearnerProfileScreen({
             </ul>
           </div>
 
-          {/*
-            Las tres métricas van también en la versión reducida del hero: sin
-            ellas la pantalla principal quedaba con la mitad de abajo vacía, y
-            "Mi progreso" se reducía a una barra suelta que no explicaba nada.
-          */}
+          {/* Las tres métricas van también en la versión reducida del hero: sin ellas "Mi progreso" se reducía a una barra suelta que no explicaba nada. */}
           <div className={cx(styles.metricGrid, compact && styles.metricGridRow)}>
             {/* Hasta dónde llegó. Sale del historial, no del estado actual. */}
             <div className={styles.metric}>
