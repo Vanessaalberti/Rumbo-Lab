@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { usePlansOverlay } from '@/hooks/usePlansOverlay';
 import { Avatar } from '@/components/ui/Avatar';
 import { Icon } from '@/components/ui/Icon';
 import { ROUTES } from '@/constants/routes';
@@ -19,6 +20,7 @@ import styles from './UserMenu.module.css';
  */
 export function UserMenu() {
   const { user, experiences, signOut } = useAuth();
+  const { openPlansOverlay } = usePlansOverlay();
   const location = useLocation();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -123,6 +125,22 @@ export function UserMenu() {
               <Icon name="plus" size={16} className={styles.itemIcon} />
               <span className={styles.itemLabel}>Activar otra experiencia</span>
             </Link>
+          )}
+
+          {/* El plan es un concepto de Aprendiz: sin esa experiencia activada no hay nada que mejorar. Abre superpuesto, no navega — se puede cerrar y volver exactamente a donde estaba. */}
+          {experiences?.apprentice && (
+            <button
+              type="button"
+              role="menuitem"
+              className={styles.item}
+              onClick={() => {
+                setOpen(false);
+                openPlansOverlay();
+              }}
+            >
+              <Icon name="trending" size={16} className={styles.itemIcon} />
+              <span className={styles.itemLabel}>Mejorar plan</span>
+            </button>
           )}
 
           <Link to={ROUTES.settings} role="menuitem" className={styles.item}>

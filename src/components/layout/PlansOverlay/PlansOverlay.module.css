@@ -1,0 +1,118 @@
+/**
+ * Ventana superpuesta de Planes. Entra y sale con su propia animación —a
+ * diferencia de `Modal` (sobre `<dialog>` nativo), acá el cierre necesita
+ * jugarse a mano porque `<dialog>` no anima su salida sin trabajo extra.
+ */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  background-color: rgb(0 0 0 / 0.45);
+  backdrop-filter: blur(2px);
+  animation: plans-overlay-backdrop-in var(--duration-normal) var(--ease-out);
+}
+
+.backdropClosing {
+  animation: plans-overlay-backdrop-out var(--duration-normal) var(--ease-standard) forwards;
+}
+
+.panel {
+  width: min(760px, 100%);
+  max-height: calc(100vh - var(--space-10));
+  overflow-y: auto;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-6);
+  animation: plans-overlay-panel-in var(--duration-normal) var(--ease-out);
+}
+
+.panelClosing {
+  animation: plans-overlay-panel-out var(--duration-normal) var(--ease-standard) forwards;
+}
+
+.panel:focus-visible {
+  outline: none;
+}
+
+@keyframes plans-overlay-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes plans-overlay-backdrop-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes plans-overlay-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes plans-overlay-panel-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+}
+
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: var(--transition-colors);
+}
+
+.backButton:hover,
+.backButton:focus-visible {
+  color: var(--text);
+}
+
+.backButtonIcon {
+  transform: rotate(180deg);
+  flex-shrink: 0;
+}
+
+.content > * {
+  margin: 0;
+}
+
+@media (max-width: 480px) {
+  .panel {
+    padding: var(--space-4) var(--space-3);
+  }
+}

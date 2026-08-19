@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Icon } from '@/components/ui/Icon';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { ROUTES } from '@/constants/routes';
 import {
   readPlans,
   type PlanDescription,
@@ -15,16 +13,18 @@ import screen from '@/app/layouts/appShell.module.css';
 import styles from './planes.module.css';
 
 /**
- * Planes y cupos de las herramientas de IA. Primera versión: muestra qué
- * incluye cada plan y cuánto cuesta el pago. **Todavía no se puede
- * contratar** — no hay integración de pagos, así que el botón dice lo que
- * realmente pasa en vez de simular un checkout que no existe. Los límites no
- * están escritos acá: vienen de `/preparation/planes`, que los arma con la
- * misma configuración que aplica el cobro, para que la pantalla nunca
- * prometa algo distinto de lo que el backend permite. Por eso hay esqueleto:
- * lo único que se espera es esa llamada, así que el resto de la tarjeta
- * —título, precio, descripción— se dibuja de entrada y sólo la lista aparece
- * después.
+ * Contenido de Planes y cupos de las herramientas de IA. Se muestra dentro de
+ * `PlansOverlay`, nunca como página propia — no hay "volver a Preparación"
+ * porque no se llega navegando, se abre y se cierra desde el menú de la
+ * cuenta en cualquier pantalla. Primera versión: muestra qué incluye cada
+ * plan y cuánto cuesta el pago. **Todavía no se puede contratar** — no hay
+ * integración de pagos, así que el botón dice lo que realmente pasa en vez
+ * de simular un checkout que no existe. Los límites no están escritos acá:
+ * vienen de `/preparation/planes`, que los arma con la misma configuración
+ * que aplica el cobro, para que la pantalla nunca prometa algo distinto de lo
+ * que el backend permite. Por eso hay esqueleto: lo único que se espera es
+ * esa llamada, así que el resto de la tarjeta —título, precio, descripción—
+ * se dibuja de entrada y sólo la lista aparece después.
  */
 
 const PRICE_ARS = 5000;
@@ -35,17 +35,18 @@ const TOOL_LABELS: Record<string, string> = {
   oratoria: 'Prácticas de oratoria',
   entrevista: 'Entrevistas simuladas completas',
   linkedin: 'Publicaciones para LinkedIn',
+  presentacion: 'Cartas de presentación',
 };
 
 /** El orden en que se leen. El mismo en los dos planes, para poder comparar. */
-const TOOL_ORDER = ['cvMatch', 'oratoria', 'entrevista', 'linkedin'];
+const TOOL_ORDER = ['cvMatch', 'oratoria', 'entrevista', 'linkedin', 'presentacion'];
 
 /**
  * Cuánto mide, más o menos, cada fila de la lista mientras carga. Salen de
  * los largos reales de `TOOL_LABELS`, en el mismo orden: un esqueleto que no
  * se parece a lo que viene después no anticipa nada.
  */
-const SKELETON_WIDTHS = ['88%', '62%', '78%', '70%'];
+const SKELETON_WIDTHS = ['88%', '62%', '78%', '70%', '66%'];
 
 export function PlansSection() {
   const [info, setInfo] = useState<PlansInfo | null>(null);
@@ -65,11 +66,6 @@ export function PlansSection() {
 
   return (
     <div className={styles.body}>
-      <Link to={ROUTES.myRumboPreparation} className={styles.backLink}>
-        <Icon name="arrowRight" size={14} className={styles.backLinkIcon} />
-        Volver a Preparación
-      </Link>
-
       <div className={screen.header}>
         <div>
           <p className={screen.headerTitle}>Planes</p>

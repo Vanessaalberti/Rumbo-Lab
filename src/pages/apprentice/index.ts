@@ -12,3 +12,4 @@ export { OratoriaSection } from './preparacion/OratoriaSection';
 export { AtsTesterSection } from './preparacion/AtsTesterSection';
 export { EntrevistaSection } from './preparacion/EntrevistaSection';
 export { LinkedinPostSection } from './preparacion/LinkedinPostSection';
+export { PresentationLetterSection } from './preparacion/PresentationLetterSection';

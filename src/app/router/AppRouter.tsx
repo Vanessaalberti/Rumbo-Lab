@@ -20,9 +20,9 @@ import {
   LinkedinPostSection,
   OratoriaSection,
   PreparationSection,
+  PresentationLetterSection,
   FeedbackSection,
   PerfilSection,
-  PlansSection,
   SpacesSection,
 } from '@/pages/apprentice';
 import { MentorPanelPlaceholderPage } from '@/pages/mentor';
@@ -68,12 +68,12 @@ export function AppRouter() {
                 <Route path="objetivos" element={<GoalsSection />} />
                 <Route path="espacios" element={<SpacesSection />} />
                 <Route path="preparacion" element={<PreparationSection />} />
-                <Route path="planes" element={<PlansSection />} />
                 <Route path="preparacion/comparar-cv" element={<CvMatchSection />} />
                 <Route path="preparacion/oratoria" element={<OratoriaSection />} />
                 <Route path="preparacion/tester-ats" element={<AtsTesterSection />} />
                 <Route path="preparacion/entrevista" element={<EntrevistaSection />} />
                 <Route path="preparacion/linkedin" element={<LinkedinPostSection />} />
+                <Route path="preparacion/presentacion" element={<PresentationLetterSection />} />
                 <Route path="feedback" element={<FeedbackSection />} />
                 <Route path="evidencias" element={<EvidencesSection />} />
               </Route>

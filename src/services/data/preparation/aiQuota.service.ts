@@ -17,6 +17,8 @@ export interface AiToolQuota {
   remaining: number;
   /** ISO. El arranque del bloque siguiente. */
   resetAt: string | null;
+  /** Sólo en plan admin: no hay tope, `used`/`limit`/`remaining` no aplican. */
+  unlimited?: boolean;
 }
 
 export interface AiQuota {
@@ -25,7 +27,8 @@ export interface AiQuota {
   resetAt: string | null;
   /** Cada cuántas horas se renueva. Lo decide el backend, no la pantalla. */
   windowHours: number;
-  plan: 'free' | 'pro';
+  /** `admin` no se vende: se marca a mano para probar sin gastar cupo real. */
+  plan: 'free' | 'pro' | 'admin';
 }
 
 /** Los dos planes con sus límites, para la página de planes. */

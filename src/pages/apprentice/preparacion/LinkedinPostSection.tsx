@@ -4,6 +4,7 @@ import type { ApprenticeShellContext } from '@/app/layouts/ApprenticeShell';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { LoadingState } from '@/components/ui/LoadingState';
+import { TextLink } from '@/components/ui/TextLink';
 import {
   generateLinkedinPost,
   type LinkedinCta,
@@ -131,6 +132,21 @@ export function LinkedinPostSection() {
             Contá todo lo que querés que aparezca, como salga, y elegí cómo tiene que sonar.
           </p>
         </div>
+      </div>
+
+      <div className={styles.notice}>
+        <Icon name="alert" size={14} className={styles.noticeIcon} />
+        <p className={styles.noticeText}>
+          Escribí el borrador vos primero, con tus palabras — usá esto para pulirlo, no para
+          reemplazarlo. Apoyarse en la IA para escribir baja la actividad cerebral registrada
+          durante la tarea y el sentido de que el texto es propio (
+          <TextLink href="https://www.media.mit.edu/publications/your-brain-on-chatgpt/">
+            MIT Media Lab, 2025
+          </TextLink>
+          ), y usarla seguido está asociado a pensar menos por cuenta propia (
+          <TextLink href="https://www.mdpi.com/2075-4698/15/1/6">Gerlich, 2025</TextLink>
+          ).
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className={styles.form} noValidate>

@@ -27,8 +27,10 @@ export function TextLink({ children, href, className }: TextLinkProps) {
     );
   }
 
+  /* Pestaña nueva: quien lo toca suele estar en medio de algo (un borrador,
+     un formulario) que perdería si el enlace externo navegara en la misma. */
   return (
-    <a href={href} className={classes}>
+    <a href={href} className={classes} target="_blank" rel="noopener noreferrer">
       {children}
     </a>
   );

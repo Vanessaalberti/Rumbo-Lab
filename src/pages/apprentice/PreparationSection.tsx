@@ -1,7 +1,8 @@
 import { Link, useOutletContext } from 'react-router-dom';
 import type { ApprenticeShellContext } from '@/app/layouts/ApprenticeShell';
+import { usePlansOverlay } from '@/hooks/usePlansOverlay';
 import { Card } from '@/components/ui/Card';
-import { LinkButton } from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 import { Icon, type IconName } from '@/components/ui/Icon';
 import { ROUTES } from '@/constants/routes';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -18,7 +19,7 @@ interface Tool {
   /** Sin ruta, la herramienta todavía no existe: se muestra como "Próximamente". */
   href?: string;
   /** Tiene que coincidir con las claves de `AI_TOOLS` del backend. Sin `quotaId`, sin límite — hoy sólo el Tester ATS, que no usa IA. */
-  quotaId?: 'cvMatch' | 'oratoria' | 'linkedin' | 'entrevista';
+  quotaId?: 'cvMatch' | 'oratoria' | 'linkedin' | 'entrevista' | 'presentacion';
 }
 
 /**
@@ -59,6 +60,12 @@ const TOOLS: Tool[] = [
     quotaId: 'linkedin',
   },
   {
+    icon: 'analytics',
+    name: 'Evaluar tu perfil de LinkedIn',
+    text: 'Revisar tu perfil para ver qué está completo, qué falta y qué ajustar para que un reclutador lo entienda rápido.',
+    tone: 'brand',
+  },
+  {
     icon: 'shield',
     name: 'Tester ATS',
     text: 'Ver si tu CV pasa los filtros automáticos que usan las empresas antes de que lo lea una persona.',
@@ -68,8 +75,10 @@ const TOOLS: Tool[] = [
   {
     icon: 'portfolio',
     name: 'Crear texto de presentación',
-    text: 'A partir de tu CV y la oferta, armar el mensaje que la acompaña, listo para copiar.',
+    text: 'A partir de tu CV y la oferta, armar el mensaje que la acompaña, ajustado al límite de caracteres que necesites.',
     tone: 'amber',
+    href: ROUTES.myRumboPresentacion,
+    quotaId: 'presentacion',
   },
 ];
 
@@ -143,6 +152,29 @@ export function PreparationSection() {
  * usos" se lee como "volvé mañana" cuando puede faltar un rato corto.
  */
 function QuotaBanner({ quota }: { quota: AiQuota | null }) {
+  const { openPlansOverlay } = usePlansOverlay();
+
+  /* Admin no tiene bloque que renovar: `resetAt` viaja `null` siempre, así
+     que "faltan ___" quedaría esperando un dato que nunca llega. Aviso
+     propio, más corto, en vez de forzar el mismo layout. */
+  if (quota?.plan === 'admin') {
+    return (
+      <div className={styles.quotaRow}>
+        <div className={styles.credits}>
+          <Icon name="clock" size={16} className={styles.creditsIcon} />
+          <p className={styles.creditsText}>
+            <strong className={styles.creditsCount}>Sin límite de usos</strong>
+            <span className={styles.creditsNote}>
+              Cuenta admin: ninguna herramienta descuenta cupo ni cuenta para el presupuesto del
+              proyecto.
+            </span>
+          </p>
+          <span className={styles.creditsPlan}>Admin</span>
+        </div>
+      </div>
+    );
+  }
+
   const remaining = quota ? timeUntilReset(quota.resetAt) : null;
   const hours = quota?.windowHours;
 
@@ -178,9 +210,9 @@ function QuotaBanner({ quota }: { quota: AiQuota | null }) {
       </div>
 
       {quota?.plan === 'free' && (
-        <LinkButton href={ROUTES.myRumboPlans} variant="secondary" size="sm">
+        <Button type="button" onClick={openPlansOverlay} variant="secondary" size="sm">
           Mejorar plan
-        </LinkButton>
+        </Button>
       )}
     </div>
   );
@@ -206,6 +238,10 @@ function ToolQuotaLabel({ tool, quota }: { tool: Tool; quota: AiQuota | null }) 
         <Skeleton width="2.2rem" height="0.9em" />
       </span>
     );
+  }
+
+  if (toolQuota.unlimited) {
+    return <span className={cx(styles.toolCost, styles.toolCostFree)}>Sin límite de usos</span>;
   }
 
   const empty = toolQuota.remaining === 0;
