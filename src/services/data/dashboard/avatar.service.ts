@@ -16,7 +16,8 @@ import { updateApprenticeProfile } from './dashboard.service';
 /** 2 MB — mismo tope que declara el bucket. */
 export const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
 
-const AVATAR_TYPES: Record<string, string> = {
+/** Qué extensión le corresponde a cada tipo aceptado. Lo comparte la foto de Mentor, que usa el mismo bucket. */
+export const AVATAR_TYPES_BY_MIME: Record<string, string> = {
   'image/jpeg': 'jpg',
   'image/png': 'png',
   'image/webp': 'webp',
@@ -26,7 +27,7 @@ export const AVATAR_ACCEPT_ATTRIBUTE = '.jpg,.jpeg,.png,.webp';
 
 /** Valida antes de subir, para no gastar una subida que el bucket rechazaría. */
 export function validateAvatarFile(file: File): string | null {
-  if (!AVATAR_TYPES[file.type]) return 'La foto tiene que ser JPG, PNG o WEBP.';
+  if (!AVATAR_TYPES_BY_MIME[file.type]) return 'La foto tiene que ser JPG, PNG o WEBP.';
   if (file.size > AVATAR_MAX_BYTES) return 'La foto no puede superar los 2 MB.';
   return null;
 }
@@ -38,7 +39,7 @@ export async function uploadAvatar(
   const invalid = validateAvatarFile(file);
   if (invalid) return failure({ kind: 'unexpected', message: invalid });
 
-  const path = `${apprenticeId}/${crypto.randomUUID()}.${AVATAR_TYPES[file.type]}`;
+  const path = `${apprenticeId}/${crypto.randomUUID()}.${AVATAR_TYPES_BY_MIME[file.type]}`;
 
   const uploaded = await supabase.storage
     .from('avatars')

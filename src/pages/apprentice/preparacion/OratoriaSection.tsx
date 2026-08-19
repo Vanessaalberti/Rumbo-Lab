@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
-import type { ApprenticeShellContext } from '@/app/layouts/ApprenticeShell';
+import { usePreparationTool } from './preparationToolContext';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Icon, type IconName } from '@/components/ui/Icon';
@@ -60,7 +59,7 @@ interface OratoriaSelection {
 }
 
 export function OratoriaSection() {
-  const { refreshQuota } = useOutletContext<ApprenticeShellContext>();
+  const { refreshQuota } = usePreparationTool();
   const [selection, setSelection] = useState<OratoriaSelection | null>(null);
   const [analysis, setAnalysis] = useState<AnalysisState>({ status: 'idle' });
   const recorder = useAudioRecorder();

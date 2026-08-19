@@ -1,6 +1,5 @@
 import { useRef, useState, type FormEvent, type RefObject } from 'react';
-import { useOutletContext } from 'react-router-dom';
-import type { ApprenticeShellContext } from '@/app/layouts/ApprenticeShell';
+import { usePreparationTool, type PreparationToolContext } from './preparationToolContext';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { ProgressBar } from '@/components/ui/ProgressBar';
@@ -82,11 +81,11 @@ type Phase =
   | { name: 'results'; closing: InterviewClosing | null };
 
 export function EntrevistaSection() {
-  const { dashboard, refreshQuota } = useOutletContext<ApprenticeShellContext>();
+  const { cvs, refreshQuota } = usePreparationTool();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recorder = useAudioRecorder({ maxSeconds: MAX_ANSWER_SECONDS });
 
-  const eligibleCvs = dashboard.cvs.filter(
+  const eligibleCvs = cvs.filter(
     (cv) => cv.storagePath && cv.mimeType && EXTRACTABLE_MIME_TYPES.has(cv.mimeType),
   );
 
@@ -283,7 +282,7 @@ export function EntrevistaSection() {
       {phase.name === 'setup' && (
         <SetupForm
           eligibleCvs={eligibleCvs}
-          savedCvCount={dashboard.cvs.length}
+          savedCvCount={cvs.length}
           source={source}
           setSource={setSource}
           cvId={cvId}
@@ -351,7 +350,7 @@ export function EntrevistaSection() {
 /* ─── Configuración inicial ──────────────────────────────────────────────── */
 
 interface SetupFormProps {
-  eligibleCvs: ApprenticeShellContext['dashboard']['cvs'];
+  eligibleCvs: PreparationToolContext['cvs'];
   savedCvCount: number;
   source: CvSource;
   setSource: (source: CvSource) => void;

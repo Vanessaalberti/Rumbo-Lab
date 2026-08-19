@@ -3,12 +3,14 @@ import { PublicLayout } from '@/app/layouts/PublicLayout';
 import { AccessLayout } from '@/app/layouts/AccessLayout';
 import { PrivateLayout } from '@/app/layouts/PrivateLayout';
 import { ApprenticeShell } from '@/app/layouts/ApprenticeShell';
+import { MentorShell } from '@/app/layouts/MentorShell';
 import { RequireAuth } from '@/app/guards/RequireAuth';
 import { RequireExperience } from '@/app/guards/RequireExperience';
 import { RedirectIfAuthenticated } from '@/app/guards/RedirectIfAuthenticated';
 import { LandingPage } from '@/pages/landing';
 import { CreateSpacePage, SignInPage } from '@/pages/authentication';
 import { ChooseExperiencePage } from '@/pages/experience';
+import { JoinSpacePage } from '@/pages/espacios';
 import {
   ApplicationsSection,
   AtsTesterSection,
@@ -25,7 +27,14 @@ import {
   PerfilSection,
   SpacesSection,
 } from '@/pages/apprentice';
-import { MentorPanelPlaceholderPage } from '@/pages/mentor';
+import {
+  AgendaSection,
+  MentorFeedbacksSection,
+  MentorPreparationSection,
+  MentorProfileSection,
+  MentorSpacesSection,
+  SpaceDetailSection,
+} from '@/pages/mentor';
 import { SettingsPage } from '@/pages/settings';
 import { NotFoundPage } from '@/pages/errors';
 import { ROUTES } from '@/constants/routes';
@@ -59,6 +68,9 @@ export function AppRouter() {
           <Route element={<PrivateLayout />}>
             <Route path={ROUTES.chooseExperience} element={<ChooseExperiencePage />} />
             <Route path={ROUTES.settings} element={<SettingsPage />} />
+            {/* Sólo exige sesión: quien recibe una invitación puede todavía no
+                haber activado ninguna experiencia. */}
+            <Route path={ROUTES.joinSpace} element={<JoinSpacePage />} />
 
             <Route element={<RequireExperience experience="apprentice" />}>
               <Route path={ROUTES.myRumbo} element={<ApprenticeShell />}>
@@ -80,7 +92,18 @@ export function AppRouter() {
             </Route>
 
             <Route element={<RequireExperience experience="mentor" />}>
-              <Route path={ROUTES.mentorPanel} element={<MentorPanelPlaceholderPage />} />
+              <Route path={ROUTES.mentorPanel} element={<MentorShell />}>
+                <Route index element={<MentorProfileSection />} />
+                <Route path="espacios" element={<MentorSpacesSection />} />
+                <Route path="espacios/:id" element={<SpaceDetailSection />} />
+                <Route path="feedbacks" element={<MentorFeedbacksSection />} />
+                <Route path="agenda" element={<AgendaSection />} />
+                <Route path="preparacion" element={<MentorPreparationSection />} />
+                {/* Las mismas herramientas de Mi Rumbo: el componente es el
+                    mismo, sólo cambia el shell que lo monta. */}
+                <Route path="preparacion/comparar-cv" element={<CvMatchSection />} />
+                <Route path="preparacion/linkedin" element={<LinkedinPostSection />} />
+              </Route>
             </Route>
           </Route>
         </Route>

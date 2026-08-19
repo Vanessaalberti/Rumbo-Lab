@@ -1,0 +1,508 @@
+/**
+ * Agenda. Misma división que Postulaciones —lo que se recorre a la izquierda,
+ * el detalle a la derecha— pero en lugar de una tabla hay un calendario.
+ */
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+
+@media (min-width: 1100px) {
+  .split {
+    grid-template-columns: minmax(0, 1.7fr) minmax(320px, 1fr);
+  }
+}
+
+.calendarColumn {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* --- Barra de período ------------------------------------------------------- */
+
+.periodBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.periodLabel {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--text);
+  /* La primera letra del mes y del día de la semana viene en minúscula del locale. */
+  text-transform: capitalize;
+  min-width: 0;
+}
+
+.viewSwitch {
+  display: inline-flex;
+  padding: 3px;
+  gap: 3px;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-alt);
+  border: 1px solid var(--border);
+  margin-left: auto;
+}
+
+.viewOption {
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  font: inherit;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: var(--transition-colors);
+}
+
+.viewOptionActive {
+  background-color: var(--surface);
+  color: var(--text);
+  font-weight: var(--weight-semibold);
+  box-shadow: var(--shadow-xs);
+}
+
+.navButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+  color: var(--text-soft);
+  font: inherit;
+  cursor: pointer;
+  transition: var(--transition-colors);
+}
+
+.navButton:hover {
+  background-color: var(--bg-alt);
+  color: var(--text);
+}
+
+/* --- Grilla del mes ------------------------------------------------------------ */
+
+/*
+ * El mes se organiza por días y no por horas: en una celda de un centímetro no
+ * entra una franja horaria legible, y a esa escala lo que se busca es "qué días
+ * tengo ocupados", no "a qué hora".
+ */
+.grid {
+  display: grid;
+  gap: var(--space-2);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.weekdayLabel {
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--text-faint);
+  text-align: center;
+  padding-bottom: var(--space-1);
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-height: 96px;
+  padding: var(--space-2);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background-color: var(--surface);
+  min-width: 0;
+}
+
+/* Los días de relleno del mes anterior o el siguiente se ven, pero atrás. */
+.dayOutside {
+  background-color: var(--bg-alt);
+  opacity: 0.65;
+}
+
+.dayToday {
+  border-color: var(--brand);
+}
+
+.dayNumber {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--text-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.dayNumberToday {
+  color: var(--brand-strong);
+}
+
+/*
+ * Cada sesión es una franja del color de su Espacio. El color va en el borde
+ * izquierdo y no en el fondo entero: seis colores de fondo saturados en una
+ * grilla llena compiten con el texto.
+ */
+.eventChip {
+  display: block;
+  width: 100%;
+  padding: var(--space-1) var(--space-2);
+  border: none;
+  border-left: 3px solid var(--space-color, var(--brand));
+  border-radius: var(--radius-xs);
+  background-color: var(--bg-alt);
+  font: inherit;
+  font-size: var(--text-2xs);
+  line-height: 1.35;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: var(--transition-colors);
+}
+
+.eventChip:hover {
+  background-color: var(--surface-sunken, var(--bg-alt));
+  color: var(--brand-strong);
+}
+
+.eventChipSelected {
+  background-color: var(--brand-tint);
+  color: var(--brand-strong);
+  font-weight: var(--weight-semibold);
+}
+
+.eventTime {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-faint);
+  margin-right: var(--space-1);
+}
+
+/* --- Grilla horaria (día y semana) ----------------------------------------------- */
+
+/*
+ * Día y semana se organizan por horas: cada sesión ocupa el alto real de su
+ * duración, así que a simple vista se ve cuánto dura y qué hueco queda entre
+ * una y otra — información que una lista de chips no da.
+ */
+.timeGrid {
+  display: grid;
+  /* Gutter de horas + una columna por día. */
+  grid-template-columns: 52px repeat(var(--day-count, 1), minmax(0, 1fr));
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background-color: var(--surface);
+  overflow: hidden;
+}
+
+.timeHeaderSpacer {
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border-soft);
+}
+
+.timeHeader {
+  padding: var(--space-2) var(--space-1);
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border-soft);
+  text-align: center;
+  min-width: 0;
+}
+
+.timeHeader:last-child {
+  border-right: none;
+}
+
+.timeHeaderDay {
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.timeHeaderNumber {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-soft);
+  line-height: 1.2;
+}
+
+.timeHeaderToday .timeHeaderNumber,
+.timeHeaderToday .timeHeaderDay {
+  color: var(--brand-strong);
+}
+
+/* El gutter y las columnas comparten el alto de hora, que viene de JS. */
+.timeGutter {
+  border-right: 1px solid var(--border-soft);
+}
+
+.hourLabel {
+  height: var(--hour-height);
+  padding-right: var(--space-2);
+  text-align: right;
+  font-size: var(--text-2xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-faint);
+  /* Sube media línea para alinear con la raya, no con el centro de la franja. */
+  transform: translateY(-0.55em);
+}
+
+.dayColumn {
+  position: relative;
+  border-right: 1px solid var(--border-soft);
+  min-width: 0;
+}
+
+.dayColumn:last-child {
+  border-right: none;
+}
+
+.hourSlot {
+  height: var(--hour-height);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.dayColumnToday {
+  background-color: var(--brand-tint);
+}
+
+/* Cada sesión es un bloque del alto de su duración, ubicado por JS. */
+.timeEvent {
+  position: absolute;
+  padding: 3px 6px;
+  border: none;
+  border-left: 3px solid var(--space-color, var(--brand));
+  border-radius: var(--radius-xs);
+  background-color: var(--bg-alt);
+  font: inherit;
+  font-size: var(--text-2xs);
+  line-height: 1.3;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transition: var(--transition-colors);
+}
+
+.timeEvent:hover {
+  color: var(--brand-strong);
+}
+
+.timeEventSelected {
+  background-color: var(--brand-tint);
+  color: var(--brand-strong);
+  font-weight: var(--weight-semibold);
+}
+
+.timeEventTitle {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timeEventTime {
+  display: block;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-faint);
+}
+
+.timeEventSelected .timeEventTime {
+  color: var(--brand-strong);
+}
+
+/* La sesión sigue desde ayer o continúa mañana: se corta el redondeo del lado que sigue. */
+.timeEventContinuesBefore {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.timeEventContinuesAfter {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* --- Panel de detalle ---------------------------------------------------------- */
+
+.detailColumn {
+  min-width: 0;
+}
+
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.detailPlaceholder {
+  padding: var(--space-6) var(--space-5);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+.detailHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.detailTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-tight);
+  color: var(--text);
+  line-height: 1.3;
+  min-width: 0;
+}
+
+.detailMeta {
+  font-size: var(--text-xs);
+  color: var(--text-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.detailText {
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--text);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Un choque no es un error: se avisa y se sigue. Superponer puede ser a propósito. */
+.overlapNote {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background-color: var(--amber-tint);
+  font-size: var(--text-xs);
+  line-height: var(--leading-relaxed);
+  color: var(--text);
+}
+
+.overlapIcon {
+  color: var(--amber-strong);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* --- Tramos de la sesión --------------------------------------------------------- */
+
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.section {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-alt);
+}
+
+.sectionOrder {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background-color: var(--surface);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-soft);
+}
+
+.sectionText {
+  min-width: 0;
+}
+
+.sectionTitle {
+  font-size: var(--text-sm);
+  color: var(--text);
+}
+
+.sectionMeta {
+  font-size: var(--text-2xs);
+  color: var(--text-faint);
+}
+
+/* --- Asistencia ------------------------------------------------------------------- */
+
+.attendanceRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-block: var(--space-2);
+  border-bottom: 1px solid var(--border-soft);
+  min-width: 0;
+}
+
+.attendanceRow:last-of-type {
+  border-bottom: none;
+}
+
+.attendanceName {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: var(--text-sm);
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attendanceSelect {
+  flex-shrink: 0;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--text-xs);
+}
+
+.attendanceSelect:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+}
+
+@media (max-width: 480px) {
+  .detail {
+    padding: var(--space-4) var(--space-3);
+  }
+
+  .day {
+    min-height: 72px;
+    padding: var(--space-1);
+  }
+}

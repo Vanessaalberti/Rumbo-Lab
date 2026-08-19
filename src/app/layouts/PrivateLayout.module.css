@@ -11,7 +11,7 @@
  * y el contenido lleva su propio espaciado interno—, así que un padding global
  * acá le abría un hueco entre el header y la pantalla. Las vistas que sí
  * necesitan aire lo declaran ellas mismas (`ChooseExperiencePage`,
- * `MentorPanelPlaceholderPage`), que es donde esa decisión pertenece.
+ * `MentorShell`), que es donde esa decisión pertenece.
  *
  * Sin padding horizontal tampoco: el ancho lo resuelven las clases `container`
  * de cada página y el propio shell de Mi Rumbo.

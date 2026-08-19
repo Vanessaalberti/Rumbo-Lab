@@ -25,6 +25,18 @@ export interface ApprenticeShellContext {
 
   /** Vuelve a pedir los cupos — sólo las herramientas la llaman, después de generar algo. */
   refreshQuota: () => Promise<void>;
+
+  /**
+   * Los CVs guardados, al tope del contexto y no sólo dentro de `dashboard`:
+   * es lo único que las herramientas de Preparación necesitan de acá, y
+   * exponerlo suelto les permite correr también bajo el shell de Mentor
+   * (`PreparationToolContext`).
+   */
+  cvs: MyRumboDashboard['cvs'];
+
+  /** Ver `PreparationToolContext`. Del lado del Aprendiz no hay CVs ajenos que analizar. */
+  owner: 'apprentice';
+  spaces: never[];
 }
 
 type ShellState =
@@ -123,6 +135,9 @@ export function ApprenticeShell() {
     refresh: () => load(),
     quota,
     refreshQuota: loadQuota,
+    cvs: state.data.cvs,
+    owner: 'apprentice',
+    spaces: [],
   };
 
   return (

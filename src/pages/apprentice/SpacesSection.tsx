@@ -3,6 +3,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { ROUTES } from '@/constants/routes';
 import type { ApprenticeShellContext } from '@/app/layouts/ApprenticeShell';
 import type { FeedbackSummary } from '@/services/data/dashboard/dashboard.types';
+import { JoinSpacePanel } from './espacios/JoinSpacePanel';
 import { formatLongDate } from './perfil/formatters';
 import screen from '@/app/layouts/appShell.module.css';
 
@@ -23,6 +24,7 @@ import screen from '@/app/layouts/appShell.module.css';
 export function SpacesSection() {
   const {
     dashboard: { spaces, mentors, applications, feedbacks, feedbacksTotal },
+    refresh,
   } = useOutletContext<ApprenticeShellContext>();
 
   /** Devoluciones agrupadas por Espacio, para leerlas en su contexto. */
@@ -64,10 +66,12 @@ export function SpacesSection() {
         </div>
       </div>
 
+      <JoinSpacePanel onJoined={() => void refresh()} />
+
       {spaces.length === 0 ? (
         <p className={screen.emptyState}>
-          Acá van a aparecer los Espacios en los que un mentor te sume. No hace falta pertenecer a
-          uno para usar Mi Rumbo.
+          Acá van a aparecer los Espacios en los que participes. Podés entrar a uno con el código o
+          el link que te compartan. No hace falta pertenecer a ninguno para usar Mi Rumbo.
         </p>
       ) : (
         spaces.map((space) => {

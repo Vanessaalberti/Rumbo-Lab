@@ -1,6 +1,5 @@
 import { useId, useRef, useState, type FormEvent } from 'react';
-import { useOutletContext } from 'react-router-dom';
-import type { ApprenticeShellContext } from '@/app/layouts/ApprenticeShell';
+import { usePreparationTool } from './preparationToolContext';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { ProgressBar } from '@/components/ui/ProgressBar';
@@ -15,6 +14,7 @@ import {
 } from '@/services/data/preparation/cvMatch.service';
 import { cx } from '@/utils/classNames';
 import { ToolBackLink } from './ToolBackLink';
+import { SpaceCvPicker } from './SpaceCvPicker';
 import screen from '@/app/layouts/appShell.module.css';
 import styles from './cvMatch.module.css';
 
@@ -26,7 +26,13 @@ const EXTRACTABLE_ACCEPT_ATTRIBUTE = '.pdf,.docx';
 
 const MIN_JOB_TEXT_LENGTH = 30;
 
-type CvSource = 'saved' | 'upload';
+/**
+ * De dónde sale el CV. `saved` sólo existe del lado del Aprendiz (son los
+ * suyos) y `space` sólo del lado del Mentor (es el de alguien a quien
+ * acompaña): no tiene sentido ofrecerle a un mentor "uno de mis CVs", que no
+ * es la finalidad de ese panel.
+ */
+type CvSource = 'saved' | 'upload' | 'space';
 
 type ViewState =
   | { status: 'idle' }
@@ -35,22 +41,25 @@ type ViewState =
   | { status: 'error'; message: string };
 
 export function CvMatchSection() {
-  const { dashboard, refreshQuota } = useOutletContext<ApprenticeShellContext>();
+  const { owner, cvs, spaces, refreshQuota } = usePreparationTool();
   const cvSelectId = useId();
   const jobTextId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const eligibleCvs = dashboard.cvs.filter(
+  const eligibleCvs = cvs.filter(
     (cv) => cv.storagePath && cv.mimeType && EXTRACTABLE_MIME_TYPES.has(cv.mimeType),
   );
-  const [source, setSource] = useState<CvSource>(eligibleCvs.length > 0 ? 'saved' : 'upload');
+  const isMentor = owner === 'mentor';
+  const [source, setSource] = useState<CvSource>(
+    isMentor ? (spaces.length > 0 ? 'space' : 'upload') : 'saved',
+  );
   const [cvId, setCvId] = useState(eligibleCvs[0]?.id ?? '');
   const [file, setFile] = useState<File | null>(null);
   const [jobText, setJobText] = useState('');
   const [state, setState] = useState<ViewState>({ status: 'idle' });
 
   const jobTextTooShort = jobText.trim().length > 0 && jobText.trim().length < MIN_JOB_TEXT_LENGTH;
-  const hasCvChosen = source === 'saved' ? cvId !== '' : file !== null;
+  const hasCvChosen = source === 'upload' ? file !== null : cvId !== '';
   const canSubmit = hasCvChosen && jobText.trim().length >= MIN_JOB_TEXT_LENGTH;
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -59,10 +68,13 @@ export function CvMatchSection() {
 
     setState({ status: 'loading' });
     const trimmedJobText = jobText.trim();
+    /* Un CV guardado y uno de un espacio viajan igual: los dos son un `cvId`
+       que el backend resuelve contra Storage. Lo que cambia es de quién es, y
+       eso lo decide la RLS, no esta pantalla. */
     const result =
-      source === 'saved'
-        ? await compareCvWithOffer({ cvId, jobText: trimmedJobText })
-        : await compareUploadedCvWithOffer(file as File, trimmedJobText);
+      source === 'upload'
+        ? await compareUploadedCvWithOffer(file as File, trimmedJobText)
+        : await compareCvWithOffer({ cvId, jobText: trimmedJobText });
 
     if (result.status === 'success') {
       setState({ status: 'success', match: result.data.match });
@@ -87,9 +99,13 @@ export function CvMatchSection() {
 
       <div className={screen.header}>
         <div>
-          <p className={screen.headerTitle}>Comparar tu CV con una oferta</p>
+          <p className={screen.headerTitle}>
+            {isMentor ? 'Comparar un CV con una oferta' : 'Comparar tu CV con una oferta'}
+          </p>
           <p className={screen.headerMeta}>
-            Ver qué pide la búsqueda, qué de eso ya está en tu CV y qué te falta nombrar.
+            {isMentor
+              ? 'Ver qué pide la búsqueda, qué de eso ya está en el CV y qué falta nombrar.'
+              : 'Ver qué pide la búsqueda, qué de eso ya está en tu CV y qué te falta nombrar.'}
           </p>
         </div>
       </div>
@@ -97,21 +113,39 @@ export function CvMatchSection() {
       <form onSubmit={handleSubmit} className={styles.form} noValidate>
         <div className={styles.inputsRow}>
           <div className={styles.field}>
-            <span className={styles.fieldLabel}>Tu CV</span>
+            <span className={styles.fieldLabel}>{isMentor ? 'El CV' : 'Tu CV'}</span>
 
             <div
               className={styles.sourceSwitch}
               role="group"
               aria-label="De dónde sale el CV a comparar"
             >
-              <button
-                type="button"
-                className={cx(styles.sourceOption, source === 'saved' && styles.sourceOptionActive)}
-                onClick={() => setSource('saved')}
-                disabled={state.status === 'loading'}
-              >
-                Uno de mis CVs
-              </button>
+              {/* "Uno de mis CVs" es del Aprendiz; el Mentor toma el de alguien
+                  de un espacio suyo, que es la finalidad de ese panel. */}
+              {isMentor ? (
+                spaces.length > 0 && (
+                  <button
+                    type="button"
+                    className={cx(
+                      styles.sourceOption,
+                      source === 'space' && styles.sourceOptionActive,
+                    )}
+                    onClick={() => setSource('space')}
+                    disabled={state.status === 'loading'}
+                  >
+                    De un espacio
+                  </button>
+                )
+              ) : (
+                <button
+                  type="button"
+                  className={cx(styles.sourceOption, source === 'saved' && styles.sourceOptionActive)}
+                  onClick={() => setSource('saved')}
+                  disabled={state.status === 'loading'}
+                >
+                  Uno de mis CVs
+                </button>
+              )}
               <button
                 type="button"
                 className={cx(
@@ -125,10 +159,17 @@ export function CvMatchSection() {
               </button>
             </div>
 
-            {source === 'saved' ? (
+            {source === 'space' ? (
+              <SpaceCvPicker
+                spaces={spaces}
+                value={cvId}
+                onChange={setCvId}
+                disabled={state.status === 'loading'}
+              />
+            ) : source === 'saved' ? (
               eligibleCvs.length === 0 ? (
                 <p className={styles.fieldEmpty}>
-                  {dashboard.cvs.length === 0
+                  {cvs.length === 0
                     ? 'Todavía no subiste ningún CV. '
                     : 'Ninguno de tus CVs está en un formato que podamos leer (PDF o Word). '}
                   <TextLink href={ROUTES.myRumboCvs}>Ir a CVs</TextLink>
@@ -171,8 +212,8 @@ export function CvMatchSection() {
                   {file ? file.name : 'PDF o Word (.docx)'}
                 </span>
                 <p className={styles.fieldHint}>
-                  Se usa solo para esta comparación. No se agrega a tus CVs ni queda guardado en
-                  ningún lado.
+                  Se usa solo para esta comparación y no queda guardado en ningún lado
+                  {isMentor ? '.' : ': no se agrega a tus CVs.'}
                 </p>
               </div>
             )}

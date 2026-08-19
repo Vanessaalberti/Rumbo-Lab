@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { Button, LinkButton } from '@/components/ui/Button';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
+import { RumbotSection } from './RumbotSection';
+import { DeleteAccountSection } from './DeleteAccountSection';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/hooks/useAuth';
 import { cx } from '@/utils/classNames';
@@ -99,6 +101,8 @@ export function SettingsPage() {
         )}
       </section>
 
+      <RumbotSection />
+
       <section className={styles.section}>
         <span className={styles.label}>Apariencia</span>
         <div className={styles.row}>
@@ -122,6 +126,9 @@ export function SettingsPage() {
           </Button>
         </div>
       </section>
+
+      {/* Al final: es lo único irreversible de la pantalla. */}
+      <DeleteAccountSection />
     </div>
   );
 }

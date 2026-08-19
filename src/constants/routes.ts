@@ -36,8 +36,33 @@ export const ROUTES = {
   myRumboEntrevista: '/mi-rumbo/preparacion/entrevista',
   myRumboLinkedin: '/mi-rumbo/preparacion/linkedin',
   myRumboPresentacion: '/mi-rumbo/preparacion/presentacion',
+  /** Donde caen los links y códigos de invitación a un Espacio. */
+  joinSpace: '/unirme',
+
+  /**
+   * Panel de Mentor. Misma composición que Mi Rumbo —perfil como índice y las
+   * demás secciones colgando del shell— porque es el mismo tipo de entorno:
+   * lo que cambia es de quién es el recorrido que se mira.
+   */
   mentorPanel: '/panel-mentor',
+  mentorSpaces: '/panel-mentor/espacios',
+  mentorFeedbacks: '/panel-mentor/feedbacks',
+  mentorAgenda: '/panel-mentor/agenda',
+  mentorPreparation: '/panel-mentor/preparacion',
+  /**
+   * Las herramientas son las mismas que las de Mi Rumbo —el mismo componente,
+   * el mismo endpoint y el mismo cupo— montadas también acá para que una
+   * cuenta que sólo activó Mentor pueda llegar a ellas: las de `/mi-rumbo`
+   * están detrás del guard de la experiencia Aprendiz.
+   */
+  mentorCvMatch: '/panel-mentor/preparacion/comparar-cv',
+  mentorLinkedin: '/panel-mentor/preparacion/linkedin',
   /** Ajustes de la cuenta — no del perfil de Aprendiz, que vive en Mi Rumbo. */
   settings: '/configuracion',
   notFound: '*',
 } as const;
+
+/** El detalle de un Espacio lleva su id en la ruta, así que no puede ser una constante suelta. */
+export function mentorSpacePath(spaceId: string): string {
+  return `${ROUTES.mentorSpaces}/${spaceId}`;
+}

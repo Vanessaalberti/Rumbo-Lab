@@ -1,6 +1,5 @@
 import { useId, useRef, useState, type FormEvent } from 'react';
-import { useOutletContext } from 'react-router-dom';
-import type { ApprenticeShellContext } from '@/app/layouts/ApprenticeShell';
+import { usePreparationTool } from './preparationToolContext';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { TextLink } from '@/components/ui/TextLink';
@@ -45,13 +44,13 @@ type ViewState =
   | { status: 'error'; message: string };
 
 export function PresentationLetterSection() {
-  const { dashboard, refreshQuota } = useOutletContext<ApprenticeShellContext>();
+  const { cvs, refreshQuota } = usePreparationTool();
   const cvSelectId = useId();
   const jobTextId = useId();
   const charLimitId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const eligibleCvs = dashboard.cvs.filter(
+  const eligibleCvs = cvs.filter(
     (cv) => cv.storagePath && cv.mimeType && EXTRACTABLE_MIME_TYPES.has(cv.mimeType),
   );
   const [source, setSource] = useState<CvSource>(eligibleCvs.length > 0 ? 'saved' : 'upload');
@@ -144,7 +143,7 @@ export function PresentationLetterSection() {
             {source === 'saved' ? (
               eligibleCvs.length === 0 ? (
                 <p className={styles.fieldEmpty}>
-                  {dashboard.cvs.length === 0
+                  {cvs.length === 0
                     ? 'Todavía no subiste ningún CV. '
                     : 'Ninguno de tus CVs está en un formato que podamos leer (PDF o Word). '}
                   <TextLink href={ROUTES.myRumboCvs}>Ir a CVs</TextLink>

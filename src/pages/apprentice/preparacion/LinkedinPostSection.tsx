@@ -1,6 +1,5 @@
 import { useId, useState, type FormEvent } from 'react';
-import { useOutletContext } from 'react-router-dom';
-import type { ApprenticeShellContext } from '@/app/layouts/ApprenticeShell';
+import { usePreparationTool } from './preparationToolContext';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { LoadingState } from '@/components/ui/LoadingState';
@@ -62,7 +61,7 @@ const LOADING_STEPS = [
 ];
 
 export function LinkedinPostSection() {
-  const { refreshQuota } = useOutletContext<ApprenticeShellContext>();
+  const { refreshQuota } = usePreparationTool();
   const rawTextId = useId();
 
   const [rawText, setRawText] = useState('');

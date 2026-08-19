@@ -1,6 +1,5 @@
 import { useRef, useState, type FormEvent } from 'react';
-import { useOutletContext } from 'react-router-dom';
-import type { ApprenticeShellContext } from '@/app/layouts/ApprenticeShell';
+import { usePreparationTool } from './preparationToolContext';
 import { Button } from '@/components/ui/Button';
 import { Icon, type IconName } from '@/components/ui/Icon';
 import { ProgressBar } from '@/components/ui/ProgressBar';
@@ -39,12 +38,12 @@ type ViewState =
   | { status: 'error'; message: string };
 
 export function AtsTesterSection() {
-  const { dashboard } = useOutletContext<ApprenticeShellContext>();
+  const { cvs } = usePreparationTool();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const detailRef = useRef<HTMLDivElement>(null);
 
-  const [source, setSource] = useState<CvSource>(dashboard.cvs.length > 0 ? 'saved' : 'upload');
-  const [cvId, setCvId] = useState(dashboard.cvs[0]?.id ?? '');
+  const [source, setSource] = useState<CvSource>(cvs.length > 0 ? 'saved' : 'upload');
+  const [cvId, setCvId] = useState(cvs[0]?.id ?? '');
   const [file, setFile] = useState<File | null>(null);
   const [state, setState] = useState<ViewState>({ status: 'idle' });
 
@@ -128,7 +127,7 @@ export function AtsTesterSection() {
             </div>
 
             {source === 'saved' ? (
-              dashboard.cvs.length === 0 ? (
+              cvs.length === 0 ? (
                 <p className={styles.fieldEmpty}>
                   Todavía no subiste ningún CV. <TextLink href={ROUTES.myRumboCvs}>Ir a CVs</TextLink>
                 </p>
@@ -139,7 +138,7 @@ export function AtsTesterSection() {
                   onChange={(event) => setCvId(event.target.value)}
                   disabled={state.status === 'loading'}
                 >
-                  {dashboard.cvs.map((cv) => (
+                  {cvs.map((cv) => (
                     <option key={cv.id} value={cv.id}>
                       {cv.name}
                     </option>
