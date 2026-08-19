@@ -41,6 +41,12 @@ export interface AnswerScores {
 
 export type EntrevistaCriterion = keyof AnswerScores;
 
+/** Una muletilla real: relleno repetido, no un conector natural del habla. */
+export interface FillerWord {
+  text: string;
+  count: number;
+}
+
 /**
  * Qué tipo de pregunta era. Decide si cabe esperar una estructura STAR
  * (situación, tarea, acción, resultado) — sólo `conductual` la espera; antes,
@@ -90,6 +96,9 @@ export interface AnswerEvaluation {
   starFeedback: string;
   strengths: string[];
   improvements: string[];
+  fillers: FillerWord[];
+  /** Silencios de tres segundos o más dentro de la respuesta, medidos en el paso de transcripción. */
+  longPauses: number;
 }
 
 /** Cómo se presenta cada criterio. Mismo patrón que `CriterionMeta` en `oratoria.service.ts`. */
@@ -176,11 +185,21 @@ export interface InterviewReview {
   closing: InterviewClosing;
 }
 
+/** Lo que devuelve el paso de transcripción por cada grabación. */
+export interface TranscriptionAnswer {
+  transcript: string;
+  /** El mismo texto con las pausas marcadas (`[silencio de N s]`) — lo que lee el paso de revisión, no se muestra a la persona. */
+  annotatedTranscript: string;
+  longPauses: number;
+}
+
 /** Una respuesta ya transcripta, lista para que la evalúen. */
 export interface TranscribedAnswer {
   question: string;
   kind: string;
   transcript: string;
+  annotatedTranscript: string;
+  longPauses: number;
 }
 
 /** Paso 1 — genera las preguntas atadas al CV y a la oferta. */
@@ -209,7 +228,7 @@ export function prepareInterviewWithUpload(
  */
 export function transcribeInterviewAnswers(
   recordings: ReadonlyArray<{ audio: Blob; question: string }>,
-): Promise<AsyncState<{ transcripts: string[] }>> {
+): Promise<AsyncState<{ answers: TranscriptionAnswer[] }>> {
   const form = new FormData();
   recordings.forEach((recording, index) => {
     form.append('audio', recording.audio, `respuesta-${index + 1}`);

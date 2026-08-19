@@ -47,6 +47,9 @@ interface AnsweredQuestion {
   /** `null` si se salteó la pregunta. */
   audio: Blob | null;
   transcript: string;
+  /** El mismo texto con las pausas marcadas — sólo viaja a la revisión, nunca se muestra. */
+  annotatedTranscript: string;
+  longPauses: number;
   evaluation: AnswerEvaluation | null;
 }
 
@@ -131,7 +134,16 @@ export function EntrevistaSection() {
 
     const composed = composeInterview(result.data.preparation.questions);
     setRoleSummary(result.data.preparation.roleSummary);
-    setAnswers(composed.map((question) => ({ question, audio: null, transcript: '', evaluation: null })));
+    setAnswers(
+      composed.map((question) => ({
+        question,
+        audio: null,
+        transcript: '',
+        annotatedTranscript: '',
+        longPauses: 0,
+        evaluation: null,
+      })),
+    );
     setCurrent(0);
     recorder.reset();
     setPhase({ name: 'interview' });
@@ -199,9 +211,13 @@ export function EntrevistaSection() {
 
     const withTranscripts = finished.map((entry) => ({ ...entry }));
     recorded.forEach((item, position) => {
-      const transcript = transcribed.data.transcripts[position] ?? '';
+      const result = transcribed.data.answers[position];
       const target = withTranscripts[item.index];
-      if (target) target.transcript = transcript;
+      if (target && result) {
+        target.transcript = result.transcript;
+        target.annotatedTranscript = result.annotatedTranscript;
+        target.longPauses = result.longPauses;
+      }
     });
     setAnswers(withTranscripts);
 
@@ -211,6 +227,8 @@ export function EntrevistaSection() {
         question: entry.question.question,
         kind: entry.question.kind,
         transcript: entry.transcript,
+        annotatedTranscript: entry.annotatedTranscript,
+        longPauses: entry.longPauses,
       })),
     );
 
@@ -807,6 +825,23 @@ function AnswerCard({ entry, index }: { entry: AnsweredQuestion; index: number }
 
               <FeedbackList icon="check" iconClass={styles.strengthIcon} title="Lo que hiciste bien" items={evaluation.strengths} empty="No encontramos algo puntual para destacar en esta respuesta." />
               <FeedbackList icon="alert" iconClass={styles.improvementIcon} title="Para mejorar" items={evaluation.improvements} empty="Sin observaciones puntuales." />
+
+              {/* Sólo aparecen las muletillas de verdad: un conector suelto no cuenta como problema. */}
+              {evaluation.fillers.length > 0 && (
+                <div className={styles.fillerWords}>
+                  <p className={styles.listTitle}>Muletillas que se repitieron</p>
+                  <ul className={styles.fillerWordsList}>
+                    {evaluation.fillers.map((item) => (
+                      <li key={item.text} className={styles.fillerWordItem}>
+                        <span className={styles.fillerWordText}>"{item.text}"</span>
+                        <span className={styles.fillerWordCount}>
+                          {item.count} {item.count === 1 ? 'vez' : 'veces'}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               <details className={styles.transcriptBlock}>
                 <summary className={styles.transcriptToggle}>Ver lo que dijiste</summary>
