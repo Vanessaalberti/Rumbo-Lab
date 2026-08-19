@@ -204,9 +204,6 @@ export function ApplicationsSection() {
 
       <div className={styles.split}>
         <div className={styles.tableColumn}>
-          {
-
-          }
           <div className={styles.toolbar}>
             <Input
               label="Buscar postulaciones"
@@ -221,7 +218,6 @@ export function ApplicationsSection() {
               className={styles.search}
             />
 
-            {}
             <div className={styles.toolbarActions}>
               <Button size="sm" iconLeading="plus" onClick={() => setModalOpen(true)}>
                 Nueva postulación
@@ -247,7 +243,6 @@ export function ApplicationsSection() {
             </div>
           </div>
 
-          {}
           {applications.length === 0 && !pending ? (
             <p className={screen.emptyState}>
               Acá van a aparecer las postulaciones que registres. Alcanza con saber dónde
@@ -356,7 +351,6 @@ export function ApplicationsSection() {
           )}
         </div>
 
-        {}
         <aside className={styles.detailColumn} aria-label="Detalle de la postulación">
           {selected ? (
             <ApplicationDetail

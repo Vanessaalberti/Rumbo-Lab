@@ -29,7 +29,7 @@ export function cvChoiceOptions(cvs: CvSummary[]): CvChoiceOption[] {
  */
 export function cvChoiceLabel(
   application: { cvId: string | null; customCv: boolean },
-  cvs: CvSummary[],
+  cvs: readonly CvSummary[],
 ): string {
   if (application.cvId) {
     return cvs.find((cv) => cv.id === application.cvId)?.name ?? 'CV eliminado';

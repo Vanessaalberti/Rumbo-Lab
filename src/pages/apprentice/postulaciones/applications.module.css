@@ -39,7 +39,7 @@
   }
 }
 
-/* --- Filtro por estado ---------------------------------------------------- */
+/* --- Filtro (período, marca y estado) y menú de exportar ------------------ */
 
 .filterRoot {
   position: relative;
@@ -317,7 +317,6 @@
   opacity: 0.55;
   pointer-events: none;
 }
-
 
 .option {
   display: flex;
