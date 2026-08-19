@@ -7,6 +7,11 @@ import type {
 } from '@/services/data/dashboard/dashboard.types';
 import { APPLICATION_STATUS_LABELS, APPLICATION_STATUS_ORDER } from '../applicationStatus';
 import { APPLICATION_MARKS } from './applicationMark';
+import {
+  APPLICATION_DATE_RANGES,
+  APPLICATION_DATE_RANGE_LABELS,
+  type ApplicationDateRange,
+} from './applicationDateRange';
 import styles from './applications.module.css';
 
 interface ApplicationsFilterProps {
@@ -14,26 +19,33 @@ interface ApplicationsFilterProps {
   onStatusesChange: (next: ApplicationStatus[]) => void;
   marks: ApplicationMark[];
   onMarksChange: (next: ApplicationMark[]) => void;
+  dateRange: ApplicationDateRange;
+  onDateRangeChange: (next: ApplicationDateRange) => void;
 }
 
 /**
- * Filtro de la tabla · `Filtrar`. Dos criterios, cada uno con selección
- * múltiple: **estado** (Notion `04 · Postulaciones` §18bis.6bis) y **marca**
- * personal — no se filtra por nombre, puesto, URL, CV enviado ni fecha. Los
- * dos grupos se cruzan con Y y dentro de cada uno con O: elegir "Entrevista"
- * y "Favorita" muestra las favoritas que están en entrevista, no la suma de
- * las dos listas. Filtrar no modifica ninguna postulación ni el historial:
- * sólo acota qué filas se muestran.
+ * Filtro de la tabla · `Filtrar`. Tres criterios en el mismo panel:
+ * **período** (selección única — no tiene sentido cruzar "última semana" con
+ * "último mes", el segundo ya contiene al primero), **estado** (Notion
+ * `04 · Postulaciones` §18bis.6bis) y **marca** personal, estos dos últimos
+ * con selección múltiple. No se filtra por nombre, puesto, URL ni CV enviado.
+ * Los tres grupos se cruzan con Y y, dentro de estado y marca, con O: elegir
+ * "Entrevista" y "Favorita" muestra las favoritas que están en entrevista,
+ * no la suma de las dos listas. Filtrar no modifica ninguna postulación ni
+ * el historial: sólo acota qué filas se muestran.
  */
 export function ApplicationsFilter({
   statuses,
   onStatusesChange,
   marks,
   onMarksChange,
+  dateRange,
+  onDateRangeChange,
 }: ApplicationsFilterProps) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
+  const dateRangeGroupId = useId();
 
   useEffect(() => {
     if (!open) return;
@@ -53,7 +65,7 @@ export function ApplicationsFilter({
     };
   }, [open]);
 
-  const total = statuses.length + marks.length;
+  const total = statuses.length + marks.length + (dateRange !== 'all' ? 1 : 0);
 
   const toggleStatus = (status: ApplicationStatus) => {
     onStatusesChange(
@@ -88,9 +100,23 @@ export function ApplicationsFilter({
 
       {open && (
         <div id={menuId} className={styles.filterPanel}>
-          {/* Las marcas van primero: son tres y se eligen de un vistazo, contra
+          <p className={styles.filterHead}>Filtrar por período</p>
+
+          {APPLICATION_DATE_RANGES.map((range) => (
+            <label key={range} className={styles.filterOption}>
+              <input
+                type="radio"
+                name={dateRangeGroupId}
+                checked={dateRange === range}
+                onChange={() => onDateRangeChange(range)}
+              />
+              {APPLICATION_DATE_RANGE_LABELS[range]}
+            </label>
+          ))}
+
+          {/* Las marcas van después: son tres y se eligen de un vistazo, contra
               nueve estados que ocupan casi todo el panel. */}
-          <p className={styles.filterHead}>Filtrar por marca</p>
+          <p className={cx(styles.filterHead, styles.filterHeadSpaced)}>Filtrar por marca</p>
 
           {APPLICATION_MARKS.map((meta) => (
             <label key={meta.id} className={styles.filterOption}>
@@ -124,6 +150,7 @@ export function ApplicationsFilter({
               onClick={() => {
                 onStatusesChange([]);
                 onMarksChange([]);
+                onDateRangeChange('all');
               }}
             >
               Quitar filtros

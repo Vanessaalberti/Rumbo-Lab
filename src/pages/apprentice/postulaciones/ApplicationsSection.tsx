@@ -17,6 +17,8 @@ import type {
 import { ApplicationDetail } from './ApplicationDetail';
 import { NewApplicationModal } from './NewApplicationModal';
 import { ApplicationsFilter } from './ApplicationsFilter';
+import { ApplicationsExportButton } from './ApplicationsExportButton';
+import { matchesDateRange, type ApplicationDateRange } from './applicationDateRange';
 import { CvCell, MarkIcon, StatusCell } from './TableCells';
 import { ContactCell } from './ContactCell';
 import screen from '@/app/layouts/appShell.module.css';
@@ -77,6 +79,7 @@ export function ApplicationsSection() {
   const [modalOpen, setModalOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<ApplicationStatus[]>([]);
   const [markFilter, setMarkFilter] = useState<ApplicationMark[]>([]);
+  const [dateRange, setDateRange] = useState<ApplicationDateRange>('all');
   const [search, setSearch] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -89,7 +92,7 @@ export function ApplicationsSection() {
 
   const normalizedSearch = normalize(search.trim());
   const isFiltered =
-    statusFilter.length > 0 || markFilter.length > 0 || normalizedSearch !== '';
+    statusFilter.length > 0 || markFilter.length > 0 || dateRange !== 'all' || normalizedSearch !== '';
 
   /* Los criterios se cruzan con Y, y dentro de cada uno con O: elegir
      "Entrevista" y "Favorita" muestra las favoritas que están en entrevista,
@@ -103,6 +106,7 @@ export function ApplicationsSection() {
         markFilter.length === 0 ||
         (application.mark !== null && markFilter.includes(application.mark)),
     )
+    .filter((application) => matchesDateRange(application.createdAt, dateRange))
     .filter((application) => matchesSearch(application, normalizedSearch));
 
   /*
@@ -233,7 +237,13 @@ export function ApplicationsSection() {
                   setMarkFilter(next);
                   setPage(1);
                 }}
+                dateRange={dateRange}
+                onDateRangeChange={(next) => {
+                  setDateRange(next);
+                  setPage(1);
+                }}
               />
+              <ApplicationsExportButton applications={visible} cvs={cvs} />
             </div>
           </div>
 

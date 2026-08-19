@@ -83,6 +83,10 @@
   left: 0;
   z-index: 50;
   min-width: 210px;
+  /* Con período + marca + estado el panel entero pasaba el alto de la tabla:
+     se acota y el scroll queda adentro del panel, no de la página. */
+  max-height: min(360px, 60vh);
+  overflow-y: auto;
   padding: var(--space-2);
   background-color: var(--surface);
   border: 1px solid var(--border);
@@ -128,11 +132,15 @@
 
 .filterClear {
   width: 100%;
+  /* Pegado abajo del panel que scrollea: con tres grupos de filtros, sin esto
+     había que bajar hasta el final de la lista para encontrarlo. */
+  position: sticky;
+  bottom: 0;
   margin-top: var(--space-2);
   padding: var(--space-2) var(--space-3);
   border: none;
   border-top: 1px solid var(--border-soft);
-  background: none;
+  background-color: var(--surface);
   font: inherit;
   font-size: var(--text-sm);
   color: var(--brand-strong);
