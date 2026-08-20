@@ -3,7 +3,6 @@ import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom
 import type { MentorShellContext } from '@/app/layouts/MentorShell';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
 import { Icon } from '@/components/ui/Icon';
 import { Modal } from '@/components/ui/Modal';
 import { PageSkeleton } from '@/components/ui/Skeleton';
@@ -17,13 +16,14 @@ import {
 import type { SpaceDetail, SpaceInvitation, SpaceMember } from '@/services/data/mentor/mentor.types';
 import { spaceColorStyle } from '@/utils/spaceColor';
 import { EditSpaceModal } from './EditSpaceModal';
+import { SpaceMetrics } from './SpaceMetrics';
 import { InviteField } from './InviteField';
 import { invitationShareValue, parseEmails } from './invitationSharing';
 import screen from '@/app/layouts/appShell.module.css';
 import styles from '../mentor.module.css';
 
-/** Cuánta gente entra en la columna lateral antes de mandar al resto a "Ver todos". */
-const ASIDE_MEMBERS = 6;
+/** Cuánta gente se lista en la columna lateral; el resto vive en el modal. */
+const ASIDE_MEMBERS = 5;
 
 /** La ficha de un Espacio. Pide sus datos por su cuenta: miembros e invitaciones sólo hacen falta acá. */
 export function SpaceDetailSection() {
@@ -69,9 +69,7 @@ export function SpaceDetailSection() {
         <div className={styles.spaceMain}>
           {space.description && <p className={styles.cardText}>{space.description}</p>}
 
-          <Card padding="lg">
-            <SpaceInvites spaceId={space.id} spaceCode={space.code} onInvited={load} />
-          </Card>
+          <SpaceMetrics spaceId={space.id} />
 
           {pendingInvitations.length > 0 && (
             <section className={styles.block}>
@@ -83,7 +81,12 @@ export function SpaceDetailSection() {
           )}
         </div>
 
-        <MembersAside members={apprentices} />
+        <MembersAside
+          members={apprentices}
+          spaceId={space.id}
+          spaceCode={space.code}
+          onInvited={load}
+        />
       </div>
     </div>
   );
@@ -147,13 +150,40 @@ function SpaceHero({
   );
 }
 
-/** Quiénes están, al costado. Se muestran unos pocos porque es una referencia, no la tarea. */
-function MembersAside({ members }: { members: SpaceMember[] }) {
+/**
+ * Quiénes están, al costado. Muestra unos pocos porque es una referencia y no
+ * la tarea; el resto y la invitación viven cada uno en su modal. Invitar dejó
+ * de ocupar el centro de la ficha: se hace una vez y después estorba.
+ */
+function MembersAside({
+  members,
+  spaceId,
+  spaceCode,
+  onInvited,
+}: {
+  members: SpaceMember[];
+  spaceId: string;
+  spaceCode: string;
+  onInvited: () => void;
+}) {
   const [showingAll, setShowingAll] = useState(false);
+  const [inviting, setInviting] = useState(false);
 
   return (
     <aside className={styles.spaceAside}>
-      <p className={styles.blockTitle}>Integrantes</p>
+      <div className={styles.asideHead}>
+        <p className={styles.blockTitle}>Integrantes</p>
+
+        <button
+          type="button"
+          className={styles.asideAction}
+          onClick={() => setInviting(true)}
+          title="Invitar gente"
+          aria-label="Invitar gente"
+        >
+          <Icon name="userPlus" size={16} />
+        </button>
+      </div>
 
       {members.length === 0 ? (
         <p className={screen.emptyState}>
@@ -163,16 +193,33 @@ function MembersAside({ members }: { members: SpaceMember[] }) {
         <>
           <MemberList members={members.slice(0, ASIDE_MEMBERS)} />
 
-          {members.length > ASIDE_MEMBERS && (
-            <button type="button" className={styles.spaceAsideLink} onClick={() => setShowingAll(true)}>
-              Ver todos ({members.length}) →
-            </button>
-          )}
+          <button type="button" className={styles.spaceAsideLink} onClick={() => setShowingAll(true)}>
+            Ver integrantes ({members.length}) →
+          </button>
         </>
       )}
 
       <Modal open={showingAll} title="Integrantes" onClose={() => setShowingAll(false)}>
-        <MemberList members={members} />
+        <div className={styles.memberCards}>
+          {members.map((person) => (
+            <div key={person.id ?? person.joinedAt} className={styles.memberCard}>
+              <Avatar name={person.fullName ?? 'Aprendiz'} src={person.avatarUrl ?? undefined} size="lg" />
+              <p className={styles.memberCardName}>{person.fullName ?? 'Sin nombre'}</p>
+              {person.headline && <p className={styles.personMeta}>{person.headline}</p>}
+            </div>
+          ))}
+        </div>
+      </Modal>
+
+      <Modal open={inviting} title="Invitar gente" onClose={() => setInviting(false)}>
+        <SpaceInvites
+          spaceId={spaceId}
+          spaceCode={spaceCode}
+          onInvited={() => {
+            onInvited();
+            setInviting(false);
+          }}
+        />
       </Modal>
     </aside>
   );

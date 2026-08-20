@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
+import { Icon } from '@/components/ui/Icon';
 import {
   confirmWhatsappCode,
   readWhatsappLink,
@@ -113,8 +114,8 @@ export function WhatsappLinkPanel() {
   };
 
   return (
-    <section className={styles.block}>
-      <p className={styles.blockTitle}>Tu WhatsApp</p>
+    <section className={styles.card}>
+      <p className={styles.cardTitle}>Tu WhatsApp</p>
       <p className={styles.blockText}>
         Vinculá tu número para escribirle a Rumbot y para que pueda avisarte. Confirmamos que el
         número es tuyo con un código: sin eso, cualquiera que supiera tu teléfono podría hablar en
@@ -124,13 +125,21 @@ export function WhatsappLinkPanel() {
       {step.name === 'loading' && <p className={styles.blockText}>Cargando…</p>}
 
       {step.name === 'linked' && (
-        <div className={styles.linked}>
-          <span className={styles.phone}>{step.phone}</span>
-          <span className={styles.linkedMeta}>Confirmado</span>
-          <Button type="button" variant="ghost" size="sm" onClick={() => void unlink()} disabled={busy}>
-            Desvincular
-          </Button>
-        </div>
+        <>
+          <div className={styles.linkedRow}>
+            <span className={styles.phone}>{step.phone}</span>
+            <span className={styles.badgeOk}>
+              <Icon name="check" size={12} />
+              Vinculado
+            </span>
+          </div>
+
+          <div className={styles.fullWidthAction}>
+            <Button type="button" variant="secondary" size="sm" onClick={() => void unlink()} disabled={busy}>
+              Desvincular
+            </Button>
+          </div>
+        </>
       )}
 
       {step.name === 'idle' && (

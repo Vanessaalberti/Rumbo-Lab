@@ -185,3 +185,20 @@ export function saveAttendance(
 ): Promise<AsyncState<{ attendance: AttendanceEntry[] }>> {
   return httpClient.post(`/mentor/agenda/${eventId}/attendance`, { entries });
 }
+
+/** Cómo le va al grupo, en conteos. Nunca dice de quién es cada postulación; ver la ruta. */
+export interface SpaceMetrics {
+  members: number;
+  withApplications: number;
+  applying: number;
+  withReply: number;
+  withInterview: number;
+  withOffer: number;
+  hired: number;
+  applicationsTotal: number;
+  applicationsOpen: number;
+}
+
+export function getSpaceMetrics(spaceId: string): Promise<AsyncState<{ metrics: SpaceMetrics }>> {
+  return httpClient.get(`/mentor/spaces/${spaceId}/metrics`);
+}

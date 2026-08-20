@@ -548,8 +548,12 @@
   padding: 0 var(--space-5) var(--space-5);
 }
 
-/* Mitad del avatar por encima del borde de la portada, como en el boceto. */
+/* Mitad del avatar por encima del borde de la portada, como en el boceto.
+   `position` porque la portada es un elemento posicionado: sin esto se pinta
+   encima del avatar aunque venga antes en el documento. */
 .spaceHeroAvatar {
+  position: relative;
+  z-index: 1;
   margin-top: -40px;
   box-shadow: 0 0 0 4px var(--surface);
   flex-shrink: 0;
@@ -662,4 +666,121 @@
 /* El input nativo no se puede maquillar: se dispara desde el botón de al lado. */
 .fileInput {
   display: none;
+}
+
+/* --- Panel lateral de integrantes ---------------------------------------------------- */
+
+.asideHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Invitar vive acá y no en el centro de la ficha: se hace una vez y después estorba. */
+.asideAction {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background-color: var(--surface-raised);
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: var(--transition-colors);
+}
+
+.asideAction:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.asideAction:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+}
+
+/* Dentro del modal la gente se ve como tarjetas: hay lugar para la foto grande. */
+.memberCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-3);
+}
+
+.memberCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background-color: var(--surface-raised);
+  text-align: center;
+}
+
+.memberCardName {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text);
+}
+
+/* --- Métricas del Espacio -------------------------------------------------------------- */
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-3);
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background-color: var(--surface-raised);
+}
+
+.metricValue {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* El total va al lado y en chico: lo que importa es cuántos, sobre cuántos. */
+.metricTotal {
+  font-size: var(--text-base);
+  font-weight: var(--weight-regular);
+  color: var(--text-faint);
+}
+
+.metricLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text);
+}
+
+.metricDetail {
+  font-size: var(--text-xs);
+  line-height: var(--leading-relaxed);
+  color: var(--text-faint);
+}
+
+.metricsFoot {
+  font-size: var(--text-sm);
+  color: var(--text-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.metricsWarn {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-sunken);
+  font-size: var(--text-xs);
+  color: var(--text-soft);
 }

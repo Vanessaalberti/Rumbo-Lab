@@ -15,6 +15,8 @@ export interface WhatsappLinkState {
   } | null;
   /** Sin línea conectada el código se genera igual, pero queda en el log del servidor. */
   canDeliverCode: boolean;
+  /** Link `wa.me` al número del bot, para abrir la conversación sin más. `null` si no hay número configurado. */
+  botUrl: string | null;
 }
 
 export function readWhatsappLink(): Promise<AsyncState<WhatsappLinkState>> {

@@ -3,6 +3,16 @@
  * el detalle a la derecha— pero en lugar de una tabla hay un calendario.
  */
 
+/*
+ * Alto del calendario. Sin tope, la vista de día y la de semana dibujan las
+ * veinticuatro horas y la página se vuelve un scroll interminable: se acota a
+ * la altura de la tabla de Postulaciones y el desplazamiento queda adentro,
+ * con la fila de días fija arriba. El detalle de al lado usa el mismo alto.
+ */
+.split {
+  --agenda-alto: min(520px, 62vh);
+}
+
 .split {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -13,6 +23,25 @@
 @media (min-width: 1100px) {
   .split {
     grid-template-columns: minmax(0, 1.7fr) minmax(320px, 1fr);
+    align-items: stretch;
+  }
+
+  /* Mismo recurso que en Postulaciones: la columna se estira y el panel se
+     ancla adentro, así nunca es más alto que lo que tiene al lado. */
+  .detailColumn {
+    position: relative;
+    min-height: 0;
+  }
+
+  .detail,
+  .detailPlaceholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    max-height: 100%;
+    overflow-y: auto;
+    margin-right: var(--space-1);
   }
 }
 
@@ -102,9 +131,16 @@
   display: grid;
   gap: var(--space-2);
   grid-template-columns: repeat(7, minmax(0, 1fr));
+  max-height: var(--agenda-alto);
+  overflow-y: auto;
 }
 
+/* Los rótulos de día se quedan arriba cuando el mes no entra entero. */
 .weekdayLabel {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: var(--bg, var(--surface));
   font-size: var(--text-2xs);
   font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-wide);
@@ -118,7 +154,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  min-height: 96px;
+  min-height: 76px;
   padding: var(--space-2);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-md);
@@ -203,7 +239,18 @@
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-md);
   background-color: var(--surface);
-  overflow: hidden;
+  max-height: var(--agenda-alto);
+  overflow: auto;
+}
+
+/* La fila de días queda fija: al desplazarse por las horas hay que seguir
+   sabiendo de qué día es cada columna. */
+.timeHeaderSpacer,
+.timeHeader {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: var(--surface);
 }
 
 .timeHeaderSpacer {

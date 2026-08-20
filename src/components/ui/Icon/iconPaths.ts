@@ -64,6 +64,10 @@ export const ICON_PATHS = {
   compass: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18M15.5 8.5l-2 5-5 2 2-5z',
   /* Rumbot. Globo de conversación con la cola hacia abajo a la izquierda, como
      el de `feedback`, pero con los tres puntos: acá se habla, no se devuelve. */
+  /* Persona con un más: invitar a alguien a un Espacio. Reusa el trazo de
+     `profile` para que las dos figuras humanas se lean como la misma familia. */
+  userPlus:
+    'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M19 8v6M22 11h-6',
   assistant:
     'M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.6-.7L3 21l1.9-4.5A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01',
 } as const;

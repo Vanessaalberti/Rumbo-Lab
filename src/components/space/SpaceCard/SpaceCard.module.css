@@ -57,6 +57,10 @@
  * el centro.
  */
 .avatar {
+  /* `position` porque la portada es un elemento posicionado y, sin esto, se
+     pinta encima del avatar por más que venga antes en el documento. */
+  position: relative;
+  z-index: 1;
   margin-top: -28px;
   margin-bottom: var(--space-2);
   box-shadow: 0 0 0 3px var(--surface);

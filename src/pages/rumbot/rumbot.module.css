@@ -1,16 +1,156 @@
 /*
- * Rumbot. La misma pantalla en Mi Rumbo y en el panel de Mentor: el número es
- * de la cuenta, no del rol, así que tener dos configuraciones para el mismo
- * WhatsApp sería contradictorio.
+ * Rumbot. La misma pantalla en Mi Rumbo y en el panel de Mentor: el número y
+ * las preferencias son de la cuenta, no del rol, así que dos configuraciones
+ * para el mismo WhatsApp se contradirían entre sí.
+ *
+ * Tres columnas numeradas, en el orden en que se recorre: primero se entiende
+ * qué es y se conecta, después qué avisa, y al final cuándo.
  */
 
-.body {
+/* --- Cabecera ------------------------------------------------------------------------ */
+
+.hero {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-5);
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-6);
 }
 
-.block {
+.heroIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-lg);
+  background-color: var(--brand-tint);
+  color: var(--brand);
+  flex-shrink: 0;
+}
+
+.heroText {
+  min-width: 0;
+}
+
+.heroTitleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.heroTitle {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
+  color: var(--text);
+}
+
+.heroMeta {
+  font-size: var(--text-sm);
+  color: var(--text-soft);
+}
+
+/* Tarjeta de estado: responde "¿anda?" antes de que haya que tocar nada. */
+.statusCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-left: auto;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background-color: var(--surface);
+}
+
+.statusHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--text-soft);
+}
+
+.statusValue {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: var(--weight-medium);
+  color: var(--brand);
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background-color: var(--brand);
+}
+
+.statusText {
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-5);
+  align-items: start;
+}
+
+@media (max-width: 1100px) {
+  .columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.columnTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--text);
+}
+
+/* El ícono va al final del título, empujado al borde: nombra la columna sin competir con el número. */
+.columnIcon {
+  margin-left: auto;
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+/* El número como bloque y no como texto suelto: es lo que da el orden de un
+   vistazo cuando las tres columnas se ven a la vez. */
+.columnNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  background-color: var(--brand);
+  color: var(--surface);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Tarjetas ---------------------------------------------------------------------- */
+
+.card {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
@@ -20,8 +160,8 @@
   background-color: var(--surface);
 }
 
-.blockTitle {
-  font-size: var(--text-base);
+.cardTitle {
+  font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
   color: var(--text);
 }
@@ -32,9 +172,22 @@
   color: var(--text-soft);
 }
 
-/* --- Estado del vínculo -------------------------------------------------------- */
+.bullets {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-left: var(--space-5);
+  list-style: disc;
+}
 
-.linked {
+.bullets li {
+  font-size: var(--text-sm);
+  color: var(--text-soft);
+}
+
+/* --- Estado del vínculo -------------------------------------------------------------- */
+
+.linkedRow {
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -42,72 +195,92 @@
 }
 
 .phone {
-  font-size: var(--text-base);
-  font-weight: var(--weight-medium);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
   color: var(--text);
   font-variant-numeric: tabular-nums;
 }
 
-.linkedMeta {
-  margin-right: auto;
-  font-size: var(--text-sm);
-  color: var(--text-faint);
+/* Con tilde y en el color de marca: el estado se lee de un vistazo, sin leer la palabra. */
+.badgeOk {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background-color: var(--surface-sunken);
+  color: var(--brand);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
 }
 
-/* --- Formulario ------------------------------------------------------------------ */
+/* --- Cómo vincular: los tres pasos ---------------------------------------------------- */
 
-.field {
+.steps {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-sunken);
+}
+
+.step {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--space-2);
+  flex: 1;
+  min-width: 0;
+  text-align: center;
 }
 
-.fieldLabel {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  color: var(--text);
+.stepIcon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--brand);
+  background-color: var(--surface);
+  color: var(--brand);
 }
 
-.hint {
+/* El orden va pegado al ícono: sin el número, tres círculos iguales no dicen cuál va primero. */
+.stepNumber {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-full);
+  background-color: var(--brand);
+  color: var(--surface);
+  font-size: 10px;
+  font-weight: var(--weight-semibold);
+}
+
+.stepLabel {
   font-size: var(--text-xs);
+  line-height: 1.3;
+  color: var(--text-soft);
+}
+
+.stepArrow {
+  margin-top: 14px;
+  flex-shrink: 0;
   color: var(--text-faint);
 }
 
-.input {
-  width: 100%;
-  max-width: 20rem;
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background-color: var(--surface-raised);
-  color: var(--text);
-  font-size: var(--text-sm);
-  font-family: inherit;
-}
-
-.input:focus-visible {
-  outline: 2px solid var(--brand);
-  outline-offset: 1px;
-}
-
-.actions {
-  display: flex;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-}
-
-.errorState {
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
-  background-color: var(--error-tint);
-  color: var(--error-strong);
-  font-size: var(--text-sm);
-}
-
-/* --- Preferencias ------------------------------------------------------------------ */
+/* --- Preferencias ---------------------------------------------------------------------- */
 
 /*
- * Cada preferencia es una fila con su explicación: sin ella un rótulo como
+ * Cada preferencia lleva su explicación: sin ella un rótulo como
  * "Recordatorios" no dice cuándo llega el mensaje, y quien no sabe qué activa
  * no lo activa.
  */
@@ -115,12 +288,13 @@
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
-  padding: var(--space-3) 0;
+  padding: var(--space-4) 0;
   border-bottom: 1px solid var(--border);
 }
 
 .pref:last-of-type {
   border-bottom: none;
+  padding-bottom: 0;
 }
 
 .prefMain {
@@ -143,44 +317,90 @@
   color: var(--text-faint);
 }
 
-.prefControl {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-shrink: 0;
-}
-
-.checkbox {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--brand);
-  cursor: pointer;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
 /* El detalle de una preferencia apagada no se oculta: se atenúa, para que se vea qué se está perdiendo. */
 .prefOff {
   opacity: 0.55;
 }
 
-.inlineSelect {
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background-color: var(--surface-raised);
-  color: var(--text);
-  font-size: var(--text-xs);
-  font-family: inherit;
+/* --- Interruptor ------------------------------------------------------------------------- */
+
+.toggle {
+  position: relative;
+  flex-shrink: 0;
+  width: 40px;
+  height: 22px;
+  margin-top: 2px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background-color: var(--border);
+  cursor: pointer;
+  transition: background-color 160ms ease;
 }
 
-.quiet {
+.toggleOn {
+  background-color: var(--brand);
+}
+
+.toggle:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.toggleKnob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-full);
+  background-color: var(--surface);
+  transition: transform 160ms ease;
+}
+
+.toggleOn .toggleKnob {
+  transform: translateX(18px);
+}
+
+/* --- Horarios ------------------------------------------------------------------------------ */
+
+.quietRow {
   display: flex;
   align-items: center;
   gap: var(--space-2);
   flex-wrap: wrap;
   font-size: var(--text-sm);
   color: var(--text-soft);
+}
+
+/*
+ * Las 24 horas como una barra: leer "de 22 a 8" cuesta más que ver la franja.
+ * Se dibuja con 24 celdas y no con un gradiente porque el silencio puede cruzar
+ * la medianoche, y ahí son dos tramos y no uno.
+ */
+.band {
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  gap: 2px;
+  margin-top: var(--space-1);
+}
+
+.bandHour {
+  height: 10px;
+  border-radius: 2px;
+  background-color: var(--border);
+}
+
+.bandHourQuiet {
+  background-color: var(--brand);
+}
+
+.bandScale {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
 }
 
 .timezoneSwap {
@@ -198,18 +418,59 @@
   color: var(--text);
 }
 
-/* --- Teléfono con país ------------------------------------------------------------- */
+/* Ocupa el lugar del botón de guardar del boceto: acá cada cambio ya se guardó solo. */
+.savedNote {
+  align-self: flex-end;
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+}
 
-.phoneRow {
+/* --- Formularios --------------------------------------------------------------------------- */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.fieldLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text);
+}
+
+.hint {
+  font-size: var(--text-xs);
+  line-height: var(--leading-relaxed);
+  color: var(--text-faint);
+}
+
+.actions {
   display: flex;
   gap: var(--space-2);
   flex-wrap: wrap;
+  align-items: center;
 }
 
-.countrySelect {
-  flex: 1 1 14rem;
-  min-width: 0;
-  max-width: 18rem;
+/* Los botones de una tarjeta angosta ocupan el ancho: no hay lugar para ponerlos al costado. */
+.fullWidthAction {
+  display: flex;
+}
+
+.fullWidthAction > * {
+  flex: 1;
+}
+
+.errorState {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background-color: var(--error-tint);
+  color: var(--error-strong);
+  font-size: var(--text-sm);
+}
+
+.inlineSelect {
+  width: 100%;
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
@@ -219,18 +480,55 @@
   font-family: inherit;
 }
 
-/* El prefijo va adentro del recuadro: es parte del número, no una etiqueta suelta. */
+.hourSelect {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background-color: var(--surface-raised);
+  color: var(--text);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+.inlineSelect:focus-visible,
+.hourSelect:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+}
+
+/* --- Teléfono con país ------------------------------------------------------------- */
+
+.phoneRow {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.countrySelect {
+  flex: 1 1 100%;
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background-color: var(--surface-raised);
+  color: var(--text);
+  font-size: var(--text-sm);
+  font-family: inherit;
+}
+
 .phoneInputWrap {
   display: flex;
   align-items: center;
-  flex: 1 1 11rem;
+  flex: 1 1 100%;
   min-width: 0;
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background-color: var(--surface-raised);
 }
 
-.phoneInputWrap:focus-within {
+.phoneInputWrap:focus-within,
+.countrySelect:focus-visible {
   outline: 2px solid var(--brand);
   outline-offset: 1px;
 }
@@ -258,11 +556,6 @@
   outline: none;
 }
 
-.countrySelect:focus-visible {
-  outline: 2px solid var(--brand);
-  outline-offset: 1px;
-}
-
 /* --- Código en seis recuadros --------------------------------------------------------- */
 
 .codeRow {
@@ -271,14 +564,15 @@
 }
 
 .codeBox {
-  width: 2.75rem;
-  height: 3.25rem;
+  flex: 1;
+  min-width: 0;
+  height: 3rem;
   padding: 0;
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background-color: var(--surface-raised);
   color: var(--text);
-  font-size: var(--text-xl);
+  font-size: var(--text-lg);
   font-family: inherit;
   font-variant-numeric: tabular-nums;
   text-align: center;
@@ -293,20 +587,15 @@
   opacity: 0.6;
 }
 
-@media (max-width: 380px) {
-  .codeBox {
-    width: 2.25rem;
-    height: 2.75rem;
-    font-size: var(--text-lg);
-  }
-}
-
 /* --- Vínculo por WhatsApp -------------------------------------------------------- */
 
 /* Enlace con peso de botón: abre WhatsApp, así que tiene que ser un `a` de verdad. */
 .whatsappButton {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  flex: 1;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-md);
   background-color: var(--brand);
@@ -321,8 +610,8 @@
 
 .linkCode {
   display: flex;
-  align-items: baseline;
-  gap: var(--space-3);
+  flex-direction: column;
+  gap: var(--space-1);
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
   background-color: var(--surface-sunken);
@@ -338,7 +627,6 @@
   font-weight: var(--weight-semibold);
   color: var(--text);
   letter-spacing: var(--tracking-widest);
-  font-variant-numeric: tabular-nums;
 }
 
 .waiting {
@@ -352,5 +640,11 @@
   padding-top: var(--space-4);
   border-top: 1px solid var(--border);
   font-size: var(--text-xs);
+  color: var(--text-faint);
+}
+
+/* Sin número configurado no hay conexión que anunciar: se dice, no se pinta de verde. */
+.statusOff {
+  font-weight: var(--weight-medium);
   color: var(--text-faint);
 }
