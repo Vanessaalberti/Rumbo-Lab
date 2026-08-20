@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/Button';
+import { cx } from '@/utils/classNames';
 import {
   readWhatsappLink,
   requestWhatsappLinkCode,
@@ -115,7 +116,7 @@ export function LinkByWhatsappPanel({ onLinked }: LinkByWhatsappPanelProps) {
       <div className={styles.actions}>
         {/* `noreferrer` porque abre en otra pestaña hacia un dominio ajeno. */}
         <a
-          className={styles.whatsappButton}
+          className={cx(styles.whatsappButton, styles.whatsappButtonWide)}
           href={invite.whatsappUrl}
           target="_blank"
           rel="noreferrer"
