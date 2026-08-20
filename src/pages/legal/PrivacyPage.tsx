@@ -13,8 +13,8 @@ import styles from './PrivacyPage.module.css';
  * distinto de lo que hace el código es peor que no tener ninguna.
  */
 
-/** A dónde escribir para ejercer los derechos de abajo. Reemplazar antes de publicar. */
-const CONTACT_EMAIL = 'REEMPLAZAR@rumbolab.com';
+/** A dónde escribir para ejercer los derechos de abajo. Meta lo revisa al publicar la app. */
+const CONTACT_EMAIL = 'vanessa.a0577346@gmail.com';
 
 const LAST_UPDATED = '19 de agosto de 2026';
 
