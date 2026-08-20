@@ -14,13 +14,16 @@ import {
   getSpaceDetail,
   revokeInvitation,
 } from '@/services/data/mentor/mentor.service';
-import type { SpaceDetail, SpaceInvitation } from '@/services/data/mentor/mentor.types';
-import { cx } from '@/utils/classNames';
+import type { SpaceDetail, SpaceInvitation, SpaceMember } from '@/services/data/mentor/mentor.types';
+import { spaceColorStyle } from '@/utils/spaceColor';
+import { EditSpaceModal } from './EditSpaceModal';
 import { InviteField } from './InviteField';
 import { invitationShareValue, parseEmails } from './invitationSharing';
-import { spaceColorStyle } from '../spaceColor';
 import screen from '@/app/layouts/appShell.module.css';
 import styles from '../mentor.module.css';
+
+/** Cuánta gente entra en la columna lateral antes de mandar al resto a "Ver todos". */
+const ASIDE_MEMBERS = 6;
 
 /** La ficha de un Espacio. Pide sus datos por su cuenta: miembros e invitaciones sólo hacen falta acá. */
 export function SpaceDetailSection() {
@@ -60,61 +63,133 @@ export function SpaceDetailSection() {
     <div className={styles.body}>
       <BackLink />
 
-      <div className={screen.header}>
-        <div>
-          <p className={screen.headerTitle}>
-            <span className={cx(styles.colorDot, styles.colorDotLarge)} style={spaceColorStyle(space.color)} />{' '}
-            {space.name}
-          </p>
-          <p className={screen.headerMeta}>
-            {apprentices.length} {apprentices.length === 1 ? 'aprendiz' : 'aprendices'}
+      <SpaceHero space={space} memberCount={apprentices.length} onChanged={load} />
+
+      <div className={styles.spaceLayout}>
+        <div className={styles.spaceMain}>
+          {space.description && <p className={styles.cardText}>{space.description}</p>}
+
+          <Card padding="lg">
+            <SpaceInvites spaceId={space.id} spaceCode={space.code} onInvited={load} />
+          </Card>
+
+          {pendingInvitations.length > 0 && (
+            <section className={styles.block}>
+              <p className={styles.blockTitle}>Invitaciones por correo sin usar</p>
+              {pendingInvitations.map((invitation) => (
+                <InvitationRow key={invitation.id} invitation={invitation} onRevoked={load} />
+              ))}
+            </section>
+          )}
+        </div>
+
+        <MembersAside members={apprentices} />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Portada, foto y nombre, con editar y eliminar en la esquina. Repite la
+ * identidad de la tarjeta del listado a propósito: entrar a un Espacio no
+ * debería hacer dudar de a cuál se entró.
+ */
+function SpaceHero({
+  space,
+  memberCount,
+  onChanged,
+}: {
+  space: SpaceDetail['space'];
+  memberCount: number;
+  onChanged: () => void;
+}) {
+  const [editing, setEditing] = useState(false);
+
+  return (
+    <div className={styles.spaceHero}>
+      <div className={styles.spaceCover} style={spaceColorStyle(space.color)}>
+        {space.coverUrl && <img className={styles.spaceCoverImage} src={space.coverUrl} alt="" />}
+
+        <div className={styles.spaceHeroEdit}>
+          <Button type="button" variant="secondary" size="sm" iconLeading="pencil" onClick={() => setEditing(true)}>
+            Editar
+          </Button>
+        </div>
+      </div>
+
+      <div className={styles.spaceHeroBody}>
+        <Avatar
+          name={space.name}
+          src={space.avatarUrl ?? undefined}
+          size="xl"
+          className={styles.spaceHeroAvatar}
+        />
+
+        <div className={styles.spaceHeroText}>
+          <p className={styles.spaceHeroName}>{space.name}</p>
+          <p className={styles.spaceHeroMeta}>
+            {memberCount} {memberCount === 1 ? 'integrante' : 'integrantes'}
           </p>
         </div>
 
-        <DeleteSpaceButton spaceId={space.id} spaceName={space.name} />
+        <div className={styles.spaceHeroActions}>
+          <DeleteSpaceButton spaceId={space.id} spaceName={space.name} />
+        </div>
       </div>
 
-      {space.description && <p className={styles.cardText}>{space.description}</p>}
+      <EditSpaceModal
+        open={editing}
+        space={space}
+        onClose={() => setEditing(false)}
+        onSaved={onChanged}
+      />
+    </div>
+  );
+}
 
-      <Card padding="lg">
-        <SpaceInvites spaceId={space.id} spaceCode={space.code} onInvited={load} />
-      </Card>
+/** Quiénes están, al costado. Se muestran unos pocos porque es una referencia, no la tarea. */
+function MembersAside({ members }: { members: SpaceMember[] }) {
+  const [showingAll, setShowingAll] = useState(false);
 
-      {pendingInvitations.length > 0 && (
-        <section className={styles.block}>
-          <p className={styles.blockTitle}>Invitaciones por correo sin usar</p>
-          {pendingInvitations.map((invitation) => (
-            <InvitationRow key={invitation.id} invitation={invitation} onRevoked={load} />
-          ))}
-        </section>
+  return (
+    <aside className={styles.spaceAside}>
+      <p className={styles.blockTitle}>Integrantes</p>
+
+      {members.length === 0 ? (
+        <p className={screen.emptyState}>
+          Todavía no entró nadie. Las invitaciones aparecen acá cuando se aceptan.
+        </p>
+      ) : (
+        <>
+          <MemberList members={members.slice(0, ASIDE_MEMBERS)} />
+
+          {members.length > ASIDE_MEMBERS && (
+            <button type="button" className={styles.spaceAsideLink} onClick={() => setShowingAll(true)}>
+              Ver todos ({members.length}) →
+            </button>
+          )}
+        </>
       )}
 
-      <section className={styles.block}>
-        <p className={styles.blockTitle}>Quiénes están</p>
+      <Modal open={showingAll} title="Integrantes" onClose={() => setShowingAll(false)}>
+        <MemberList members={members} />
+      </Modal>
+    </aside>
+  );
+}
 
-        {apprentices.length === 0 ? (
-          <p className={screen.emptyState}>
-            Todavía no entró nadie. Las invitaciones que crees arriba aparecen acá cuando se
-            aceptan.
-          </p>
-        ) : (
-          <div className={styles.people}>
-            {apprentices.map((person) => (
-              <div key={person.id ?? person.joinedAt} className={styles.person}>
-                <Avatar
-                  name={person.fullName ?? 'Aprendiz'}
-                  src={person.avatarUrl ?? undefined}
-                  size="sm"
-                />
-                <div className={styles.personText}>
-                  <p className={styles.personName}>{person.fullName ?? 'Sin nombre'}</p>
-                  {person.headline && <p className={styles.personMeta}>{person.headline}</p>}
-                </div>
-              </div>
-            ))}
+function MemberList({ members }: { members: SpaceMember[] }) {
+  return (
+    <div className={styles.people}>
+      {members.map((person) => (
+        <div key={person.id ?? person.joinedAt} className={styles.person}>
+          <Avatar name={person.fullName ?? 'Aprendiz'} src={person.avatarUrl ?? undefined} size="sm" />
+          <div className={styles.personText}>
+            <p className={styles.personName}>{person.fullName ?? 'Sin nombre'}</p>
+            {person.headline && <p className={styles.personMeta}>{person.headline}</p>}
           </div>
-        )}
-      </section>
+        </div>
+      ))}
     </div>
   );
 }

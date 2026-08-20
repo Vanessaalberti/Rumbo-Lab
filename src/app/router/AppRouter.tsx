@@ -8,11 +8,13 @@ import { RequireAuth } from '@/app/guards/RequireAuth';
 import { RequireExperience } from '@/app/guards/RequireExperience';
 import { RedirectIfAuthenticated } from '@/app/guards/RedirectIfAuthenticated';
 import { LandingPage } from '@/pages/landing';
+import { PrivacyPage } from '@/pages/legal';
 import { CreateSpacePage, SignInPage } from '@/pages/authentication';
 import { ChooseExperiencePage } from '@/pages/experience';
 import { JoinSpacePage } from '@/pages/espacios';
 import {
   ApplicationsSection,
+  ApprenticeSpaceSection,
   AtsTesterSection,
   CvMatchSection,
   CvsSection,
@@ -35,6 +37,7 @@ import {
   MentorSpacesSection,
   SpaceDetailSection,
 } from '@/pages/mentor';
+import { RumbotSection } from '@/pages/rumbot';
 import { SettingsPage } from '@/pages/settings';
 import { NotFoundPage } from '@/pages/errors';
 import { ROUTES } from '@/constants/routes';
@@ -54,6 +57,7 @@ export function AppRouter() {
       <Routes>
         <Route element={<PublicLayout />}>
           <Route path={ROUTES.landing} element={<LandingPage />} />
+          <Route path={ROUTES.privacy} element={<PrivacyPage />} />
           <Route path={ROUTES.notFound} element={<NotFoundPage />} />
         </Route>
 
@@ -79,6 +83,8 @@ export function AppRouter() {
                 <Route path="cvs" element={<CvsSection />} />
                 <Route path="objetivos" element={<GoalsSection />} />
                 <Route path="espacios" element={<SpacesSection />} />
+                <Route path="espacios/:id" element={<ApprenticeSpaceSection />} />
+                <Route path="rumbot" element={<RumbotSection />} />
                 <Route path="preparacion" element={<PreparationSection />} />
                 <Route path="preparacion/comparar-cv" element={<CvMatchSection />} />
                 <Route path="preparacion/oratoria" element={<OratoriaSection />} />
@@ -99,6 +105,9 @@ export function AppRouter() {
                 <Route path="feedbacks" element={<MentorFeedbacksSection />} />
                 <Route path="agenda" element={<AgendaSection />} />
                 <Route path="preparacion" element={<MentorPreparationSection />} />
+                {/* El mismo componente que en Mi Rumbo: el número y las
+                    preferencias son de la cuenta, no de la experiencia. */}
+                <Route path="rumbot" element={<RumbotSection />} />
                 {/* Las mismas herramientas de Mi Rumbo: el componente es el
                     mismo, sólo cambia el shell que lo monta. */}
                 <Route path="preparacion/comparar-cv" element={<CvMatchSection />} />

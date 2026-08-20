@@ -38,6 +38,9 @@ export interface MentorSpaceSummary {
   /** El identificador del espacio: es su código de invitación y lo que lleva el link. */
   code: string;
   color: SpaceColor;
+  /** Foto y portada del Espacio, en el bucket `avatars` bajo `espacios/{id}/`. */
+  avatarUrl: string | null;
+  coverUrl: string | null;
   apprenticeCount: number;
   createdAt: string;
 }
@@ -121,6 +124,8 @@ export interface SpaceDetail {
     description: string | null;
     code: string;
     color: SpaceColor;
+    avatarUrl: string | null;
+    coverUrl: string | null;
     createdAt: string;
   };
   apprentices: SpaceMember[];

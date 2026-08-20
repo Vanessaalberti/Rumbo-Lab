@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button, LinkButton } from '@/components/ui/Button';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
-import { RumbotSection } from './RumbotSection';
+import { RumbotLink } from './RumbotLink';
 import { DeleteAccountSection } from './DeleteAccountSection';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/hooks/useAuth';
@@ -101,7 +101,7 @@ export function SettingsPage() {
         )}
       </section>
 
-      <RumbotSection />
+      <RumbotLink />
 
       <section className={styles.section}>
         <span className={styles.label}>Apariencia</span>

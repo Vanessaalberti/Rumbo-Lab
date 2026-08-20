@@ -62,6 +62,10 @@ export const ICON_PATHS = {
   star: 'M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z',
   spark: 'M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.4z',
   compass: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18M15.5 8.5l-2 5-5 2 2-5z',
+  /* Rumbot. Globo de conversación con la cola hacia abajo a la izquierda, como
+     el de `feedback`, pero con los tres puntos: acá se habla, no se devuelve. */
+  assistant:
+    'M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.6-.7L3 21l1.9-4.5A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01',
 } as const;
 
 export type IconName = keyof typeof ICON_PATHS;

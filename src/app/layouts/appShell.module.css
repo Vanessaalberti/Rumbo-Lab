@@ -425,3 +425,18 @@
     padding: var(--space-4) var(--space-3);
   }
 }
+
+/*
+ * El punto de aviso del rail: algo llegó y espera una respuesta en esa sección.
+ * Va empujado al extremo derecho para que no dependa del largo de la etiqueta,
+ * y con `aria-label` en el elemento, porque un color solo no es información
+ * para quien no lo ve.
+ */
+.railDot {
+  margin-left: auto;
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background-color: var(--brand);
+}

@@ -24,10 +24,11 @@ export const APPRENTICE_RAIL: ApprenticeRailItem[] = [
 ];
 
 /**
- * Preparación va aparte, separada por un filete: no es una sección más del
- * recorrido, las otras seis **registran** lo que la persona hizo y esta la
- * **entrena** para lo que viene.
+ * Preparación y Rumbot van aparte, separadas por un filete: no son secciones
+ * más del recorrido. Las otras seis **registran** lo que la persona hizo;
+ * estas dos la acompañan hacia lo que viene.
  */
 export const APPRENTICE_RAIL_PRACTICE: ApprenticeRailItem[] = [
   { label: 'Preparación', icon: 'spark', href: ROUTES.myRumboPreparation },
+  { label: 'Rumbot', icon: 'assistant', href: ROUTES.myRumboRumbot },
 ];

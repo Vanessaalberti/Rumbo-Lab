@@ -1,4 +1,5 @@
 import type { NavigationItem } from '@/constants/navigation';
+import { ROUTES } from '@/constants/routes';
 
 interface FooterColumn {
   title: string;
@@ -35,7 +36,7 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
     items: [
       { label: 'Cómo funciona', href: '#solucion' },
       { label: 'Historias', href: '#testimonios' },
-      { label: 'Privacidad', href: '#comenzar' },
+      { label: 'Privacidad', href: ROUTES.privacy },
       { label: 'Contacto', href: '#comenzar' },
     ],
   },

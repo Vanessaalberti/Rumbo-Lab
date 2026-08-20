@@ -172,3 +172,15 @@
   line-height: var(--leading-relaxed);
   color: var(--text);
 }
+
+/* Un enlace que ocupa el lugar de un botón en la fila: mismo peso visual, sin fingir que es una acción. */
+.rowLink {
+  flex-shrink: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--brand);
+}
+
+.rowLink:hover {
+  text-decoration: underline;
+}

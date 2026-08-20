@@ -31,7 +31,7 @@ import {
   HOUR_HEIGHT,
   type AgendaView,
 } from './agendaRange';
-import { spaceColorStyle } from '../spaceColor';
+import { spaceColorStyle } from '@/utils/spaceColor';
 import screen from '@/app/layouts/appShell.module.css';
 import mentor from '../mentor.module.css';
 import styles from './agenda.module.css';

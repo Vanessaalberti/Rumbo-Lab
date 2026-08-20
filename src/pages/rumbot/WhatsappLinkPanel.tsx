@@ -7,7 +7,7 @@ import {
   unlinkWhatsapp,
   type WhatsappLinkState,
 } from '@/services/data/settings/rumbot.service';
-import styles from './SettingsPage.module.css';
+import styles from './rumbot.module.css';
 
 type Step =
   | { name: 'loading' }
@@ -16,11 +16,12 @@ type Step =
   | { name: 'linked'; phone: string };
 
 /**
- * Rumbot · el asistente de WhatsApp. Va en Configuración porque el número es de
- * **la cuenta**. **Todavía no hay línea**: mientras no la haya el código no se
- * entrega y la pantalla lo dice, en vez de simular un envío.
+ * Vincular el número. Es de **la cuenta**, no de una experiencia: quien es
+ * aprendiz y mentor tiene un solo WhatsApp. Mientras no haya línea conectada
+ * el código se genera igual pero no se puede entregar, y la pantalla lo dice
+ * en vez de simular un envío.
  */
-export function RumbotSection() {
+export function WhatsappLinkPanel() {
   const phoneId = useId();
   const codeId = useId();
 
@@ -80,9 +81,7 @@ export function RumbotSection() {
     setBusy(false);
 
     if (result.status !== 'success') {
-      setError(
-        result.status === 'error' ? result.error.message : 'No se pudo confirmar el código.',
-      );
+      setError(result.status === 'error' ? result.error.message : 'No se pudo confirmar el código.');
       return;
     }
 
@@ -99,23 +98,20 @@ export function RumbotSection() {
   };
 
   return (
-    <section className={styles.section}>
-      <span className={styles.label}>Rumbot · WhatsApp</span>
-      <p className={styles.rowMeta}>
-        Vinculá tu número para poder registrar postulaciones y consultar tus cosas escribiéndole a
-        Rumbot por WhatsApp.
+    <section className={styles.block}>
+      <p className={styles.blockTitle}>Tu WhatsApp</p>
+      <p className={styles.blockText}>
+        Vinculá tu número para escribirle a Rumbot y para que pueda avisarte. Confirmamos que el
+        número es tuyo con un código: sin eso, cualquiera que supiera tu teléfono podría hablar en
+        tu nombre.
       </p>
 
-      {step.name === 'loading' && <p className={styles.rowMeta}>Cargando…</p>}
+      {step.name === 'loading' && <p className={styles.blockText}>Cargando…</p>}
 
       {step.name === 'linked' && (
-        <div className={styles.row}>
-          <div className={styles.rowMain}>
-            <p className={styles.rowTitle}>{step.phone}</p>
-            <p className={styles.rowMeta}>
-              Número confirmado. Rumbot va a reconocerte cuando le escribas desde acá.
-            </p>
-          </div>
+        <div className={styles.linked}>
+          <span className={styles.phone}>{step.phone}</span>
+          <span className={styles.linkedMeta}>Confirmado</span>
           <Button type="button" variant="ghost" size="sm" onClick={() => void unlink()} disabled={busy}>
             Desvincular
           </Button>
@@ -139,7 +135,7 @@ export function RumbotSection() {
               disabled={busy}
               autoComplete="tel"
             />
-            <p className={styles.rowMeta}>Con el código de país, como lo tenés en WhatsApp.</p>
+            <p className={styles.hint}>Con el código de país, como lo tenés en WhatsApp.</p>
           </div>
 
           {error && (
@@ -148,14 +144,16 @@ export function RumbotSection() {
             </p>
           )}
 
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => void start()}
-            disabled={busy || phone.trim().length === 0}
-          >
-            {busy ? 'Enviando…' : 'Enviarme el código'}
-          </Button>
+          <div className={styles.actions}>
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => void start()}
+              disabled={busy || phone.trim().length === 0}
+            >
+              {busy ? 'Enviando…' : 'Enviarme el código'}
+            </Button>
+          </div>
         </>
       )}
 
@@ -175,7 +173,7 @@ export function RumbotSection() {
               disabled={busy}
               autoComplete="one-time-code"
             />
-            <p className={styles.rowMeta}>
+            <p className={styles.hint}>
               {step.delivered
                 ? `Te lo mandamos por WhatsApp a ${step.phone}. Vence en 10 minutos.`
                 : 'Todavía no hay línea de WhatsApp conectada, así que el código no se pudo enviar: quedó registrado en el log del servidor.'}
@@ -189,12 +187,7 @@ export function RumbotSection() {
           )}
 
           <div className={styles.actions}>
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => void confirm()}
-              disabled={busy || code.length !== 6}
-            >
+            <Button type="button" size="sm" onClick={() => void confirm()} disabled={busy || code.length !== 6}>
               {busy ? 'Confirmando…' : 'Confirmar'}
             </Button>
             <Button type="button" variant="ghost" size="sm" onClick={() => void unlink()} disabled={busy}>
@@ -205,8 +198,9 @@ export function RumbotSection() {
       )}
 
       {!canDeliver && step.name !== 'loading' && (
-        <p className={styles.rowMeta}>
-          Rumbot está en construcción: la línea de WhatsApp todavía no está conectada.
+        <p className={styles.hint}>
+          Rumbot todavía no tiene su línea de WhatsApp conectada. Podés dejar configurado lo de
+          abajo: vale desde el primer mensaje que mande.
         </p>
       )}
     </section>

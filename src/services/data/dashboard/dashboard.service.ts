@@ -13,3 +13,8 @@ export function updateApprenticeProfile(
 ): Promise<AsyncState<{ apprentice: ApprenticeProfile }>> {
   return httpClient.patch('/me/profile', patch);
 }
+
+/** Apaga la parte de feedback del aviso de Espacios; las invitaciones siguen contando. */
+export function markSpacesSeen(): Promise<AsyncState<{ ok: boolean }>> {
+  return httpClient.post('/me/spaces-seen', {});
+}

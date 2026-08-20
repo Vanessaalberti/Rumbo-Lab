@@ -5,7 +5,7 @@ import {
   type SpaceColor,
 } from '@/services/data/mentor/mentor.types';
 import { cx } from '@/utils/classNames';
-import { isCustomColor, spaceColorStyle } from '../spaceColor';
+import { isCustomColor, spaceColorStyle } from '@/utils/spaceColor';
 import styles from '../mentor.module.css';
 
 interface SpaceColorPickerProps {

@@ -11,7 +11,7 @@ interface RailItem {
   href: string;
 }
 
-function RailLink({ item }: { item: RailItem }) {
+function RailLink({ item, notice }: { item: RailItem; notice?: boolean }) {
   return (
     <NavLink
       to={item.href}
@@ -20,6 +20,7 @@ function RailLink({ item }: { item: RailItem }) {
     >
       <Icon name={item.icon} size={16} className={styles.railIcon} />
       {item.label}
+      {notice && <span className={styles.railDot} role="status" aria-label="Tenés algo sin ver" />}
     </NavLink>
   );
 }
@@ -32,13 +33,17 @@ function RailLink({ item }: { item: RailItem }) {
  * separación es la diferencia entre mirar hacia atrás y prepararse para
  * adelante.
  */
-export function AppRail() {
+export function AppRail({ spacesNotice = false }: { spacesNotice?: boolean }) {
   return (
     <nav className={styles.rail} aria-label="Mi Rumbo">
       <p className={styles.railLabel}>Mi Rumbo</p>
 
       {APPRENTICE_RAIL.map((item) => (
-        <RailLink key={item.label} item={item} />
+        <RailLink
+          key={item.label}
+          item={item}
+          notice={item.href === ROUTES.myRumboSpaces && spacesNotice}
+        />
       ))}
 
       <hr className={styles.railDivider} />

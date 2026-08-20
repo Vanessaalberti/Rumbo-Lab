@@ -36,3 +36,31 @@ export function confirmWhatsappCode(
 export function unlinkWhatsapp(): Promise<AsyncState<{ ok: boolean }>> {
   return httpClient.delete('/settings/whatsapp');
 }
+
+/**
+ * Qué le puede escribir Rumbot. Sin fila guardada el servidor devuelve los
+ * valores por defecto, que son los que va a aplicar: la pantalla muestra lo
+ * que el bot realmente hace, no un formulario vacío.
+ */
+export interface RumbotPreferences {
+  agendaReminders: boolean;
+  agendaLeadMinutes: number;
+  applyNudges: boolean;
+  applyNudgeDays: number;
+  weeklySummary: boolean;
+  /** Franja en la que no escribe, en hora local de la persona. */
+  quietStart: number;
+  quietEnd: number;
+  timezone: string;
+}
+
+export function readRumbotPreferences(): Promise<AsyncState<{ preferences: RumbotPreferences }>> {
+  return httpClient.get('/settings/rumbot');
+}
+
+/** Parcial: viaja sólo lo que se tocó. */
+export function saveRumbotPreferences(
+  input: Partial<RumbotPreferences>,
+): Promise<AsyncState<{ preferences: RumbotPreferences }>> {
+  return httpClient.patch('/settings/rumbot', input);
+}

@@ -18,7 +18,8 @@ export const MENTOR_RAIL: MentorRailItem[] = [
   { label: 'Agenda', icon: 'calendar', href: ROUTES.mentorAgenda },
 ];
 
-/** Aparte, con el mismo criterio que en Mi Rumbo: las otras registran, esta entrena. */
+/** Aparte, con el mismo criterio que en Mi Rumbo: las otras registran, estas acompañan. */
 export const MENTOR_RAIL_PRACTICE: MentorRailItem[] = [
   { label: 'Preparación', icon: 'spark', href: ROUTES.mentorPreparation },
+  { label: 'Rumbot', icon: 'assistant', href: ROUTES.mentorRumbot },
 ];

@@ -1,12 +1,10 @@
 import { useState } from 'react';
-import { Link, useNavigate, useOutletContext } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import type { MentorShellContext } from '@/app/layouts/MentorShell';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
+import { SpaceCard, SpaceCardGrid } from '@/components/space/SpaceCard';
 import { mentorSpacePath } from '@/constants/routes';
-import { cx } from '@/utils/classNames';
 import { NewSpaceModal } from './NewSpaceModal';
-import { spaceColorStyle } from '../spaceColor';
 import screen from '@/app/layouts/appShell.module.css';
 import styles from '../mentor.module.css';
 
@@ -45,24 +43,11 @@ export function MentorSpacesSection() {
           correo, con un código o con un link.
         </p>
       ) : (
-        <div className={styles.cards}>
+        <SpaceCardGrid>
           {spaces.map((space) => (
-            <Link key={space.id} to={mentorSpacePath(space.id)} className={styles.cardLink}>
-              <Card padding="lg" interactive className={styles.card}>
-                <span className={styles.cardHead}>
-                  <span className={cx(styles.colorDot)} style={spaceColorStyle(space.color)} />
-                  <span className={styles.cardName}>{space.name}</span>
-                </span>
-
-                {space.description && <p className={styles.cardText}>{space.description}</p>}
-
-                <p className={styles.cardMeta}>
-                  {space.apprenticeCount} {space.apprenticeCount === 1 ? 'aprendiz' : 'aprendices'}
-                </p>
-              </Card>
-            </Link>
+            <SpaceCard key={space.id} space={space} href={mentorSpacePath(space.id)} />
           ))}
-        </div>
+        </SpaceCardGrid>
       )}
 
       {/* Al crear se entra directo a la ficha: es donde están el código y el

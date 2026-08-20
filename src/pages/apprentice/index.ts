@@ -2,6 +2,7 @@ export { PerfilSection } from './perfil';
 export { ApplicationsSection } from './postulaciones/ApplicationsSection';
 export { CvsSection } from './cvs';
 export { SpacesSection } from './SpacesSection';
+export { ApprenticeSpaceSection } from './espacios/ApprenticeSpaceSection';
 export { FeedbackSection } from './FeedbackSection';
 export { EvidencesSection } from './EvidencesSection';
 export { GoalsSection } from './GoalsSection';

@@ -5,6 +5,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Icon } from '@/components/ui/Icon';
+import { SpaceCard, SpaceCardGrid } from '@/components/space/SpaceCard';
 import { ROUTES, mentorSpacePath } from '@/constants/routes';
 import { updateMentorProfile } from '@/services/data/mentor/mentor.service';
 import {
@@ -13,7 +14,7 @@ import {
 } from '@/services/data/mentor/mentorAvatar.service';
 import { AVATAR_ACCEPT_ATTRIBUTE } from '@/services/data/dashboard/avatar.service';
 import { cx } from '@/utils/classNames';
-import { spaceColorStyle } from './spaceColor';
+import { spaceColorStyle } from '@/utils/spaceColor';
 import screen from '@/app/layouts/appShell.module.css';
 import styles from './mentor.module.css';
 
@@ -134,22 +135,11 @@ export function MentorProfileSection() {
       {spaces.length > 0 && (
         <section className={styles.block}>
           <p className={styles.blockTitle}>Tus espacios</p>
-          <div className={styles.cards}>
+          <SpaceCardGrid>
             {spaces.map((space) => (
-              <Link key={space.id} to={mentorSpacePath(space.id)} className={styles.cardLink}>
-                <Card padding="lg" interactive className={styles.card}>
-                  <span className={styles.cardHead}>
-                    <span className={cx(styles.colorDot)} style={spaceColorStyle(space.color)} />
-                    <span className={styles.cardName}>{space.name}</span>
-                  </span>
-                  <p className={styles.cardMeta}>
-                    {space.apprenticeCount}{' '}
-                    {space.apprenticeCount === 1 ? 'aprendiz' : 'aprendices'}
-                  </p>
-                </Card>
-              </Link>
+              <SpaceCard key={space.id} space={space} href={mentorSpacePath(space.id)} />
             ))}
-          </div>
+          </SpaceCardGrid>
         </section>
       )}
     </div>

@@ -56,7 +56,13 @@ export function getSpaceDetail(spaceId: string): Promise<AsyncState<SpaceDetail>
 
 export function updateSpace(
   spaceId: string,
-  input: { name?: string; description?: string | null; color?: SpaceColor },
+  input: {
+    name?: string;
+    description?: string | null;
+    color?: SpaceColor;
+    avatarUrl?: string | null;
+    coverUrl?: string | null;
+  },
 ): Promise<AsyncState<{ space: SpaceDetail['space'] }>> {
   return httpClient.patch(`/mentor/spaces/${spaceId}`, input);
 }

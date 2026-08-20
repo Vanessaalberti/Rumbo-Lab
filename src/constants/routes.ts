@@ -21,6 +21,8 @@ export const ROUTES = {
   myRumboCvs: '/mi-rumbo/cvs',
   myRumboGoals: '/mi-rumbo/objetivos',
   myRumboSpaces: '/mi-rumbo/espacios',
+  /** Preferencias de Rumbot y vínculo del WhatsApp. Está en las dos experiencias: el número es de la cuenta, no del rol. */
+  myRumboRumbot: '/mi-rumbo/rumbot',
   /**
    * Feedback ya no es una sección propia del rail: se lee dentro de Espacios,
    * que es donde ocurre el acompañamiento. La ruta sigue existiendo porque el
@@ -38,6 +40,8 @@ export const ROUTES = {
   myRumboPresentacion: '/mi-rumbo/preparacion/presentacion',
   /** Donde caen los links y códigos de invitación a un Espacio. */
   joinSpace: '/unirme',
+  /** Pública y sin sesión: Meta y Google la exigen para publicar la app, y se lee antes de registrarse. */
+  privacy: '/privacidad',
 
   /**
    * Panel de Mentor. Misma composición que Mi Rumbo —perfil como índice y las
@@ -49,6 +53,7 @@ export const ROUTES = {
   mentorFeedbacks: '/panel-mentor/feedbacks',
   mentorAgenda: '/panel-mentor/agenda',
   mentorPreparation: '/panel-mentor/preparacion',
+  mentorRumbot: '/panel-mentor/rumbot',
   /**
    * Las herramientas son las mismas que las de Mi Rumbo —el mismo componente,
    * el mismo endpoint y el mismo cupo— montadas también acá para que una
@@ -65,4 +70,9 @@ export const ROUTES = {
 /** El detalle de un Espacio lleva su id en la ruta, así que no puede ser una constante suelta. */
 export function mentorSpacePath(spaceId: string): string {
   return `${ROUTES.mentorSpaces}/${spaceId}`;
+}
+
+/** El mismo Espacio visto desde adentro: sin administración, con lo que le pasó a la persona ahí. */
+export function apprenticeSpacePath(spaceId: string): string {
+  return `${ROUTES.myRumboSpaces}/${spaceId}`;
 }

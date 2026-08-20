@@ -1,3 +1,5 @@
+import type { SpaceColor } from '@/services/data/mentor/mentor.types';
+
 /**
  * Contrato de "Mi Rumbo" tal como lo sirve `rumbo-lab-backend` (`GET /api/me`).
  * No hay objetivos: no existe tabla `goals`, y el bloque del mockup se
@@ -156,6 +158,11 @@ export interface SpaceSummary {
   id: string;
   name: string;
   description: string | null;
+  color: SpaceColor;
+  avatarUrl: string | null;
+  coverUrl: string | null;
+  /** Cuánta gente hay adentro. Llega por RPC: el Aprendiz sólo ve su propia membresía. */
+  apprenticeCount: number;
   joinedAt: string;
 }
 
@@ -182,6 +189,14 @@ export interface EvidenceSummary {
   spaceName: string | null;
 }
 
+/** Lo que espera una respuesta en Espacios: enciende el punto del rail. */
+export interface SpacesNotice {
+  /** Siguen contando aunque ya se haya visitado la sección: se apagan al responderlas. */
+  invitations: number;
+  /** Feedback recibido después de la última visita. */
+  newFeedbacks: number;
+}
+
 export interface MyRumboDashboard {
   apprentice: ApprenticeProfile;
   cvs: CvSummary[];
@@ -194,6 +209,7 @@ export interface MyRumboDashboard {
   feedbacksTotal: number;
   evidences: EvidenceSummary[];
   evidencesTotal: number;
+  spacesNotice: SpacesNotice;
 }
 
 export interface ProfilePatch {

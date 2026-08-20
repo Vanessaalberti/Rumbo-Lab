@@ -105,10 +105,15 @@ export function ApprenticeShell() {
     void loadQuota();
   }, []);
 
+  /* El punto se enciende con lo que ya cargó la portada: no hace falta una
+     request aparte sólo para saber si hay algo esperando. */
+  const notice = state.status === 'success' ? state.data.spacesNotice : null;
+  const hasSpacesNotice = (notice?.invitations ?? 0) + (notice?.newFeedbacks ?? 0) > 0;
+
   if (state.status === 'loading') {
     return (
       <div className={styles.screen}>
-        <AppRail />
+        <AppRail spacesNotice={hasSpacesNotice} />
         <div className={styles.main}>
           <PageSkeleton variant={skeletonFor(location.pathname)} />
         </div>
@@ -119,7 +124,7 @@ export function ApprenticeShell() {
   if (state.status === 'error') {
     return (
       <div className={styles.screen}>
-        <AppRail />
+        <AppRail spacesNotice={hasSpacesNotice} />
         <div className={styles.main}>
           <p className={styles.emptyState}>
             No pudimos cargar tu información. Probá recargar la página en
@@ -142,7 +147,7 @@ export function ApprenticeShell() {
 
   return (
     <div className={styles.screen}>
-      <AppRail />
+      <AppRail spacesNotice={hasSpacesNotice} />
       <div className={styles.main}>
         <Outlet context={context} />
       </div>
