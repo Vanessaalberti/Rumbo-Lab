@@ -197,3 +197,106 @@
 .timezoneSwap:hover {
   color: var(--text);
 }
+
+/* --- Teléfono con país ------------------------------------------------------------- */
+
+.phoneRow {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.countrySelect {
+  flex: 1 1 14rem;
+  min-width: 0;
+  max-width: 18rem;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background-color: var(--surface-raised);
+  color: var(--text);
+  font-size: var(--text-sm);
+  font-family: inherit;
+}
+
+/* El prefijo va adentro del recuadro: es parte del número, no una etiqueta suelta. */
+.phoneInputWrap {
+  display: flex;
+  align-items: center;
+  flex: 1 1 11rem;
+  min-width: 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background-color: var(--surface-raised);
+}
+
+.phoneInputWrap:focus-within {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+}
+
+.dialPrefix {
+  padding-left: var(--space-3);
+  color: var(--text-faint);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.phoneInput {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  background: none;
+  color: var(--text);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+.phoneInput:focus-visible {
+  outline: none;
+}
+
+.countrySelect:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+}
+
+/* --- Código en seis recuadros --------------------------------------------------------- */
+
+.codeRow {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.codeBox {
+  width: 2.75rem;
+  height: 3.25rem;
+  padding: 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background-color: var(--surface-raised);
+  color: var(--text);
+  font-size: var(--text-xl);
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.codeBox:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+}
+
+.codeBox:disabled {
+  opacity: 0.6;
+}
+
+@media (max-width: 380px) {
+  .codeBox {
+    width: 2.25rem;
+    height: 2.75rem;
+    font-size: var(--text-lg);
+  }
+}

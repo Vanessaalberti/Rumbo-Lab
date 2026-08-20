@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import {
   confirmWhatsappCode,
@@ -7,6 +7,9 @@ import {
   unlinkWhatsapp,
   type WhatsappLinkState,
 } from '@/services/data/settings/rumbot.service';
+import { CodeInput } from './CodeInput';
+import { PhoneField } from './PhoneField';
+import { composePhone, DEFAULT_COUNTRY } from './countries';
 import styles from './rumbot.module.css';
 
 type Step =
@@ -22,12 +25,10 @@ type Step =
  * en vez de simular un envío.
  */
 export function WhatsappLinkPanel() {
-  const phoneId = useId();
-  const codeId = useId();
-
   const [step, setStep] = useState<Step>({ name: 'loading' });
   const [canDeliver, setCanDeliver] = useState(true);
-  const [phone, setPhone] = useState('');
+  const [country, setCountry] = useState(DEFAULT_COUNTRY);
+  const [national, setNational] = useState('');
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +54,11 @@ export function WhatsappLinkPanel() {
     });
   }, []);
 
+  const phone = composePhone(country, national);
+
   const start = async () => {
+    if (!phone) return;
+
     setBusy(true);
     setError(null);
 
@@ -92,7 +97,7 @@ export function WhatsappLinkPanel() {
     setBusy(true);
     await unlinkWhatsapp();
     setBusy(false);
-    setPhone('');
+    setNational('');
     setCode('');
     setStep({ name: 'idle' });
   };
@@ -120,23 +125,13 @@ export function WhatsappLinkPanel() {
 
       {step.name === 'idle' && (
         <>
-          <div className={styles.field}>
-            <label className={styles.fieldLabel} htmlFor={phoneId}>
-              Tu número de WhatsApp
-            </label>
-            <input
-              id={phoneId}
-              className={styles.input}
-              type="tel"
-              inputMode="tel"
-              placeholder="+54 9 11 5555 5555"
-              value={phone}
-              onChange={(event) => setPhone(event.target.value)}
-              disabled={busy}
-              autoComplete="tel"
-            />
-            <p className={styles.hint}>Con el código de país, como lo tenés en WhatsApp.</p>
-          </div>
+          <PhoneField
+            country={country}
+            onCountryChange={setCountry}
+            national={national}
+            onNationalChange={setNational}
+            disabled={busy}
+          />
 
           {error && (
             <p className={styles.errorState} role="alert">
@@ -149,7 +144,7 @@ export function WhatsappLinkPanel() {
               type="button"
               size="sm"
               onClick={() => void start()}
-              disabled={busy || phone.trim().length === 0}
+              disabled={busy || !phone}
             >
               {busy ? 'Enviando…' : 'Enviarme el código'}
             </Button>
@@ -159,26 +154,13 @@ export function WhatsappLinkPanel() {
 
       {step.name === 'code' && (
         <>
-          <div className={styles.field}>
-            <label className={styles.fieldLabel} htmlFor={codeId}>
-              Código de seis números
-            </label>
-            <input
-              id={codeId}
-              className={styles.input}
-              inputMode="numeric"
-              placeholder="000000"
-              value={code}
-              onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
-              disabled={busy}
-              autoComplete="one-time-code"
-            />
-            <p className={styles.hint}>
-              {step.delivered
-                ? `Te lo mandamos por WhatsApp a ${step.phone}. Vence en 10 minutos.`
-                : 'Todavía no hay línea de WhatsApp conectada, así que el código no se pudo enviar: quedó registrado en el log del servidor.'}
-            </p>
-          </div>
+          <CodeInput value={code} onChange={setCode} disabled={busy} />
+
+          <p className={styles.hint}>
+            {step.delivered
+              ? `Te lo mandamos por WhatsApp a ${step.phone}. Vence en 10 minutos.`
+              : 'Todavía no hay línea de WhatsApp conectada, así que el código no se pudo enviar: quedó registrado en el log del servidor.'}
+          </p>
 
           {error && (
             <p className={styles.errorState} role="alert">
