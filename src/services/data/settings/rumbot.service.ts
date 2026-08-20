@@ -64,3 +64,14 @@ export function saveRumbotPreferences(
 ): Promise<AsyncState<{ preferences: RumbotPreferences }>> {
   return httpClient.patch('/settings/rumbot', input);
 }
+
+/**
+ * Arranca el vínculo por el lado de WhatsApp: devuelve un código y el link para
+ * abrir la conversación con el mensaje ya escrito. Quien lo confirma es el bot
+ * cuando ese mensaje llega, así que después hay que consultar el estado.
+ */
+export function requestWhatsappLinkCode(): Promise<
+  AsyncState<{ code: string; expiresAt: string; whatsappUrl: string }>
+> {
+  return httpClient.post('/settings/whatsapp/link-code', {});
+}

@@ -8,6 +8,7 @@ import {
   type WhatsappLinkState,
 } from '@/services/data/settings/rumbot.service';
 import { CodeInput } from './CodeInput';
+import { LinkByWhatsappPanel } from './LinkByWhatsappPanel';
 import { PhoneField } from './PhoneField';
 import { composePhone, DEFAULT_COUNTRY } from './countries';
 import styles from './rumbot.module.css';
@@ -20,13 +21,16 @@ type Step =
 
 /**
  * Vincular el número. Es de **la cuenta**, no de una experiencia: quien es
- * aprendiz y mentor tiene un solo WhatsApp. Mientras no haya línea conectada
- * el código se genera igual pero no se puede entregar, y la pantalla lo dice
- * en vez de simular un envío.
+ * aprendiz y mentor tiene un solo WhatsApp.
+ *
+ * El camino principal es escribirle al bot: como la persona manda el mensaje,
+ * su WhatsApp prueba el número y no hace falta que le mandemos nada. El camino
+ * inverso —recibir un código de seis dígitos— sólo aparece cuando el servidor
+ * dice que puede entregarlo, porque necesita una plantilla aprobada por Meta.
  */
 export function WhatsappLinkPanel() {
   const [step, setStep] = useState<Step>({ name: 'loading' });
-  const [canDeliver, setCanDeliver] = useState(true);
+  const [canDeliver, setCanDeliver] = useState(false);
   const [country, setCountry] = useState(DEFAULT_COUNTRY);
   const [national, setNational] = useState('');
   const [code, setCode] = useState('');
@@ -47,11 +51,17 @@ export function WhatsappLinkPanel() {
     setStep({ name: 'code', phone: state.link.phone, delivered: state.canDeliverCode });
   };
 
-  useEffect(() => {
-    void readWhatsappLink().then((result) => {
+  const refresh = () =>
+    readWhatsappLink().then((result) => {
       if (result.status === 'success') applyState(result.data);
       else setStep({ name: 'idle' });
     });
+
+  /* Sólo al montar: `refresh` se recrea en cada render y ponerlo como
+     dependencia dispararía una consulta por render. */
+  useEffect(() => {
+    void refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const phone = composePhone(country, national);
@@ -125,30 +135,37 @@ export function WhatsappLinkPanel() {
 
       {step.name === 'idle' && (
         <>
-          <PhoneField
-            country={country}
-            onCountryChange={setCountry}
-            national={national}
-            onNationalChange={setNational}
-            disabled={busy}
-          />
+          <LinkByWhatsappPanel onLinked={() => void refresh()} />
 
-          {error && (
-            <p className={styles.errorState} role="alert">
-              {error}
-            </p>
+          {canDeliver && (
+            <>
+              <p className={styles.divider}>o recibí un código de seis números</p>
+              <PhoneField
+                country={country}
+                onCountryChange={setCountry}
+                national={national}
+                onNationalChange={setNational}
+                disabled={busy}
+              />
+
+              {error && (
+                <p className={styles.errorState} role="alert">
+                  {error}
+                </p>
+              )}
+
+              <div className={styles.actions}>
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => void start()}
+                  disabled={busy || !phone}
+                >
+                  {busy ? 'Enviando…' : 'Enviarme el código'}
+                </Button>
+              </div>
+            </>
           )}
-
-          <div className={styles.actions}>
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => void start()}
-              disabled={busy || !phone}
-            >
-              {busy ? 'Enviando…' : 'Enviarme el código'}
-            </Button>
-          </div>
         </>
       )}
 
@@ -179,12 +196,6 @@ export function WhatsappLinkPanel() {
         </>
       )}
 
-      {!canDeliver && step.name !== 'loading' && (
-        <p className={styles.hint}>
-          Rumbot todavía no tiene su línea de WhatsApp conectada. Podés dejar configurado lo de
-          abajo: vale desde el primer mensaje que mande.
-        </p>
-      )}
     </section>
   );
 }
