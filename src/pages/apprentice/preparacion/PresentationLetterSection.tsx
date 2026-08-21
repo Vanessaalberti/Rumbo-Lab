@@ -9,10 +9,22 @@ import {
   generateUploadedPresentationLetter,
   type PresentationLetterResult,
 } from '@/services/data/preparation/presentationLetter.service';
+
+import {
+  TONE_CHOICES,
+  EMOJI_CHOICES,
+} from './linkedinOptions';
+
+import type {
+  LinkedinTone,
+  LinkedinEmojiLevel,
+} from '@/services/data/preparation/linkedinPost.service';
+
 import { cx } from '@/utils/classNames';
 import { ToolBackLink } from './ToolBackLink';
 import screen from '@/app/layouts/appShell.module.css';
 import styles from './presentacion.module.css';
+
 
 /**
  * Preparación · Crear texto de presentación. Mismo origen de CV que Comparar
@@ -58,6 +70,8 @@ export function PresentationLetterSection() {
   const [file, setFile] = useState<File | null>(null);
   const [jobText, setJobText] = useState('');
   const [charLimitText, setCharLimitText] = useState(DEFAULT_CHAR_LIMIT);
+  const [tone, setTone] = useState<LinkedinTone>('profesional');
+  const [emojis, setEmojis] = useState<LinkedinEmojiLevel>('ninguno');
   const [state, setState] = useState<ViewState>({ status: 'idle' });
   /* La carta editable. Se separa del resultado porque a partir de que aparece es de la persona: puede retocarla antes de copiarla. */
   const [draft, setDraft] = useState('');
@@ -77,8 +91,20 @@ export function PresentationLetterSection() {
 
     const result =
       source === 'saved'
-        ? await generatePresentationLetter({ cvId, jobText: trimmedJobText, charLimit })
-        : await generateUploadedPresentationLetter(file as File, trimmedJobText, charLimit);
+        ? await generatePresentationLetter({
+            cvId,
+            jobText: trimmedJobText,
+            charLimit,
+            tone,
+            emojis,
+          })
+        : await generateUploadedPresentationLetter(
+            file as File,
+            trimmedJobText,
+            charLimit,
+            tone,
+            emojis,
+          );
 
     if (result.status === 'success') {
       setState({ status: 'success', result: result.data.generated });
@@ -211,24 +237,74 @@ export function PresentationLetterSection() {
             )}
           </div>
 
-          <div className={styles.field}>
-            <label className={styles.fieldLabel} htmlFor={charLimitId}>
-              Límite de caracteres
-            </label>
-            <input
-              id={charLimitId}
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              className={styles.numberInput}
-              value={charLimitText}
-              onChange={(event) => setCharLimitText(event.target.value.replace(/\D/g, '').slice(0, 4))}
-              disabled={isLoading}
-            />
-            <span className={styles.fieldHint}>
-              Cuánto admite el lugar donde vas a pegarla — no siempre es un correo, cada portal de
-              postulación tiene el suyo. Entre {MIN_CHAR_LIMIT} y {MAX_CHAR_LIMIT.toLocaleString('es-AR')}.
-            </span>
+          <div className={styles.preferencesGrid}>
+            <div className={styles.field}>
+              <label className={styles.fieldLabel} htmlFor={charLimitId}>
+                Límite de caracteres
+              </label>
+
+              <input
+                id={charLimitId}
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                className={styles.numberInput}
+                value={charLimitText}
+                onChange={(event) =>
+                  setCharLimitText(
+                    event.target.value.replace(/\D/g, '').slice(0, 4),
+                  )
+                }
+                disabled={isLoading}
+              />
+
+              <span className={styles.fieldHint}>
+                Entre {MIN_CHAR_LIMIT} y{' '}
+                {MAX_CHAR_LIMIT.toLocaleString('es-AR')}.
+              </span>
+            </div>
+
+            <div className={styles.field}>
+              <label className={styles.fieldLabel}>
+                Tono
+              </label>
+
+              <select
+                className={styles.select}
+                value={tone}
+                onChange={(event) =>
+                  setTone(event.target.value as LinkedinTone)
+                }
+                disabled={isLoading}
+              >
+                {TONE_CHOICES.map((choice) => (
+                  <option key={choice.id} value={choice.id}>
+                    {choice.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className={styles.field}>
+              <label className={styles.fieldLabel}>
+                Emojis
+              </label>
+
+              <select
+                className={styles.select}
+                value={emojis}
+                onChange={(event) =>
+                  setEmojis(event.target.value as LinkedinEmojiLevel)
+                }
+                disabled={isLoading}
+              >
+                {EMOJI_CHOICES.map((choice) => (
+                  <option key={choice.id} value={choice.id}>
+                    {choice.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <Button type="submit" disabled={!canSubmit}>

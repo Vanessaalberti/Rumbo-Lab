@@ -8,6 +8,11 @@ import type {
   LinkedinVoice,
 } from '@/services/data/preparation/linkedinPost.service';
 
+export type {
+  LinkedinEmojiLevel,
+  LinkedinTone,
+} from '@/services/data/preparation/linkedinPost.service';
+
 /**
  * Cómo se ven en pantalla las siete preferencias del creador de
  * publicaciones. Acá vive **sólo la etiqueta**: qué significa cada opción
